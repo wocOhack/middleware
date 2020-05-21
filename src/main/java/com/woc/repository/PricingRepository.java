@@ -1,10 +1,10 @@
 package com.woc.repository;
 
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
+import java.util.List;
+
 import com.woc.entity.Pricing;
 
-@Repository
-public interface PricingRepository extends CrudRepository<Pricing, Long>{
+public interface PricingRepository{
 
+	public List<Pricing> findAll();
 }

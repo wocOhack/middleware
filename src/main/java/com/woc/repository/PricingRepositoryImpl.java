@@ -7,18 +7,18 @@ import javax.persistence.PersistenceContext;
 
 import org.springframework.stereotype.Repository;
 
-import com.woc.entity.User;
+import com.woc.entity.Pricing;
 
 @Repository
-public class UserRepositoryImpl implements UserRepository{
+public class PricingRepositoryImpl implements PricingRepository{
 
 	
     @PersistenceContext
     private EntityManager entityManager;
 
 	@Override
-	public List<User> findAll() {
-		List<User> users = entityManager.createNamedQuery("User.findAll").getResultList();
-		return users;
+	public List<Pricing> findAll() {
+		List<Pricing> prices = entityManager.createNamedQuery("Pricing.findAll").getResultList();
+		return prices;
 	}
 }

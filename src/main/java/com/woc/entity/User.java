@@ -1,12 +1,17 @@
 package com.woc.entity;
 
 import java.io.Serializable;
-import javax.persistence.*;
 import java.util.Date;
-import java.sql.Timestamp;
+
+import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
 
 
 @Entity
+@Table(name="USER")
 @NamedQuery(name="User.findAll", query="SELECT u FROM User u")
 public class User implements Serializable {
 	private static final long serialVersionUID = 1L;

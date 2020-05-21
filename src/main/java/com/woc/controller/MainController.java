@@ -1,31 +1,41 @@
 package com.woc.controller;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.woc.entity.Pricing;
 import com.woc.entity.User;
-import com.woc.service.UserService;  
+import com.woc.service.WOCService;
 
-@RestController
+
+@RestController  
+@EnableAutoConfiguration
+@RequestMapping("/woc")
 public class MainController {
-	
-@Autowired
-UserService userService;
+		
+	@Autowired
+	WOCService wocService;
 
-	@GetMapping("/woc")
+	@GetMapping("/greet")
 	@ResponseBody
 	public String hello() {
-		return "i am first 200 from woc";
+		return "Greetings!";
 	}
 	
 	@GetMapping("/users")
 	@ResponseBody
-	public List<User> getUsers() {
-		return userService.getAllUsers();
+	public Iterable<User> getUsers() {
+		return wocService.getAllUsers();
 	}
 	
-
+	@GetMapping("/prices")
+	@ResponseBody
+	public Iterable<Pricing> getPrices(){
+		return wocService.getAllPrices();
+	}
+	
+	
 }
