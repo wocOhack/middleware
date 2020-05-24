@@ -11,6 +11,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.woc.service.UserService;
+import com.woc.entity.Driver;
+import com.woc.entity.Pricing;
+import com.woc.entity.Rider;
+import com.woc.entity.User;
 import com.woc.service.WOCService;
 
 @RestController
@@ -83,4 +87,15 @@ public class MainController {
 		return wocService.getAllVehicles();
 	}
 
+    @GetMapping("/drivers")
+    @ResponseBody
+    public Iterable<Driver> getDrivers() {
+        return wocService.getAllDrivers();
+    }
+
+    @GetMapping("/riders")
+    @ResponseBody
+    public Iterable<Rider> getRiders() {
+        return wocService.getAllRiders();
+    }
 }

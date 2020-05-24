@@ -7,15 +7,29 @@ import com.woc.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.woc.entity.Driver;
+import com.woc.entity.Pricing;
+import com.woc.entity.Rider;
+import com.woc.entity.User;
+import com.woc.repository.DriverRepository;
+import com.woc.repository.PricingRepository;
+import com.woc.repository.RiderRepository;
+import com.woc.repository.UserRepository;
 
 @Service
-public class WOCServiceImpl implements WOCService{
+public class WOCServiceImpl implements WOCService {
 
-	@Autowired
-	UserRepository userRepository;
-	
-	@Autowired
-	PricingRepository pricingRepository;
+    @Autowired
+    UserRepository userRepository;
+
+    @Autowired
+    PricingRepository pricingRepository;
+
+    @Autowired
+    DriverRepository driverRepository;
+
+    @Autowired
+    RiderRepository riderRepository;
 
 	@Autowired
 	DriverAvailabilityRepository driverAvailabilityRepository;
@@ -49,6 +63,19 @@ public class WOCServiceImpl implements WOCService{
 	public Iterable<Feedback> getAllFeedbacks() {
 		return feedbackRepository.findAll();
 	}
+
+
+    @Override
+    public Iterable<Rider> getAllRiders() {
+        System.out.println("Reached");
+        return riderRepository.findAll();
+    }
+
+    @Override
+    public Iterable<Driver> getAllDrivers() {
+        System.out.println("Reached");
+        return driverRepository.findAll();
+    }
 
 	public Iterable<Trip> getAllTrips() {
 		return tripRepository.findAll();
