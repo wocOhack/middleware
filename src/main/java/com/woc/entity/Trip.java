@@ -29,6 +29,14 @@ public class Trip implements Serializable {
     @Column(name = "end_location", length = 20)
     private String endLocation;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "trip_start_time")
+    private Date tripStartTime;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "trip_end_time")
+    private Date tripEndTime;
+
     @Temporal(TemporalType.TIME)
     @Column(name = "duration")
     private Date duration;
@@ -38,6 +46,9 @@ public class Trip implements Serializable {
 
     @Column(name = "cost")
     private Double cost;
+
+    @Column(name = "status")
+    private String status;
 
     @Column(name = "cancelled_by")
     private Integer cancelledBy;
@@ -94,6 +105,22 @@ public class Trip implements Serializable {
         this.endLocation = endLocation;
     }
 
+    public Date getTripStartTime() {
+        return tripStartTime;
+    }
+
+    public void setTripStartTime(Date tripStartTime) {
+        this.tripStartTime = tripStartTime;
+    }
+
+    public Date getTripEndTime() {
+        return tripEndTime;
+    }
+
+    public void setTripEndTime(Date tripEndTime) {
+        this.tripEndTime = tripEndTime;
+    }
+
     public Date getDuration() {
         return this.duration;
     }
@@ -116,6 +143,14 @@ public class Trip implements Serializable {
 
     public void setCost(Double cost) {
         this.cost = cost;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public Integer getCancelledBy() {

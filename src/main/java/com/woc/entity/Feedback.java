@@ -15,12 +15,15 @@ public class Feedback implements Serializable {
     private Integer id;
 
     @ManyToOne
+    @JoinColumn(name = "trip_id", referencedColumnName = "id")
+    private Trip trip;
+
+    @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "feedback_owner_id", referencedColumnName = "id")
-    private User feedbackOwner;
+    @Column(name = "feedback_owner")
+    private String feedbackOwner;
 
     @Column(name = "rating", nullable = false)
     private Integer rating;
@@ -40,6 +43,12 @@ public class Feedback implements Serializable {
         this.id = id;
     }
 
+    public Trip getTrip() { return trip; }
+
+    public void setTrip(Trip trip) {
+        this.trip = trip;
+    }
+
     public User getUser() {
         return user;
     }
@@ -48,11 +57,11 @@ public class Feedback implements Serializable {
         this.user = user;
     }
 
-    public User getFeedbackOwner() {
+    public String getFeedbackOwner() {
         return feedbackOwner;
     }
 
-    public void setFeedbackOwner(User feedbackOwner) {
+    public void setFeedbackOwner(String feedbackOwner) {
         this.feedbackOwner = feedbackOwner;
     }
 
