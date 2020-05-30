@@ -22,8 +22,9 @@ public class Feedback implements Serializable {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
-    @Column(name = "feedback_owner")
-    private String feedbackOwner;
+    @ManyToOne
+    @JoinColumn(name = "feedback_owner_id", referencedColumnName = "id")
+    private User feedbackOwner;
 
     @Column(name = "rating", nullable = false)
     private Integer rating;
@@ -57,11 +58,11 @@ public class Feedback implements Serializable {
         this.user = user;
     }
 
-    public String getFeedbackOwner() {
+    public User getFeedbackOwner() {
         return feedbackOwner;
     }
 
-    public void setFeedbackOwner(String feedbackOwner) {
+    public void setFeedbackOwner(User feedbackOwner) {
         this.feedbackOwner = feedbackOwner;
     }
 
