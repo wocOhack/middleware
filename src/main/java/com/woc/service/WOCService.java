@@ -1,7 +1,6 @@
 package com.woc.service;
 
-import com.woc.entity.Pricing;
-import com.woc.entity.User;
+import com.woc.entity.*;
 
 
 public interface WOCService {
@@ -10,5 +9,13 @@ public interface WOCService {
 
 	Iterable<Pricing> getAllPrices();
 
+	Iterable<DriverAvailability> getDriverAvailabilityList();
 
+	Iterable<Feedback> getAllFeedbacks();
+
+	Iterable<Trip> getAllTrips();
+
+	Iterable<UserLocation> getUserLocationList();
+
+	Iterable<Vehicle> getAllVehicles();
 }
