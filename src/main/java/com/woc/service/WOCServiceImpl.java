@@ -61,4 +61,21 @@ public class WOCServiceImpl implements WOCService{
 	public Iterable<Vehicle> getAllVehicles() {
 		return vehicleRepository.findAll();
 	}
+
+
+	@Override
+	public List<Trip> getTrips() {
+		return null;
+	}
+
+
+	@Override
+	public Trip createTrip() {		
+		return null;
+	}
+	
+	public Trip updateTrip() {
+		return null;
+		
+	}
 }

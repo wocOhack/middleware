@@ -6,6 +6,7 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
@@ -16,13 +17,14 @@ import javax.persistence.Table;
 public class User implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	@EmbeddedId
+	@Column(name="id",unique=true,nullable=false, length=30)
+	@Id
 	private Long id;
 	
 	@Column(name="Name",nullable=false, length=30)
 	private String name;
 	
-	@Column(name="phone",nullable=false, length=15)
+	@Column(name="phone",unique=true, nullable=false, length=15)
 	private String phone;
 	
 	@Column(name="email",nullable=true, length=50)

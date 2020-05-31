@@ -6,14 +6,16 @@ import java.util.Date;
 
 @Entity
 @Table(name = "TRIP")
-@NamedQuery(name = "Trip.findAll", query = "SELECT t from TRIP t")
+@NamedQueries(value = { 
+		@NamedQuery(name = "Trip.findAll", query = "SELECT t from Trip t"),
+		@NamedQuery(name = "Trip.findById", query = "SELECT t from Trip t where id = ?1")})
 public class Trip implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private Integer id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "driver_id", referencedColumnName = "id")
@@ -65,11 +67,11 @@ public class Trip implements Serializable {
         return serialVersionUID;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return this.id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

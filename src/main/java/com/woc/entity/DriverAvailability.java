@@ -6,7 +6,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "DRIVER_AVAILABILITY")
-@NamedQuery(name = "DriverAvailability.findAll", query = "SELECT d from DRIVER_AVAILABILITY d")
+@NamedQuery(name = "DriverAvailability.findAll", query = "SELECT d from DriverAvailability d")
 public class DriverAvailability implements Serializable {
     private static final long serialVersionUID = 1L;
 

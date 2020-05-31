@@ -6,7 +6,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "USER_LOCATION")
-@NamedQuery(name = "UserLocation.findAll", query = "SELECT l from USER_LOCATION l")
+@NamedQuery(name = "UserLocation.findAll", query = "SELECT l from UserLocation l")
 public class UserLocation implements Serializable {
     private static final long serialVersionUID = 1L;
 
