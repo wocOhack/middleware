@@ -34,38 +34,31 @@ public class WOCServiceImpl implements WOCService{
 
 
 	public Iterable<User> getAllUsers(){
-		System.out.println("Reached");
 		return userRepository.findAll();
 	}
 	
 
 	public Iterable<Pricing> getAllPrices(){
-		System.out.println("Reached");
 		return pricingRepository.findAll();
 	}
 
 	public Iterable<DriverAvailability> getDriverAvailabilityList() {
-		System.out.println("Reached");
 		return driverAvailabilityRepository.findAll();
 	}
 
 	public Iterable<Feedback> getAllFeedbacks() {
-		System.out.println("Reached");
 		return feedbackRepository.findAll();
 	}
 
 	public Iterable<Trip> getAllTrips() {
-		System.out.println("Reached");
 		return tripRepository.findAll();
 	}
 
 	public Iterable<UserLocation> getUserLocationList() {
-		System.out.println("Reached");
 		return userLocationRepository.findAll();
 	}
 
 	public Iterable<Vehicle> getAllVehicles() {
-		System.out.println("Reached");
 		return vehicleRepository.findAll();
 	}
 }
