@@ -105,4 +105,22 @@ public class WOCServiceImpl implements WOCService {
 		return null;
 		
 	}
+    @Override
+    public void addDriver(Driver driver) {
+        System.out.println("Adding driver");
+        driverRepository.addDriver(driver);
+    }
+
+    @Override
+    public void addUser(User u) {
+        System.out.println("Adding user");
+        userRepository.addUser(u);
+    }
+    
+    @Override
+    public void addRider(Rider r) {
+        System.out.println("Adding rider");
+        riderRepository.addRider(r);
+    }
+
 }

@@ -7,4 +7,6 @@ import com.woc.entity.Driver;
 public interface DriverRepository {
 
     public List<Driver> findAll();
+
+    public void addDriver(Driver driver);
 }

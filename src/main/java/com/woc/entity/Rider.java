@@ -5,6 +5,7 @@ import java.sql.Date;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
@@ -13,7 +14,7 @@ import javax.persistence.Table;
 @NamedQuery(name="Rider.findAll", query="SELECT r FROM Rider r")
 public class Rider {
 
-    @EmbeddedId
+    @Id
     private Long id;
 
     @Column(name = "pin", nullable = false, length = 30)
@@ -22,16 +23,16 @@ public class Rider {
     @Column(name = "is_challenged", nullable = false, length = 30)
     private boolean is_challenged;
 
-    @Column(name = "is_verified", nullable = false, length = 30)
+    @Column(name = "is_verified", nullable = true, length = 30)
     private boolean is_verified;
 
-    @Column(name = "verification_date", nullable = false, length = 30)
+    @Column(name = "verification_date", nullable = true, length = 30)
     private Date verification_date;
 
-    @Column(name = "verified_date", nullable = false, length = 30)
+    @Column(name = "verified_date", nullable = true, length = 30)
     private Date verified_date;
 
-    @Column(name = "proof_of_challenge", nullable = false, length = 30)
+    @Column(name = "proof_of_challenge", nullable = true, length = 30)
     private String proof_of_challenge;
 
     @Column(name = "user_id", nullable = false, length = 30)

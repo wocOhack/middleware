@@ -30,5 +30,11 @@ public interface WOCService {
 
     public Iterable<Rider> getAllRiders();
 
-    public Iterable<Driver> getAllDrivers();
+    Iterable<Driver> getAllDrivers();
+
+    void addDriver(Driver driver);
+
+    void addUser(User u);
+    
+    void addRider(Rider r);
 }

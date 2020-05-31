@@ -92,6 +92,28 @@ public class MainController {
     public Iterable<Driver> getDrivers() {
         return wocService.getAllDrivers();
     }
+    
+    @PostMapping("/rider")
+    @ResponseBody
+    public void addDriver(@RequestBody Rider rider) {
+        // return wocService.getAllDrivers();
+        wocService.addRider(rider);
+    }
+
+    @PostMapping("/driver")
+    @ResponseBody
+    public void addDriver(@RequestBody Driver driver) {
+        // return wocService.getAllDrivers();
+        wocService.addDriver(driver);
+    }
+
+    @PostMapping("/user")
+    @ResponseBody
+    public void addUser(@RequestBody User u) {
+        // return wocService.getAllDrivers();
+        System.out.println("user request : " + u.toString());
+        wocService.addUser(u);
+    }
 
     @GetMapping("/riders")
     @ResponseBody

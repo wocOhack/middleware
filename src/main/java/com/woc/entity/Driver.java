@@ -6,6 +6,8 @@ import java.sql.Date;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
@@ -19,7 +21,7 @@ public class Driver implements Serializable {
      */
     private static final long serialVersionUID = 1L;
 
-    @EmbeddedId
+    @Id
     private Long id;
 
     @Column(name = "user_id", nullable = false, length = 30)
@@ -28,19 +30,19 @@ public class Driver implements Serializable {
     @Column(name = "lcense_number", nullable = false, length = 30)
     private String lcense_number;
 
-    @Column(name = "license_expiry_date", nullable = false, length = 30)
+    @Column(name = "license_expiry_date", nullable = true, length = 30)
     private Date license_expiry_date;
 
-    @Column(name = "license_doc", nullable = false, length = 30)
+    @Column(name = "license_doc", nullable = true, length = 30)
     private String license_doc;
 
-    @Column(name = "is_verified", nullable = false, length = 30)
+    @Column(name = "is_verified", nullable = true, length = 30)
     private Boolean is_verified;
 
-    @Column(name = "verification_date", nullable = false, length = 30)
+    @Column(name = "verification_date", nullable = true, length = 30)
     private Date verification_date;
 
-    @Column(name = "verified_by", nullable = false, length = 30)
+    @Column(name = "verified_by", nullable = true, length = 30)
     private String verified_by;
 
     @Column(name = "address", nullable = false, length = 30)
@@ -117,5 +119,4 @@ public class Driver implements Serializable {
     public void setAddress(String address) {
         this.address = address;
     }
-
 }
