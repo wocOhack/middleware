@@ -17,4 +17,5 @@ public interface TripRepository {
     public Trip createTrip(Trip trip);
     
     public Trip updateTrip(Trip trip);
+
 }

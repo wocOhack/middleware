@@ -19,7 +19,7 @@ public interface WOCService {
 	
 	public List<Trip> getTrips();
 	
-	public Trip createTrip();
+	public Trip createTrip(Trip newTrip);
 
 	public Iterable<UserLocation> getUserLocationList();
 

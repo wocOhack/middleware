@@ -48,5 +48,4 @@ public class TripRepositoryImpl implements TripRepository{
 		return null;
 	}
 
-
 }

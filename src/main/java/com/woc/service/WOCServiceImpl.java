@@ -70,8 +70,8 @@ public class WOCServiceImpl implements WOCService{
 
 
 	@Override
-	public Trip createTrip() {		
-		return null;
+	public Trip createTrip(Trip newTrip) {		
+		return tripRepository.createTrip(newTrip);
 	}
 	
 	public Trip updateTrip() {
