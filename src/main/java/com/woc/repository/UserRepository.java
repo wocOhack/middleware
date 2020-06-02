@@ -10,4 +10,5 @@ public interface UserRepository{
 	
 	public User createNewUser(User newUser);
 	
+	void addUser(User u);
 }

@@ -16,11 +16,19 @@ import javax.persistence.Table;
 @Table(name="USER")
 @NamedQuery(name="User.findAll", query="SELECT u FROM User u")
 public class User implements Serializable {
-	private static final long serialVersionUID = 1L;
+	@Override
+    public String toString() {
+        return "User [id=" + id + ", name=" + name + ", phone=" + phone + ", email=" + email + ", type=" + type
+                + ", registrationDate=" + registrationDate + ", deviceId=" + deviceId + ", rating=" + rating
+                + ", status=" + status + ", bloodGroup=" + bloodGroup + "]";
+    }
 
 	@Column(name="id",unique=true,nullable=false, length=30)
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
+    private static final long serialVersionUID = 1L;
+
+	@Id
 	private Long id;
 	
 	@Column(name="Name",nullable=false, length=30)

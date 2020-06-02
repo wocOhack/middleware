@@ -7,15 +7,29 @@ import com.woc.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.woc.entity.Driver;
+import com.woc.entity.Pricing;
+import com.woc.entity.Rider;
+import com.woc.entity.User;
+import com.woc.repository.DriverRepository;
+import com.woc.repository.PricingRepository;
+import com.woc.repository.RiderRepository;
+import com.woc.repository.UserRepository;
 
 @Service
-public class WOCServiceImpl implements WOCService{
+public class WOCServiceImpl implements WOCService {
 
-	@Autowired
-	UserRepository userRepository;
-	
-	@Autowired
-	PricingRepository pricingRepository;
+    @Autowired
+    UserRepository userRepository;
+
+    @Autowired
+    PricingRepository pricingRepository;
+
+    @Autowired
+    DriverRepository driverRepository;
+
+    @Autowired
+    RiderRepository riderRepository;
 
 	@Autowired
 	DriverAvailabilityRepository driverAvailabilityRepository;
@@ -50,6 +64,19 @@ public class WOCServiceImpl implements WOCService{
 		return feedbackRepository.findAll();
 	}
 
+
+    @Override
+    public Iterable<Rider> getAllRiders() {
+        System.out.println("Reached");
+        return riderRepository.findAll();
+    }
+
+    @Override
+    public Iterable<Driver> getAllDrivers() {
+        System.out.println("Reached");
+        return driverRepository.findAll();
+    }
+
 	public Iterable<Trip> getAllTrips() {
 		return tripRepository.findAll();
 	}
@@ -78,4 +105,22 @@ public class WOCServiceImpl implements WOCService{
 		return null;
 		
 	}
+    @Override
+    public void addDriver(Driver driver) {
+        System.out.println("Adding driver");
+        driverRepository.addDriver(driver);
+    }
+
+    @Override
+    public void addUser(User u) {
+        System.out.println("Adding user");
+        userRepository.addUser(u);
+    }
+    
+    @Override
+    public void addRider(Rider r) {
+        System.out.println("Adding rider");
+        riderRepository.addRider(r);
+    }
+
 }

@@ -12,9 +12,8 @@ import org.springframework.stereotype.Repository;
 import com.woc.entity.User;
 
 @Repository
-public class UserRepositoryImpl implements UserRepository{
+public class UserRepositoryImpl implements UserRepository {
 
-	
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -36,4 +35,12 @@ public class UserRepositoryImpl implements UserRepository{
 		Date currentTime = new Date(System.currentTimeMillis());
 		return currentTime;
 	}
+    
+
+    @Transactional
+    @Override
+    public void addUser(User u) {
+        // TODO Auto-generated method stub
+        entityManager.persist(u);
+    }
 }
