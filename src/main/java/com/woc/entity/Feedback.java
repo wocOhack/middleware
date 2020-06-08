@@ -5,7 +5,7 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "FEEDBACK")
-@NamedQuery(name = "Feedback.findAll", query = "SELECT f from FEEDBACK f")
+@NamedQuery(name = "Feedback.findAll", query = "SELECT f from Feedback f")
 public class Feedback implements Serializable {
     private static final long serialVersionUID = 1L;
 

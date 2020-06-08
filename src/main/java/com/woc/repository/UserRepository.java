@@ -8,4 +8,6 @@ public interface UserRepository{
 
 	List<User> findAll();
 	
+	public User createNewUser(User newUser);
+	
 }

@@ -1,21 +1,29 @@
 package com.woc.service;
 
+import java.util.List;
+
 import com.woc.entity.*;
 
 
 public interface WOCService {
 
-	Iterable<User> getAllUsers();
+	public Iterable<User> getAllUsers();
 
-	Iterable<Pricing> getAllPrices();
+	public Iterable<Pricing> getAllPrices();
 
-	Iterable<DriverAvailability> getDriverAvailabilityList();
+	public Iterable<DriverAvailability> getDriverAvailabilityList();
 
-	Iterable<Feedback> getAllFeedbacks();
+	public Iterable<Feedback> getAllFeedbacks();
 
-	Iterable<Trip> getAllTrips();
+	public Iterable<Trip> getAllTrips();
+	
+	public List<Trip> getTrips();
+	
+	public Trip createTrip(Trip newTrip);
 
-	Iterable<UserLocation> getUserLocationList();
+	public Iterable<UserLocation> getUserLocationList();
 
-	Iterable<Vehicle> getAllVehicles();
+	public Iterable<Vehicle> getAllVehicles();
+	
+	
 }
