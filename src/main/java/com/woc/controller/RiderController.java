@@ -29,12 +29,12 @@ public class RiderController {
 		return 1L;
 	}
 	
-	@PostMapping("/updateProfile")
+	@PutMapping("/updateProfile")
 	public void updateProfile(@RequestBody Rider rider) {
 		return;
 	}
 	
-	@PostMapping("/getProfile")
+	@GetMapping("/getProfile")
 	public Rider getProfile(@RequestBody Rider rider) {
 		
 		return rider;
