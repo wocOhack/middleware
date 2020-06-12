@@ -15,53 +15,68 @@ import com.woc.dto.Ride;
 import com.woc.dto.Rider;
 import com.woc.dto.Trip;
 import com.woc.dto.TripSearchCriteria;
+import com.woc.entity.ServiceableArea;
 import com.woc.service.RiderService;
 
 @RestController
 @RequestMapping("/woc/rider")
 public class RiderController {
 
-	@Autowired
-	RiderService riderService;
-	
-	@PostMapping("/createProfile")
-	public long createNewUser(@RequestBody Rider newRider) {
-		return 1L;
-	}
-	
-	@PutMapping("/updateProfile")
-	public void updateProfile(@RequestBody Rider rider) {
-		return;
-	}
-	
-	@GetMapping("/getProfile")
-	public Rider getProfile(@RequestBody Rider rider) {
-		
-		return rider;
-	}
-	
-	@PutMapping("/updatePIN")
-	public void updatePIN(@RequestBody Rider rider) {
-		return;
-	}
-	
-	@PostMapping("/requestRide")
-	public void requestRide(@RequestBody Ride ride) {
-		return;
-	}
-	
-	@PostMapping("/cancelRide")
-	public void cancelRide(@RequestBody Ride ride) {
-		return;
-	}
-	
-	@GetMapping("getTrips")
-	public List<Trip> getTrips(@RequestBody TripSearchCriteria criteria){
-		
-		List<Trip> trips = new ArrayList<Trip>();
-		return trips;
-		
-	}
-	
-	
+    @Autowired
+    RiderService riderService;
+
+    @PostMapping("/createProfile")
+    public long createNewUser(@RequestBody Rider newRider) {
+        return 1L;
+    }
+
+    @PutMapping("/updateProfile")
+    public void updateProfile(@RequestBody Rider rider) {
+        return;
+    }
+
+    @GetMapping("/getProfile")
+    public Rider getProfile(@RequestBody Rider rider) {
+
+        return rider;
+    }
+
+    @PutMapping("/updatePIN")
+    public void updatePIN(@RequestBody Rider rider) {
+        return;
+    }
+
+    @PostMapping("/requestRide")
+    public void requestRide(@RequestBody Ride ride) {
+        return;
+    }
+
+    @PostMapping("/cancelRide")
+    public void cancelRide(@RequestBody Ride ride) {
+        return;
+    }
+
+    @GetMapping("getTrips")
+    public List<Trip> getTrips(@RequestBody TripSearchCriteria criteria) {
+
+        List<Trip> trips = new ArrayList<Trip>();
+        return trips;
+
+    }
+
+    @PostMapping("/addServicableArea")
+    public ServiceableArea addServicableArea(@RequestBody ServiceableArea a) {
+        ServiceableArea area = riderService.addArea(a);
+        return area;
+    }
+
+    @GetMapping("getServicableAreas")
+    public List<ServiceableArea> getAllServicableAreas() {
+
+        List<ServiceableArea> areas = new ArrayList<ServiceableArea>();
+        areas = (List<ServiceableArea>) riderService.getAllAreas();
+        return areas;
+
+    }
+
 }
