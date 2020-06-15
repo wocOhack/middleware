@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.woc.dto.Ride;
+import com.woc.dto.PINUpdateRequestObject;
+import com.woc.dto.RideRequestObject;
 import com.woc.dto.Rider;
+import com.woc.dto.RiderSearchCriteria;
 import com.woc.dto.Trip;
 import com.woc.dto.TripSearchCriteria;
 import com.woc.service.RiderService;
@@ -25,37 +27,39 @@ public class RiderController {
 	RiderService riderService;
 	
 	@PostMapping("/createProfile")
-	public long createNewUser(@RequestBody Rider newRider) {
+	public long createNewRider(@RequestBody Rider newRider) {
 		return 1L;
 	}
 	
 	@PutMapping("/updateProfile")
-	public void updateProfile(@RequestBody Rider rider) {
+	public void updateRiderProfile(@RequestBody Rider rider) {
 		return;
 	}
 	
 	@GetMapping("/getProfile")
-	public Rider getProfile(@RequestBody Rider rider) {
-		
+	public Rider getRiderProfile(@RequestBody RiderSearchCriteria searchCriteria) {
+		Rider rider = new Rider();
+		rider.setName("Harry Potter");
+		rider.setPhoneNumber("123456789");
 		return rider;
 	}
 	
 	@PutMapping("/updatePIN")
-	public void updatePIN(@RequestBody Rider rider) {
+	public void updatePIN(@RequestBody PINUpdateRequestObject pinUpdateRequestObject) {
 		return;
 	}
 	
 	@PostMapping("/requestRide")
-	public void requestRide(@RequestBody Ride ride) {
+	public void requestRide(@RequestBody RideRequestObject rideRequest) {
 		return;
 	}
 	
 	@PostMapping("/cancelRide")
-	public void cancelRide(@RequestBody Ride ride) {
+	public void cancelRide(@RequestBody Long riderID) {
 		return;
 	}
 	
-	@GetMapping("getTrips")
+	@GetMapping("/getTrips")
 	public List<Trip> getTrips(@RequestBody TripSearchCriteria criteria){
 		
 		List<Trip> trips = new ArrayList<Trip>();
