@@ -16,7 +16,7 @@ import com.woc.service.DriverService;
 @RequestMapping("/woc/driver")
 public class DriverController {
 
-	@Autowired
+	//@Autowired
 	DriverService driverService;
 	
 	@PostMapping("/createProfile")
