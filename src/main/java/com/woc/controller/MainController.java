@@ -22,77 +22,77 @@ import com.woc.service.WOCService;
 @RequestMapping("/woc")
 public class MainController {
 
-	@Autowired
-	WOCService wocService;
-	
-	@Autowired
-	UserService userService;
+    @Autowired
+    WOCService wocService;
 
-	@GetMapping("/greet")
-	@ResponseBody
-	public String hello() {
-		return "Greetings!";
-	}
+    @Autowired
+    UserService userService;
 
-	@GetMapping("/users")
-	@ResponseBody
-	public Iterable<User> getUsers() {
-		return wocService.getAllUsers();
-	}
-	
-	@PostMapping("/users")
-	public User createNewUser(@RequestBody User newUser) {
-		return userService.createUser(newUser);
-	}
+    @GetMapping("/greet")
+    @ResponseBody
+    public String hello() {
+        return "Greetings!";
+    }
 
-	@GetMapping("/prices")
-	@ResponseBody
-	public Iterable<Pricing> getPrices() {
-		return wocService.getAllPrices();
-	}
+    @GetMapping("/users")
+    @ResponseBody
+    public Iterable<User> getUsers() {
+        return wocService.getAllUsers();
+    }
 
-	@GetMapping("/available-drivers")
-	@ResponseBody
-	public Iterable<DriverAvailability> getDriverAvailabilityList() {
-		return wocService.getDriverAvailabilityList();
-	}
+    @PostMapping("/users")
+    public User createNewUser(@RequestBody User newUser) {
+        return userService.createUser(newUser);
+    }
 
-	@GetMapping("/feedbacks")
-	@ResponseBody
-	public Iterable<Feedback> getFeedbacks() {
-		return wocService.getAllFeedbacks();
-	}
+    @GetMapping("/prices")
+    @ResponseBody
+    public Iterable<Pricing> getPrices() {
+        return wocService.getAllPrices();
+    }
 
-	@GetMapping("/trips")
-	@ResponseBody
-	public Iterable<Trip> getTrips() {
-		return wocService.getAllTrips();
-	}
+    @GetMapping("/available-drivers")
+    @ResponseBody
+    public Iterable<DriverAvailability> getDriverAvailabilityList() {
+        return wocService.getDriverAvailabilityList();
+    }
 
-	@PostMapping("/trips")
-	@ResponseBody
-	public Trip createTrip(@RequestBody Trip newTrip) {
-		return wocService.createTrip(newTrip);
-	}
+    @GetMapping("/feedbacks")
+    @ResponseBody
+    public Iterable<Feedback> getFeedbacks() {
+        return wocService.getAllFeedbacks();
+    }
 
-	@GetMapping("/user-locations")
-	@ResponseBody
-	public Iterable<UserLocation> getUserLocationList() {
-		return wocService.getUserLocationList();
-	}
+    @GetMapping("/trips")
+    @ResponseBody
+    public Iterable<Trip> getTrips() {
+        return wocService.getAllTrips();
+    }
 
-	@GetMapping("/vehicles")
-	@ResponseBody
-	public Iterable<Vehicle> getVehicles() {
-		return wocService.getAllVehicles();
-	}
+    @PostMapping("/trips")
+    @ResponseBody
+    public Trip createTrip(@RequestBody Trip newTrip) {
+        return wocService.createTrip(newTrip);
+    }
+
+    @GetMapping("/user-locations")
+    @ResponseBody
+    public Iterable<UserLocation> getUserLocationList() {
+        return wocService.getUserLocationList();
+    }
+
+    @GetMapping("/vehicles")
+    @ResponseBody
+    public Iterable<Vehicle> getVehicles() {
+        return wocService.getAllVehicles();
+    }
 
     @GetMapping("/drivers")
     @ResponseBody
     public Iterable<Driver> getDrivers() {
         return wocService.getAllDrivers();
     }
-    
+
     @PostMapping("/rider")
     @ResponseBody
     public void addDriver(@RequestBody Rider rider) {
@@ -119,5 +119,12 @@ public class MainController {
     @ResponseBody
     public Iterable<Rider> getRiders() {
         return wocService.getAllRiders();
+    }
+
+    @PostMapping("/addUserCredentials")
+    @ResponseBody
+    public void addUserCredentials(@RequestBody UserCredentials uc) {
+        System.out.println("user cred request : " + uc.toString());
+        userService.createUserCreds(uc);
     }
 }

@@ -17,6 +17,7 @@ import com.woc.dto.Rider;
 import com.woc.dto.RiderSearchCriteria;
 import com.woc.dto.Trip;
 import com.woc.dto.TripSearchCriteria;
+import com.woc.entity.ServiceableArea;
 import com.woc.service.RiderService;
 
 @RestController
@@ -59,13 +60,28 @@ public class RiderController {
 		return;
 	}
 	
-	@GetMapping("/getTrips")
+	@GetMapping("getTrips")
 	public List<Trip> getTrips(@RequestBody TripSearchCriteria criteria){
 		
 		List<Trip> trips = new ArrayList<Trip>();
 		return trips;
 		
 	}
+	
+    @PostMapping("/addServicableArea")
+    public ServiceableArea addServicableArea(@RequestBody ServiceableArea a) {
+        ServiceableArea area = riderService.addArea(a);
+        return area;
+    }
+
+    @GetMapping("getServicableAreas")
+    public List<ServiceableArea> getAllServicableAreas() {
+
+        List<ServiceableArea> areas = new ArrayList<ServiceableArea>();
+        areas = (List<ServiceableArea>) riderService.getAllAreas();
+        return areas;
+
+    }
 	
 	
 }
