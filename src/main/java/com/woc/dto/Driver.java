@@ -7,7 +7,7 @@ public class Driver implements Serializable{
 
 	private static final long serialVersionUID = -812783202505901774L;
 	private String name;
-	private long riderID;
+	private long diverID;
 	private String phoneNumber;
 	private String email;
 	private Map<String,String> documents;
@@ -19,10 +19,10 @@ public class Driver implements Serializable{
 		this.name = name;
 	}
 	public long getRiderID() {
-		return riderID;
+		return diverID;
 	}
 	public void setRiderID(long riderID) {
-		this.riderID = riderID;
+		this.diverID = riderID;
 	}
 	public String getPhoneNumber() {
 		return phoneNumber;
