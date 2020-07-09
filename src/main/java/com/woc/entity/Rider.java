@@ -1,10 +1,12 @@
 package com.woc.entity;
 
-import java.sql.Date;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -14,11 +16,13 @@ import javax.persistence.Table;
 @NamedQuery(name="Rider.findAll", query="SELECT r FROM Rider r")
 public class Rider {
 
+    @Column(name = "id", unique = true, nullable = false, length = 30)
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "pin", nullable = false, length = 30)
-    private int pin;
+    private String pin;
 
     @Column(name = "is_challenged", nullable = false, length = 30)
     private boolean is_challenged;
@@ -36,7 +40,7 @@ public class Rider {
     private String proof_of_challenge;
 
     @Column(name = "user_id", nullable = false, length = 30)
-    private int user_id;
+    private long user_id;
 
     public Long getId() {
         return id;
@@ -46,11 +50,11 @@ public class Rider {
         this.id = id;
     }
 
-    public int getPin() {
+    public String getPin() {
         return pin;
     }
 
-    public void setPin(int pin) {
+    public void setPin(String pin) {
         this.pin = pin;
     }
 
@@ -94,11 +98,11 @@ public class Rider {
         this.proof_of_challenge = proof_of_challenge;
     }
 
-    public int getUser_id() {
+    public long getUser_id() {
         return user_id;
     }
 
-    public void setUser_id(int user_id) {
+    public void setUser_id(long user_id) {
         this.user_id = user_id;
     }
 

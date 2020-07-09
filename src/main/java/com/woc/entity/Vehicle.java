@@ -13,11 +13,10 @@ public class Vehicle implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private Integer id;
+    private long id;
 
-    @OneToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private User user;
+    @Column(name = "user_id", nullable = false, length = 20)
+    private long user_id;
 
     @Column(name = "vehicle_number", nullable = false, length = 20)
     private String vehicleNumber;
@@ -40,49 +39,89 @@ public class Vehicle implements Serializable {
     @Column(name = "verifiedby", length = 50)
     private String verifiedBy;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "verification_date")
     private Date verificationDate;
 
-    public Vehicle() { }
+    public Vehicle() {
+    }
 
-    public Integer getId(){ return this.id; }
+    public long getId() {
+        return this.id;
+    }
 
-    public void setId(Integer id) { this.id = id; }
+    public void setId(long id) {
+        this.id = id;
+    }
 
-    public User getUser(){ return this.user; }
+    public long getUser() {
+        return this.user_id;
+    }
 
-    public void setUser(User user){ this.user = user; }
+    public void setUser(long user) {
+        this.user_id = user;
+    }
 
-    public String getVehicleNumber(){ return this.vehicleNumber; }
+    public String getVehicleNumber() {
+        return this.vehicleNumber;
+    }
 
-    public void setVehicleNumber(String vehicleNumber){ this.vehicleNumber = vehicleNumber; }
+    public void setVehicleNumber(String vehicleNumber) {
+        this.vehicleNumber = vehicleNumber;
+    }
 
-    public String getInsuranceDoc(){ return this.insuranceDoc; }
+    public String getInsuranceDoc() {
+        return this.insuranceDoc;
+    }
 
-    public void setInsuranceDoc(String insuranceDoc){ this.insuranceDoc = insuranceDoc; }
+    public void setInsuranceDoc(String insuranceDoc) {
+        this.insuranceDoc = insuranceDoc;
+    }
 
-    public String getVehicleModel(){ return this.vehicleModel; }
+    public String getVehicleModel() {
+        return this.vehicleModel;
+    }
 
-    public void setVehicleModel(String vehicleModel){ this.vehicleModel = vehicleModel; }
+    public void setVehicleModel(String vehicleModel) {
+        this.vehicleModel = vehicleModel;
+    }
 
-    public String getVehicleType(){ return this.vehicleType; }
+    public String getVehicleType() {
+        return this.vehicleType;
+    }
 
-    public void setVehicleType(String vehicleType){ this.vehicleType = vehicleType; }
+    public void setVehicleType(String vehicleType) {
+        this.vehicleType = vehicleType;
+    }
 
-    public String getVehicleDoc(){ return this.vehicleDoc; }
+    public String getVehicleDoc() {
+        return this.vehicleDoc;
+    }
 
-    public void setVehicleDoc(String vehicleDoc){ this.vehicleDoc = vehicleDoc; }
+    public void setVehicleDoc(String vehicleDoc) {
+        this.vehicleDoc = vehicleDoc;
+    }
 
-    public Boolean getIsVerified(){ return this.isVerified; }
+    public Boolean getIsVerified() {
+        return this.isVerified;
+    }
 
-    public void setIsVerified(Boolean isVerified){ this.isVerified = isVerified; }
+    public void setIsVerified(Boolean isVerified) {
+        this.isVerified = isVerified;
+    }
 
-    public String getVerifiedBy(){ return this.verifiedBy; }
+    public String getVerifiedBy() {
+        return this.verifiedBy;
+    }
 
-    public void setVerifiedBy(String verifiedBy){ this.verifiedBy = verifiedBy; }
+    public void setVerifiedBy(String verifiedBy) {
+        this.verifiedBy = verifiedBy;
+    }
 
-    public Date getVerificationDate(){ return this.verificationDate; }
+    public Date getVerificationDate() {
+        return this.verificationDate;
+    }
 
-    public void setVerificationDate(Date verificationDate){this.verificationDate = verificationDate; }
+    public void setVerificationDate(Date verificationDate) {
+        this.verificationDate = verificationDate;
+    }
 }

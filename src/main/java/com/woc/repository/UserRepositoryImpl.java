@@ -39,8 +39,9 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Transactional
     @Override
-    public void addUser(User u) {
+    public User addUser(User u) {
         // TODO Auto-generated method stub
-        entityManager.persist(u);
+       entityManager.persist(u);
+       return u;
     }
 }
