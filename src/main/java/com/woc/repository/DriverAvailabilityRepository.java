@@ -7,4 +7,9 @@ import java.util.List;
 public interface DriverAvailabilityRepository {
 
     public List<DriverAvailability> findAll();
+
+    public DriverAvailability addDriverAvailabiliy(DriverAvailability driverAvail);
+
+    public long toggleDriverAvailability(long driver_id, boolean value);
+
 }

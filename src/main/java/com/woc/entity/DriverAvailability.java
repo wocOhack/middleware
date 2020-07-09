@@ -5,29 +5,26 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Entity
-@Table(name = "DRIVER_AVAILABILITY")
-@NamedQuery(name = "DriverAvailability.findAll", query = "SELECT d from DriverAvailability d")
+@Table(name = "DriverAvailability")
+@NamedQuery(name = "DriverAvailability.findAll", query = "SELECT d FROM DriverAvailability d")
 public class DriverAvailability implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    @Column(name = "id", unique = true, nullable = false, length = 30)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
     private Integer id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private User user;
+    @Column(name = "user_id", nullable = false, length = 20)
+    private long user;
 
-    @Column(name = "status", length = 20)
+    @Column(name = "status",  nullable = false,length = 20)
     private String status;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "created_time")
+    @Column(name = "created_time" ,nullable = true, length = 30)
     private Date createdTime;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "updated_time")
+    @Column(name = "updated_time",  nullable = true, length = 30)
     private Date updatedTime;
 
     public static long getSerialVersionUID() {
@@ -42,12 +39,12 @@ public class DriverAvailability implements Serializable {
         this.id = id;
     }
 
-    public User getUser() {
+    public long getUser() {
         return user;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUser(long user_id) {
+        this.user = user_id;
     }
 
     public String getStatus() {

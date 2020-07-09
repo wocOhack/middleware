@@ -11,137 +11,133 @@ import javax.persistence.Id;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
-
 @Entity
-@Table(name="USER")
-@NamedQuery(name="User.findAll", query="SELECT u FROM User u")
+@Table(name = "USER")
+@NamedQuery(name = "User.findAll", query = "SELECT u FROM User u")
 public class User implements Serializable {
-	@Override
+    @Override
     public String toString() {
         return "User [id=" + id + ", name=" + name + ", phone=" + phone + ", email=" + email + ", type=" + type
                 + ", registrationDate=" + registrationDate + ", deviceId=" + deviceId + ", rating=" + rating
                 + ", status=" + status + ", bloodGroup=" + bloodGroup + "]";
     }
 
-	@Column(name="id",unique=true,nullable=false, length=30)
-	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
     private static final long serialVersionUID = 1L;
 
-	@Id
-	private Long id;
-	
-	@Column(name="Name",nullable=false, length=30)
-	private String name;
-	
-	@Column(name="phone",unique=true, nullable=false, length=15)
-	private String phone;
-	
-	@Column(name="email",nullable=true, length=50)
-	private String email;
-	
-	@Column(name="type",nullable=false, length=10)
-	private String type;
-	
-	@Column(name="registration_date",nullable=false)
-	private Date registrationDate;
-	
-	@Column(name="device_id",nullable=false, length=30)
-	private String deviceId;
-	
-	@Column(name="ratings",nullable=true)
-	private Integer rating;
-	
-	@Column(name="status",nullable=false, length=15)
-	private String status;
-	
-	@Column(name="blood_group", nullable=true, length=5)
-	private String bloodGroup;
+    @Column(name = "id", unique = true, nullable = false, length = 30)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	public Long getId() {
-		return id;
-	}
+    @Column(name = "Name", nullable = false, length = 30)
+    private String name;
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    @Column(name = "phone", unique = true, nullable = false, length = 15)
+    private String phone;
 
-	public String getName() {
-		return name;
-	}
+    @Column(name = "email", nullable = true, length = 50)
+    private String email;
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    @Column(name = "type", nullable = false, length = 10)
+    private String type;
 
-	public String getPhone() {
-		return phone;
-	}
+    @Column(name = "registration_date", nullable = false)
+    private Date registrationDate;
 
-	public void setPhone(String phone) {
-		this.phone = phone;
-	}
+    @Column(name = "device_id", nullable = false, length = 30)
+    private String deviceId;
 
-	public String getEmail() {
-		return email;
-	}
+    @Column(name = "ratings", nullable = true)
+    private Integer rating;
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    @Column(name = "status", nullable = false, length = 15)
+    private String status;
 
-	public String getType() {
-		return type;
-	}
+    @Column(name = "blood_group", nullable = true, length = 5)
+    private String bloodGroup;
 
-	public void setType(String type) {
-		this.type = type;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public Date getRegistrationDate() {
-		return registrationDate;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public void setRegistrationDate(Date registrationDate) {
-		this.registrationDate = registrationDate;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public String getDeviceId() {
-		return deviceId;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setDeviceId(String deviceId) {
-		this.deviceId = deviceId;
-	}
+    public String getPhone() {
+        return phone;
+    }
 
-	public Integer getRating() {
-		return rating;
-	}
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
 
-	public void setRating(Integer rating) {
-		this.rating = rating;
-	}
+    public String getEmail() {
+        return email;
+    }
 
-	public String getStatus() {
-		return status;
-	}
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-	public void setStatus(String status) {
-		this.status = status;
-	}
+    public String getType() {
+        return type;
+    }
 
-	public String getBloodGroup() {
-		return bloodGroup;
-	}
+    public void setType(String type) {
+        this.type = type;
+    }
 
-	public void setBloodGroup(String bloodGroup) {
-		this.bloodGroup = bloodGroup;
-	}
+    public Date getRegistrationDate() {
+        return registrationDate;
+    }
 
-	public static long getSerialversionuid() {
-		return serialVersionUID;
-	}
+    public void setRegistrationDate(Date registrationDate) {
+        this.registrationDate = registrationDate;
+    }
 
-	
-	
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
+    }
+
+    public Integer getRating() {
+        return rating;
+    }
+
+    public void setRating(Integer rating) {
+        this.rating = rating;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getBloodGroup() {
+        return bloodGroup;
+    }
+
+    public void setBloodGroup(String bloodGroup) {
+        this.bloodGroup = bloodGroup;
+    }
+
+    public static long getSerialversionuid() {
+        return serialVersionUID;
+    }
+
 }

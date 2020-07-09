@@ -1,14 +1,17 @@
 package com.woc.repository;
 
-import com.woc.entity.Vehicle;
-import org.springframework.stereotype.Repository;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.List;
+
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.woc.entity.Vehicle;
 
 @Repository
-public class VehicleRepositoryImpl implements VehicleRepository{
+public class VehicleRepositoryImpl implements VehicleRepository {
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -17,5 +20,11 @@ public class VehicleRepositoryImpl implements VehicleRepository{
     public List<Vehicle> findAll() {
         List<Vehicle> vehicles = entityManager.createNamedQuery("Vehicle.findAll").getResultList();
         return vehicles;
+    }
+
+    @Transactional
+    @Override
+    public void addVehcile(Vehicle v) {
+        entityManager.persist(v);
     }
 }
