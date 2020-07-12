@@ -12,21 +12,18 @@ public class Feedback implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private Integer id;
+    private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "trip_id", referencedColumnName = "id")
-    private Trip trip;
+    @Column(name = "trip_id", nullable = false, length = 6)
+    private Long tripId;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private User user;
+    @Column(name = "user_id", nullable = false, length = 6)
+    private Long userId;
 
-    @ManyToOne
-    @JoinColumn(name = "feedback_owner_id", referencedColumnName = "id")
-    private User feedbackOwner;
+    @Column(name = "feedback_owner_id", nullable = false, length = 6)
+    private Long feedbackOwnerId;
 
-    @Column(name = "rating", nullable = false)
+    @Column(name = "rating", nullable = false, length = 2)
     private Integer rating;
 
     @Column(name = "comment", length = 500)
@@ -36,34 +33,36 @@ public class Feedback implements Serializable {
         return serialVersionUID;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public Trip getTrip() { return trip; }
-
-    public void setTrip(Trip trip) {
-        this.trip = trip;
+    public Long getTripId() {
+        return tripId;
     }
 
-    public User getUser() {
-        return user;
+    public void setTripId(Long tripId) {
+        this.tripId = tripId;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public Long getUserId() {
+        return userId;
     }
 
-    public User getFeedbackOwner() {
-        return feedbackOwner;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
-    public void setFeedbackOwner(User feedbackOwner) {
-        this.feedbackOwner = feedbackOwner;
+    public Long getFeedbackOwnerId() {
+        return feedbackOwnerId;
+    }
+
+    public void setFeedbackOwnerId(Long feedbackOwnerId) {
+        this.feedbackOwnerId = feedbackOwnerId;
     }
 
     public Integer getRating() {

@@ -25,6 +25,13 @@ import com.woc.repository.RideRequestRepository;
 import com.woc.repository.UserCredentialsRepository;
 import com.woc.repository.UserRepository;
 import com.woc.repository.VehicleRepository;
+import com.woc.dto.FeedBack;
+import com.woc.entity.Feedback;
+import com.woc.entity.Trip;
+import com.woc.repository.FeedbackRepository;
+import com.woc.repository.TripRepository;
+import com.woc.service.enums.TripStatus;
+import com.woc.service.exceptions.FeedbackSubmissionException;
 
 @Component
 public class DriverService {
@@ -52,6 +59,12 @@ public class DriverService {
 
     @Autowired
     RideRequestRepository rideRequestRepository;
+
+    @Autowired
+    FeedbackRepository feedbackRepository;
+
+    @Autowired
+    TripRepository tripRepository;
 
     public void toggleDriverAvailability(long user_id, String status) {
         driverAvailabilityRepository.toggleDriverAvailability(user_id, status);
@@ -221,5 +234,35 @@ public class DriverService {
 
     public long updateDriverLocation(DriverLocationUpdateRequest request) {
         return driverRepository.updateDriverLocation(request);
+    }
+
+    public void submitFeedback(FeedBack feedbackDTO) throws FeedbackSubmissionException {
+        Feedback feedback = new Feedback();
+
+        Trip trip = tripRepository.findTripById(feedbackDTO.getTripId());
+
+        if(trip == null) {
+            throw new FeedbackSubmissionException("Bad Request. Could not find trip.");
+        }
+
+        if (!trip.getStatus().equals(TripStatus.TRIP_ENDED.toString())) {
+            throw new FeedbackSubmissionException("Bad Request. This trip has not ended yet.");
+        }
+
+        List<Feedback> existingFeedbacksForTrip = feedbackRepository.getFeedbacksByTripId(trip.getId());
+        if(existingFeedbacksForTrip != null) {
+            for(Feedback f : existingFeedbacksForTrip) {
+                if(f.getFeedbackOwnerId() == trip.getDriverId()) {
+                    return;
+                }
+            }
+        }
+        feedback.setTripId(trip.getId());
+        feedback.setUserId(trip.getRiderId());
+        feedback.setFeedbackOwnerId(trip.getDriverId());
+        feedback.setRating(feedbackDTO.getRating());
+        feedback.setComment(feedbackDTO.getComments());
+
+        feedbackRepository.submitFeedback(feedback);
     }
 }

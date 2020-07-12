@@ -22,6 +22,7 @@ import com.woc.dto.Trip;
 import com.woc.entity.RideRequest;
 import com.woc.service.DriverService;
 import com.woc.service.RiderService;
+import com.woc.service.exceptions.FeedbackSubmissionException;
 
 @RestController
 @RequestMapping("/woc/driver")
@@ -106,11 +107,6 @@ public class DriverController {
         return trip;
     }
 
-    @PostMapping("/submitFeedBack")
-    public void submitFeedBack(@RequestBody FeedBack feedBack) {
-        return;
-    }
-
     @PutMapping("/toggleDriverAvailabilityStatus")
     public void toggleDriverAvailability(@RequestBody DriverAvailability driverAvailability) {
         String status = driverAvailability.getStatus();
@@ -130,4 +126,17 @@ public class DriverController {
         }
         return new ResponseEntity("Could not update driver location", HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+	@PostMapping("/submitFeedBack")
+	public ResponseEntity submitFeedBack(@RequestBody FeedBack feedBack) {
+		try {
+			driverService.submitFeedback(feedBack);
+			return ResponseEntity.status(HttpStatus.OK).build();
+		} catch (Exception e) {
+		    if(e instanceof FeedbackSubmissionException) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            }
+		    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		}
+	}
 }

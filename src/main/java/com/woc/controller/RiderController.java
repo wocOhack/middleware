@@ -3,6 +3,8 @@ package com.woc.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.woc.dto.*;
+import com.woc.service.exceptions.FeedbackSubmissionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,13 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.woc.dto.CancellRideRequestObject;
-import com.woc.dto.PINUpdateRequestObject;
-import com.woc.dto.RideRequestObject;
-import com.woc.dto.Rider;
-import com.woc.dto.RiderSearchCriteria;
-import com.woc.dto.Trip;
-import com.woc.dto.TripSearchCriteria;
 import com.woc.entity.ServiceableArea;
 import com.woc.service.DriverService;
 import com.woc.service.RiderService;
@@ -123,5 +118,18 @@ public class RiderController {
         areas = (List<ServiceableArea>) riderService.getAllAreas();
         return areas;
 
+    }
+
+    @PostMapping("/submitFeedBack")
+    public ResponseEntity submitFeedBack(@RequestBody FeedBack feedBack) {
+        try {
+            riderService.submitFeedback(feedBack);
+            return ResponseEntity.status(HttpStatus.OK).build();
+        } catch (Exception e) {
+            if(e instanceof FeedbackSubmissionException) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            }
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }

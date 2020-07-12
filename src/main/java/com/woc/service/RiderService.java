@@ -2,10 +2,7 @@ package com.woc.service;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -14,9 +11,14 @@ import com.woc.dto.CancellRideRequestObject;
 import com.woc.dto.RideRequestObject;
 import com.woc.dto.RideRequestUpdateObject;
 import com.woc.dto.PINUpdateRequestObject;
+import com.woc.dto.FeedBack;
+import com.woc.entity.Feedback;
+import com.woc.entity.Trip;
+import com.woc.repository.*;
+import com.woc.service.enums.TripStatus;
+import com.woc.service.exceptions.FeedbackSubmissionException;
 import com.woc.dto.Rider;
 import com.woc.dto.RiderSearchCriteria;
-import com.woc.dto.Trip;
 import com.woc.dto.TripSearchCriteria;
 import com.woc.entity.RideRequest;
 import com.woc.entity.ServiceableArea;
@@ -45,6 +47,9 @@ public class RiderService {
 
     @Autowired
     TripRepository tripRepository;
+
+    @Autowired
+    FeedbackRepository feedbackRepository;
 
     public ServiceableArea addArea(ServiceableArea area) {
         return servicableAreaRepository.addArea(area);
@@ -161,12 +166,12 @@ public class RiderService {
         return riderRepository.updateRiderPin(request);
     }
 
-    public List<Trip> getRiderTrips(TripSearchCriteria searchCriteria) {
-        List<Trip> fetchedTrips = new ArrayList<Trip>();
+    public List<com.woc.dto.Trip> getRiderTrips(TripSearchCriteria searchCriteria) {
+        List<com.woc.dto.Trip> fetchedTrips = new ArrayList<com.woc.dto.Trip>();
         List<com.woc.entity.Trip> trips = tripRepository.getTrips(searchCriteria);
 
         for (com.woc.entity.Trip each : trips) {
-            Trip t = new Trip();
+            com.woc.dto.Trip t = new com.woc.dto.Trip();
             t.setDistance(each.getDistance());
             t.setDuration(each.getDuration().getTime());
             t.setStartTime(each.getTripStartTime());
@@ -184,4 +189,34 @@ public class RiderService {
         super();
     }
 
+    public void submitFeedback(FeedBack feedbackDTO) throws FeedbackSubmissionException {
+        Feedback feedback = new Feedback();
+
+        Trip trip = tripRepository.findTripById(feedbackDTO.getTripId());
+
+        if(trip == null) {
+            throw new FeedbackSubmissionException("BAD REQUEST. Could not find trip.");
+        }
+
+        if (!trip.getStatus().equals(TripStatus.TRIP_ENDED.toString())) {
+            throw new FeedbackSubmissionException("BAD REQUEST. This trip has not ended yet.");
+        }
+
+        List<Feedback> existingFeedbacksForTrip = feedbackRepository.getFeedbacksByTripId(trip.getId());
+        if(existingFeedbacksForTrip != null) {
+            for(Feedback f : existingFeedbacksForTrip) {
+                if(f.getFeedbackOwnerId() == trip.getRiderId()) {
+                    return;
+                }
+            }
+        }
+
+        feedback.setTripId(trip.getId());
+        feedback.setUserId(trip.getDriverId());
+        feedback.setFeedbackOwnerId(trip.getRiderId());
+        feedback.setRating(feedbackDTO.getRating());
+        feedback.setComment(feedbackDTO.getComments());
+
+        feedbackRepository.submitFeedback(feedback);
+    }
 }
