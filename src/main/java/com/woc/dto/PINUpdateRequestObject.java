@@ -5,11 +5,11 @@ import java.io.Serializable;
 public class PINUpdateRequestObject implements Serializable{
 
 	private static final long serialVersionUID = 2761918252146493896L;
-	private Long riderID;
+	private long riderID;
 	private String PIN;
 	
 	
-	public Long getRiderID() {
+	public long getRiderID() {
 		return riderID;
 	}
 	public void setRiderID(Long riderID) {

@@ -37,7 +37,7 @@ public class DriverAvailabilityRepositoryImpl implements DriverAvailabilityRepos
 
     @Transactional
     @Override
-    public long toggleDriverAvailability(long driverId, boolean value) {
+    public long toggleDriverAvailability(long driverId, String value) {
         // TODO Auto-generated method stub
         List<Driver> drivers = entityManager
                 .createNativeQuery("select * from Driver d where d.id = " + driverId, Driver.class).getResultList();
@@ -67,9 +67,10 @@ public class DriverAvailabilityRepositoryImpl implements DriverAvailabilityRepos
             return 0l;
         }
         // entityManager.getTransaction().begin();
-        Query q = entityManager.createNativeQuery("Update Driver_Availability da set da.status = "
-                + String.valueOf(value) + ",da.updated_time = ?updated_time" + " where user_id = " + user_id);
         Date updated_time = new Date(System.currentTimeMillis());
+        
+        Query q = entityManager.createNativeQuery("Update Driver_Availability da set da.status = "
+                + String.valueOf(value) + ",da.updated_time = :updated_time" + " where user_id = " + user_id);
         q.setParameter("updated_time", updated_time);
         int rowsUpdated = q.executeUpdate();
         System.out.println("entities Updated: " + rowsUpdated);

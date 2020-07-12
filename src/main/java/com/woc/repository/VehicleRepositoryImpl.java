@@ -24,7 +24,14 @@ public class VehicleRepositoryImpl implements VehicleRepository {
 
     @Transactional
     @Override
-    public void addVehcile(Vehicle v) {
+    public long addVehcile(Vehicle v) {
         entityManager.persist(v);
+        return v.getId();
+    }
+
+    @Override
+    public long updateVehcile(com.woc.dto.Vehicle v) {
+        // TODO Auto-generated method stub
+        return 0;
     }
 }

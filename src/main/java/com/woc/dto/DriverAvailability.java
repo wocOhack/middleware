@@ -9,7 +9,7 @@ public class DriverAvailability implements Serializable {
      */
     private static final long serialVersionUID = 1L;
     private long driverID;
-    private boolean status;
+    private String status;
 
     public long getDriverID() {
         return driverID;
@@ -19,11 +19,11 @@ public class DriverAvailability implements Serializable {
         this.driverID = driverID;
     }
 
-    public boolean getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(boolean status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 

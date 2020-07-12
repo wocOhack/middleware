@@ -38,7 +38,7 @@ public class DriverController {
     public ResponseEntity createNewDriver(@RequestBody DriverRegistrationRequest request) {
         long id = driverService.addDriver(request.getDriver(), request.getVehicle(), request.getInsurance());
         // return 2L;
-        if (id != 0) {
+        if (id != 0 && id != -1) {
             String message = "Driver created sucessfully";
             return new ResponseEntity(message, HttpStatus.CREATED);
         } else if (id == -1) {
@@ -51,8 +51,12 @@ public class DriverController {
     }
 
     @PutMapping("/updateProfile")
-    public void updateDriverProfile(@RequestBody DriverRegistrationRequest request) {
-        return;
+    public ResponseEntity updateDriverProfile(@RequestBody DriverRegistrationRequest request) {
+        long id = driverService.updateDriver(request.getDriver(), request.getVehicle(), request.getInsurance());
+        if (id == 0) {
+            return new ResponseEntity("Issue updating Driver", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity("Successfully Updated Driver", HttpStatus.OK);
     }
 
     @GetMapping("/getProfile")
@@ -110,7 +114,7 @@ public class DriverController {
 
     @PutMapping("/toggleDriverAvailabilityStatus")
     public void toggleDriverAvailability(@RequestBody DriverAvailability driverAvailability) {
-        boolean status = driverAvailability.getStatus();
+        String status = driverAvailability.getStatus();
         long user_id = driverAvailability.getDriverID();
         driverService.toggleDriverAvailability(user_id, status);
     }

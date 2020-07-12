@@ -52,80 +52,122 @@ public class DriverService {
 	@Autowired
 	RideRequestRepository rideRequestRepository;
 
-	public void toggleDriverAvailability(long user_id, boolean status) {
-		driverAvailabilityRepository.toggleDriverAvailability(user_id, status);
-	}
+	public void toggleDriverAvailability(long user_id, String status) {
+        driverAvailabilityRepository.toggleDriverAvailability(user_id, status);
+    }
 
-	public long addDriver(Driver driver, Vehicle vehcile, DrivingLicense license) {
+    public long addDriver(Driver driver, Vehicle vehcile, DrivingLicense license) {
 
-		com.woc.entity.Driver d = new com.woc.entity.Driver();
-		com.woc.entity.Vehicle v = new com.woc.entity.Vehicle();
-		UserCredentials cred = new UserCredentials();
-		User u = new User();
+        com.woc.entity.Driver d = new com.woc.entity.Driver();
+        com.woc.entity.Vehicle v = new com.woc.entity.Vehicle();
+        UserCredentials cred = new UserCredentials();
+        User u = new User();
 
-		DriverSearchCriteria search = new DriverSearchCriteria();
-		search.setPhoneNumber(driver.getPhoneNumber());
-		Driver ifexisting = driverRepository.getDriver(search);
-		if (ifexisting != null) {
-			// send 400 bad request as user already exist....
-			System.out.println("User already exist.....");
-			return -1;
-		}
-		Date now = new Date(System.currentTimeMillis());
-		// int userId = Math.abs(new Random().nextInt());
-		// int driverId = Math.abs(new Random().nextInt());
-		u.setEmail(driver.getEmail());
-		// u.setId((long) userId);
-		u.setName(driver.getName());
-		u.setPhone(driver.getPhoneNumber());
-		u.setRegistrationDate(now);
-		u.setType("DRIVER");
-		// System.out.println("userId : " + userId);
-		// System.out.println("driverId : " + driverId);
-		User createdUser = userRepository.addUser(u);
+        DriverSearchCriteria search = new DriverSearchCriteria();
+        search.setPhoneNumber(driver.getPhoneNumber());
+        Driver ifexisting = driverRepository.getDriver(search);
+        if (ifexisting != null) {
+            // send 400 bad request as user already exist....
+            System.out.println("User already exist.....");
+            return -1l;
+        }
+        Date now = new Date(System.currentTimeMillis());
+        // int userId = Math.abs(new Random().nextInt());
+        // int driverId = Math.abs(new Random().nextInt());
+        u.setEmail(driver.getEmail());
+        // u.setId((long) userId);
+        u.setName(driver.getName());
+        u.setPhone(driver.getPhoneNumber());
+        u.setRegistrationDate(now);
+        u.setType("DRIVER");
+        // System.out.println("userId : " + userId);
+        // System.out.println("driverId : " + driverId);
+        User createdUser = userRepository.addUser(u);
 
-		System.out.println("userId : " + createdUser.getId());
+        System.out.println("userId : " + createdUser.getId());
 
-		d.setVerified_by("Admin");
-		d.setVerification_date(now);
-		d.setLcense_number(license.getLicenceNumber());
-		d.setLicense_doc(license.getLicenseDocumentLink());
-		d.setLicense_expiry_date(license.getExpiryDate());
-		d.setIs_verified(true);
-		d.setAddress("NA");
-		// d.setId((long) driverId);
-		d.setUser_id(createdUser.getId());
+        d.setVerified_by("Admin");
+        d.setVerification_date(now);
+        d.setLcense_number(license.getLicenceNumber());
+        d.setLicense_doc(license.getLicenseDocumentLink());
+        d.setLicense_expiry_date(license.getExpiryDate());
+        d.setIs_verified(true);
+        d.setAddress("NA");
+        // d.setId((long) driverId);
+        d.setUser_id(createdUser.getId());
 
-		com.woc.entity.Driver createdDriver = driverRepository.addDriver(d);
-		System.out.println("driverId : " + createdDriver.getId());
+        com.woc.entity.Driver createdDriver = driverRepository.addDriver(d);
+        System.out.println("driverId : " + createdDriver.getId());
 
-		v.setInsuranceDoc(vehcile.getInsuranceDocumentLink());
-		v.setVehicleDoc(vehcile.getRCDocumentLink());
-		v.setIsVerified(true);
-		v.setVehicleNumber(vehcile.getRegistrationNumber());
-		v.setVehicleType("4-Wheeler");
-		v.setUser(createdUser.getId());
-		vehicleRepository.addVehcile(v);
+        v.setInsuranceDoc(vehcile.getInsuranceDocumentLink());
+        v.setVehicleDoc(vehcile.getRCDocumentLink());
+        v.setIsVerified(true);
+        v.setVehicleNumber(vehcile.getRegistrationNumber());
+        v.setVehicleType("4-Wheeler");
+        v.setUser(createdUser.getId());
+        vehicleRepository.addVehcile(v);
 
-		cred.setUser_name(driver.getName());
-		cred.setUser_pin(driver.getPIN());
-		cred.setUser_id(createdUser.getId());
-		userCredRepository.addUserCredentails(cred);
-		return createdDriver.getId();
+        cred.setUser_name(driver.getName());
+        cred.setUser_pin(driver.getPIN());
+        cred.setUser_id(createdUser.getId());
+        userCredRepository.addUserCredentails(cred);
+        return createdDriver.getId();
 
-	}
+    }
 
-	public Driver getDriver(DriverSearchCriteria search) {
-		Driver d = driverRepository.getDriver(search);
-		return d;
-	}
+    public Driver getDriver(DriverSearchCriteria search) {
+        Driver d = driverRepository.getDriver(search);
+        return d;
+    }
 
-	public long toggleDriverAvailability(DriverAvailability availability) {
-		long result = driverAvailabilityRepository.toggleDriverAvailability(availability.getDriverID(),
-				availability.getStatus());
-		return result;
-	}
+    public long toggleDriverAvailability(DriverAvailability availability) {
+        if (availability.getDriverID()== 0 && (availability.getStatus()== null || !availability.getStatus().trim().isEmpty())) {
+            return 0l;
+        }
+        long result = driverRepository.updateDriverStatus(availability);
+        return result;
+    }
 
+    public long updateDriver(Driver driver, Vehicle vehcile, DrivingLicense license) {
+        long idUpdated = 0l;
+
+        // returning -1 for badrequest mandate paramater missing
+        if (driver.getDriverID() == 0
+                && (driver.getPhoneNumber().trim().isEmpty() || driver.getPhoneNumber() == null)) {
+            return 0l;
+        }
+
+        Driver d = new Driver();
+        DriverSearchCriteria search = new DriverSearchCriteria();
+
+        if (driver.getDriverID() != 0) {
+            search.setDriverId(driver.getDriverID());
+        } else {
+            search.setPhoneNumber(driver.getPhoneNumber());
+        }
+        d = driverRepository.getDriver(search);
+        long userId = d.getUserID();
+
+        if (driver.getEmail() != null && !driver.getEmail().trim().isEmpty()) {
+            long user_update = userRepository.updateUser("", driver.getEmail(), driver.getPhoneNumber(), userId);
+            // if (user_update != 0) {
+            // long updated = riderRepository.updateRiderData(rider);
+            // return updated;
+            // } else {
+            // return 0l;
+            // }
+            return user_update;
+        }
+        if (driver.getName() != null && !driver.getName().trim().isEmpty()) {
+            long user_update = userRepository.updateUser(driver.getName(), "", driver.getPhoneNumber(), userId);
+            return user_update;
+        }
+
+        if (license.getLicenseDocumentLink() != null && !license.getLicenseDocumentLink().trim().isEmpty()) {
+            return driverRepository.updateDriverData(driver, license);
+        }
+        return idUpdated;
+    }
 	public List<com.woc.entity.Driver> getAllAvailableDrivers() {
 
 		List<com.woc.entity.Driver> availableDrivers = driverRepository.getAllDriversWithStatus("Available");

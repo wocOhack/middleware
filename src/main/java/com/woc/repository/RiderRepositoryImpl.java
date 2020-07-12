@@ -1,7 +1,9 @@
 package com.woc.repository;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -15,6 +17,7 @@ import com.woc.dto.RiderSearchCriteria;
 import com.woc.entity.Driver;
 import com.woc.entity.Rider;
 import com.woc.entity.User;
+import com.woc.utilities.Utilities;
 
 @Repository
 public class RiderRepositoryImpl implements RiderRepository {
@@ -27,17 +30,16 @@ public class RiderRepositoryImpl implements RiderRepository {
         List<Rider> riders = entityManager.createNamedQuery("Rider.findAll", Rider.class).getResultList();
         return riders;
     }
-    
-	
-	@Override
-	public Rider findByID(long id) {
-		List<Rider> riders = entityManager.createNamedQuery("Rider.findById").setParameter(1, id).getResultList();
-		if(!riders.isEmpty()) {
-			return riders.get(0);
-		}
-		return null;
-		
-	}
+
+    @Override
+    public Rider findByID(long id) {
+        List<Rider> riders = entityManager.createNamedQuery("Rider.findById").setParameter(1, id).getResultList();
+        if (!riders.isEmpty()) {
+            return riders.get(0);
+        }
+        return null;
+
+    }
 
     @Transactional
     @Override
@@ -77,6 +79,9 @@ public class RiderRepositoryImpl implements RiderRepository {
             r.setName(u.getName());
             r.setPhoneNumber(u.getPhone());
             r.setRiderID(each.getId());
+            r.setUserId(userId);
+            Map<String, String> docs = new HashMap<String, String>();
+            docs.put("document_proof", each.getProof_of_challenge());
             // allRiders.add(r);
             // }
 
@@ -106,23 +111,66 @@ public class RiderRepositoryImpl implements RiderRepository {
             // r.setPIN(u.get);
             r.setPhoneNumber(u.getPhone());
             r.setRiderID(rider.getId());
+            Map<String, String> docs = new HashMap<String, String>();
+            docs.put("document_proof", rider.getProof_of_challenge());
+            r.setUserId(u.getId());
             return r;
             // } // return riders;
         }
     }
 
+    @Transactional
     @Override
-    public void updateRiderPin(PINUpdateRequestObject updateReq) {
+    public long updateRiderPin(PINUpdateRequestObject updateReq) {
         // TODO Auto-generated method stub
         long riderId = updateReq.getRiderID();
         String pin = updateReq.getPIN();
-        entityManager.getTransaction().begin();
         Query q = entityManager.createNativeQuery("update Rider r set r.pin = " + pin + " where r.id =" + riderId,
                 Rider.class);
-        int rowsUpdated = q.executeUpdate();
+        long rowsUpdated = q.executeUpdate();
         System.out.println("updated row : " + rowsUpdated);
-        entityManager.getTransaction().commit();
-        entityManager.close();
+        return rowsUpdated;
+    }
+
+    @Transactional
+    @Override
+    public long updateRiderData(com.woc.dto.Rider r) {
+
+        if (r.getRiderID() == 0 && (r.getPhoneNumber() == null || r.getPhoneNumber().trim().isEmpty())) {
+            return 0l;
+        } else {
+            long rowsUpdated = 0;
+            long userId = 0;
+            if (r.getRiderID() != 0) {
+                RiderSearchCriteria search = new RiderSearchCriteria();
+                search.setRiderId(r.getRiderID());
+                com.woc.dto.Rider fetched_Rider = getRider(search);
+
+                userId = fetched_Rider.getUserId();
+
+            } else {
+                List<User> users = entityManager
+                        .createNativeQuery("select * from User u where u.phone = " + r.getPhoneNumber(), User.class)
+                        .getResultList();
+                if (users.size() == 0) {
+                    return 0l;
+                }
+                User u = users.get(0);
+                userId = u.getId();
+            }
+
+            if (r.getDocuments() != null) {
+                Query q = entityManager.createNativeQuery(
+                        "update Rider r set r.proof_of_challenge = :proof_of_challenge where r.user_id =" + userId,
+                        Rider.class);
+                q.setParameter("proof_of_challenge", Utilities.convertWithStream(r.getDocuments()));
+                rowsUpdated = q.executeUpdate();
+                System.out.println("updated row : " + rowsUpdated);
+                return rowsUpdated;
+            }
+            return 0l;
+        }
+
     }
 
 }
