@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -15,11 +14,10 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "DRIVER")
 @NamedQuery(name = "Driver.findAll", query = "SELECT d FROM Driver d")
+@NamedQuery(name = "Driver.findById", query = "SELECT d FROM Driver d where id=?1")
+@NamedQuery(name="Driver.findAllWithStatus", query = "SELECT d FROM Driver d where status=?1")
 public class Driver implements Serializable {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -49,6 +47,15 @@ public class Driver implements Serializable {
 
     @Column(name = "address", nullable = false, length = 30)
     private String address;
+    
+    @Column(name = "deviceID", nullable = true, length = 30)
+    private String deviceID;
+    
+    @Column(name = "status", nullable = false, length = 30)
+    private String status;
+    
+    @Column(name = "location", nullable=true, length = 30)
+    private String location;
 
     public Long getId() {
         return id;
@@ -121,4 +128,29 @@ public class Driver implements Serializable {
     public void setAddress(String address) {
         this.address = address;
     }
+
+	public String getDeviceID() {
+		return deviceID;
+	}
+
+	public void setDeviceID(String deviceID) {
+		this.deviceID = deviceID;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	public String getLocation() {
+		return location;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
+	}
+    
 }

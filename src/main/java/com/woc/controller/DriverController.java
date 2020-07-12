@@ -18,7 +18,9 @@ import com.woc.dto.FeedBack;
 import com.woc.dto.RideRequestUpdateObject;
 import com.woc.dto.StartRideRequestObject;
 import com.woc.dto.Trip;
+import com.woc.entity.RideRequest;
 import com.woc.service.DriverService;
+import com.woc.service.RiderService;
 
 @RestController
 @RequestMapping("/woc/driver")
@@ -26,6 +28,11 @@ public class DriverController {
 
     @Autowired
     DriverService driverService;
+    
+    @Autowired
+    RiderService riderService;
+    
+
 
     @PostMapping("/createProfile")
     public ResponseEntity createNewDriver(@RequestBody DriverRegistrationRequest request) {
@@ -73,8 +80,15 @@ public class DriverController {
     }
 
     @PostMapping("/updateRideRequest")
-    public void updateRideRequest(@RequestBody RideRequestUpdateObject rideRequestUpdateObject) {
-        return;
+    public ResponseEntity updateRideRequest(@RequestBody RideRequestUpdateObject rideRequestUpdateObject) {
+    	
+    	RideRequest request = riderService.getRideRequest(rideRequestUpdateObject);
+    	if(null == request || null != request.getDriverId()) {
+    		return new ResponseEntity(HttpStatus.NOT_FOUND);
+    	}
+    	driverService.acceptRideRequest(rideRequestUpdateObject,request);
+    	//if found and no driver alloted, then allot the driver, send push notification to rider
+        return new ResponseEntity(HttpStatus.OK);
     }
 
     @PostMapping("/startRide")

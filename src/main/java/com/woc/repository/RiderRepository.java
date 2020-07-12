@@ -14,4 +14,6 @@ public interface RiderRepository {
     public com.woc.dto.Rider getRider(RiderSearchCriteria searchRider);
 
     public void updateRiderPin(PINUpdateRequestObject updateReq);
+
+	public Rider findByID(long id);
 }

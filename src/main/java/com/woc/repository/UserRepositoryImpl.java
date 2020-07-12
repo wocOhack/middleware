@@ -40,8 +40,17 @@ public class UserRepositoryImpl implements UserRepository {
     @Transactional
     @Override
     public User addUser(User u) {
-        // TODO Auto-generated method stub
        entityManager.persist(u);
        return u;
     }
+
+	@Override
+	public User findByID(long id) {
+		List<User> users = entityManager.createNamedQuery("User.findById").setParameter(1, id).getResultList();
+		if(!users.isEmpty()) {
+			return users.get(0);
+		}
+		return null;
+		
+	}
 }

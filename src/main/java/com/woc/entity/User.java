@@ -14,6 +14,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "USER")
 @NamedQuery(name = "User.findAll", query = "SELECT u FROM User u")
+@NamedQuery(name = "User.findById", query = "SELECT u FROM User u where id=?1")
 public class User implements Serializable {
     @Override
     public String toString() {

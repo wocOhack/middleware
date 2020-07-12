@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.woc.dto.PINUpdateRequestObject;
 import com.woc.dto.RiderSearchCriteria;
+import com.woc.entity.Driver;
 import com.woc.entity.Rider;
 import com.woc.entity.User;
 
@@ -26,6 +27,17 @@ public class RiderRepositoryImpl implements RiderRepository {
         List<Rider> riders = entityManager.createNamedQuery("Rider.findAll", Rider.class).getResultList();
         return riders;
     }
+    
+	
+	@Override
+	public Rider findByID(long id) {
+		List<Rider> riders = entityManager.createNamedQuery("Rider.findById").setParameter(1, id).getResultList();
+		if(!riders.isEmpty()) {
+			return riders.get(0);
+		}
+		return null;
+		
+	}
 
     @Transactional
     @Override

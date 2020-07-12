@@ -14,6 +14,8 @@ import javax.persistence.Table;
 @Entity
 @Table(name="RIDER")
 @NamedQuery(name="Rider.findAll", query="SELECT r FROM Rider r")
+@NamedQuery(name = "Rider.findById", query = "SELECT r FROM Rider r where id=?1")
+
 public class Rider {
 
     @Column(name = "id", unique = true, nullable = false, length = 30)
@@ -41,6 +43,9 @@ public class Rider {
 
     @Column(name = "user_id", nullable = false, length = 30)
     private long user_id;
+    
+    @Column(name = "deviceID", nullable = false, length = 30)
+    private long deviceID;
 
     public Long getId() {
         return id;
@@ -105,5 +110,13 @@ public class Rider {
     public void setUser_id(long user_id) {
         this.user_id = user_id;
     }
+
+	public long getDeviceID() {
+		return deviceID;
+	}
+
+	public void setDeviceID(long deviceID) {
+		this.deviceID = deviceID;
+	}
 
 }

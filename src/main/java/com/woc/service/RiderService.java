@@ -1,16 +1,19 @@
 package com.woc.service;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.woc.dto.CancellRideRequestObject;
+import com.woc.dto.RideRequestObject;
+import com.woc.dto.RideRequestUpdateObject;
 import com.woc.dto.Rider;
 import com.woc.dto.RiderSearchCriteria;
+import com.woc.entity.RideRequest;
 import com.woc.entity.ServiceableArea;
 import com.woc.entity.User;
+import com.woc.repository.RideRequestRepository;
 import com.woc.repository.RiderRepository;
 import com.woc.repository.ServicableAreaRepository;
 import com.woc.repository.UserRepository;
@@ -26,6 +29,9 @@ public class RiderService {
 
     @Autowired
     ServicableAreaRepository servicableAreaRepository;
+    
+    @Autowired
+    RideRequestRepository riderRequestsRepository;
 
     public ServiceableArea addArea(ServiceableArea area) {
         return servicableAreaRepository.addArea(area);
@@ -72,7 +78,29 @@ public class RiderService {
         Rider rider = riderRepository.getRider(search);
         return rider;
     }
-
+    
+    public long createRideRequest(RideRequestObject rideRequest) {
+    	
+    	RideRequest request = new RideRequest();
+    	request.setRiderId(riderRepository.findByID(rideRequest.getRiderID()));
+    	request.setEndLocation(rideRequest.getDestinationLocation());
+    	request.setStartLocation(rideRequest.getSourceLocation());
+    	riderRequestsRepository.addRideRequest(request);
+    	return request.getId();
+    }
+    
+    public void cancellRideRequest(CancellRideRequestObject request) {
+    	
+    	com.woc.entity.Rider rider = riderRepository.findByID(request.getRiderID());
+    	RideRequest rideRequest = riderRequestsRepository.findByRider(rider);
+    	riderRequestsRepository.deleteRideRequest(rideRequest);   	
+    	return;
+    }
+    
+    public RideRequest getRideRequest(RideRequestUpdateObject requestObject) {
+		return riderRequestsRepository.findById(requestObject.getRideRequestID());
+    }
+    
     RiderService() {
         super();
     }

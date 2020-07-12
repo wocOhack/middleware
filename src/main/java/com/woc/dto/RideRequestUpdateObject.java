@@ -2,21 +2,21 @@ package com.woc.dto;
 
 public class RideRequestUpdateObject {
 
-	private String rideRequestID;
-	private String driverID;
+	private Long rideRequestID;
+	private Long driverID;
 	private String reponse;
 	
 	
-	public String getRideRequestID() {
+	public Long getRideRequestID() {
 		return rideRequestID;
 	}
-	public void setRideRequestID(String rideRequestID) {
+	public void setRideRequestID(Long rideRequestID) {
 		this.rideRequestID = rideRequestID;
 	}
-	public String getDriverID() {
+	public Long getDriverID() {
 		return driverID;
 	}
-	public void setDriverID(String driverID) {
+	public void setDriverID(Long driverID) {
 		this.driverID = driverID;
 	}
 	public String getReponse() {

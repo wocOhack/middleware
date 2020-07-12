@@ -6,9 +6,12 @@ import com.woc.entity.User;
 
 public interface UserRepository{
 
-	List<User> findAll();
+	public List<User> findAll();
 	
 	public User createNewUser(User newUser);
 	
-	User addUser(User u);
+	public User addUser(User u);
+	
+	public User findByID(long id);
+	
 }
