@@ -2,24 +2,13 @@ package com.woc.dto;
 
 public class FeedBack {
 
-	private String feedBackOwnerID;
-	private String feedBackProviderID;
+	private int tripId;
 	private int rating;
 	private String comments;
 	
 	
-	public String getFeedBackOwnerID() {
-		return feedBackOwnerID;
-	}
-	public void setFeedBackOwnerID(String feedBackOwnerID) {
-		this.feedBackOwnerID = feedBackOwnerID;
-	}
-	public String getFeedBackProviderID() {
-		return feedBackProviderID;
-	}
-	public void setFeedBackProviderID(String feedBackProviderID) {
-		this.feedBackProviderID = feedBackProviderID;
-	}
+	public int getTripId() { return tripId; }
+	public void setTripId(int tripId) { this.tripId = tripId; }
 	public int getRating() {
 		return rating;
 	}
