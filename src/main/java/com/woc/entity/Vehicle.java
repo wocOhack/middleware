@@ -124,4 +124,12 @@ public class Vehicle implements Serializable {
     public void setVerificationDate(Date verificationDate) {
         this.verificationDate = verificationDate;
     }
+
+    @Override
+    public String toString() {
+        return "Vehicle [id=" + id + ", user_id=" + user_id + ", vehicleNumber=" + vehicleNumber + ", insuranceDoc="
+                + insuranceDoc + ", vehicleModel=" + vehicleModel + ", vehicleType=" + vehicleType + ", vehicleDoc="
+                + vehicleDoc + ", isVerified=" + isVerified + ", verifiedBy=" + verifiedBy + ", verificationDate="
+                + verificationDate + "]";
+    }
 }

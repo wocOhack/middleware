@@ -18,4 +18,10 @@ public class FeedbackRepositoryImpl implements FeedbackRepository{
         List<Feedback> feedbacks = entityManager.createNamedQuery("Feedback.findAll").getResultList();
         return feedbacks;
     }
+    
+    // @Override
+    // public Feedback addFeedback() {
+    // List<Feedback> feedbacks = entityManager.createNamedQuery("Feedback.findAll").getResultList();
+    // return feedbacks;
+    // }
 }

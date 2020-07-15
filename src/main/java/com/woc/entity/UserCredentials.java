@@ -82,4 +82,5 @@ public class UserCredentials {
     public void setUpdated_time(Date updated_time) {
         this.updated_time = updated_time;
     }
+    
 }

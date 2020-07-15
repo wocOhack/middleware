@@ -19,7 +19,8 @@ public class ServiceableAreaRepositoryImpl implements ServicableAreaRepository {
 
     @Override
     public List<ServiceableArea> findAll() {
-        List<ServiceableArea> areas = entityManager.createNamedQuery("ServiceableArea.findAll", ServiceableArea.class).getResultList();
+        List<ServiceableArea> areas = entityManager.createNamedQuery("ServiceableArea.findAll", ServiceableArea.class)
+                .getResultList();
         return areas;
     }
 
@@ -29,5 +30,4 @@ public class ServiceableAreaRepositoryImpl implements ServicableAreaRepository {
         entityManager.persist(r);
         return r;
     }
-
 }

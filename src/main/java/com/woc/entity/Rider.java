@@ -118,5 +118,12 @@ public class Rider {
 	public void setDeviceID(long deviceID) {
 		this.deviceID = deviceID;
 	}
+    @Override
+    public String toString() {
+        return "Rider [id=" + id + ", pin=" + pin + ", is_challenged=" + is_challenged + ", is_verified=" + is_verified
+                + ", verification_date=" + verification_date + ", verified_date=" + verified_date
+                + ", proof_of_challenge=" + proof_of_challenge + ", user_id=" + user_id + "]";
+    }
+    
 
 }

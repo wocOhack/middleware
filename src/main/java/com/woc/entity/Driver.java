@@ -153,4 +153,12 @@ public class Driver implements Serializable {
 		this.location = location;
 	}
     
+    @Override
+    public String toString() {
+        return "Driver [id=" + id + ", user_id=" + user_id + ", lcense_number=" + lcense_number
+                + ", license_expiry_date=" + license_expiry_date + ", license_doc=" + license_doc + ", is_verified="
+                + is_verified + ", verification_date=" + verification_date + ", verified_by=" + verified_by
+                + ", address=" + address + "]";
+    }
+
 }

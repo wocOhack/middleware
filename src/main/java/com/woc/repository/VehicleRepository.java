@@ -8,5 +8,7 @@ public interface VehicleRepository {
 
     public List<Vehicle> findAll();
 
-    public void addVehcile(Vehicle v);
+    public long addVehcile(Vehicle v);
+
+    public long updateVehcile(com.woc.dto.Vehicle v);
 }
