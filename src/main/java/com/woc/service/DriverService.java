@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import com.woc.dto.Driver;
 import com.woc.dto.DriverAvailability;
+import com.woc.dto.DriverLocationUpdateRequest;
 import com.woc.dto.DriverSearchCriteria;
 import com.woc.dto.DrivingLicense;
 import com.woc.dto.RideRequestUpdateObject;
@@ -28,31 +29,31 @@ import com.woc.repository.VehicleRepository;
 @Component
 public class DriverService {
 
-	@Autowired
-	UserRepository userRepository;
+    @Autowired
+    UserRepository userRepository;
 
-	@Autowired
-	DriverAvailabilityRepository driverAvailabilityRepository;
+    @Autowired
+    DriverAvailabilityRepository driverAvailabilityRepository;
 
-	@Autowired
-	DriverRepository driverRepository;
+    @Autowired
+    DriverRepository driverRepository;
 
-	@Autowired
-	VehicleRepository vehicleRepository;
+    @Autowired
+    VehicleRepository vehicleRepository;
 
-	@Autowired
-	UserCredentialsRepository userCredRepository;
+    @Autowired
+    UserCredentialsRepository userCredRepository;
 
-	@Autowired
-	LocationService locationService;
-	
-	@Autowired
-	PushNotificationService notificationService;
-	
-	@Autowired
-	RideRequestRepository rideRequestRepository;
+    @Autowired
+    LocationService locationService;
 
-	public void toggleDriverAvailability(long user_id, String status) {
+    @Autowired
+    PushNotificationService notificationService;
+
+    @Autowired
+    RideRequestRepository rideRequestRepository;
+
+    public void toggleDriverAvailability(long user_id, String status) {
         driverAvailabilityRepository.toggleDriverAvailability(user_id, status);
     }
 
@@ -121,7 +122,8 @@ public class DriverService {
     }
 
     public long toggleDriverAvailability(DriverAvailability availability) {
-        if (availability.getDriverID()== 0 && (availability.getStatus()== null || !availability.getStatus().trim().isEmpty())) {
+        if (availability.getDriverID() == 0
+                && (availability.getStatus() == null || !availability.getStatus().trim().isEmpty())) {
             return 0l;
         }
         long result = driverRepository.updateDriverStatus(availability);
@@ -168,52 +170,56 @@ public class DriverService {
         }
         return idUpdated;
     }
-	public List<com.woc.entity.Driver> getAllAvailableDrivers() {
 
-		List<com.woc.entity.Driver> availableDrivers = driverRepository.getAllDriversWithStatus("Available");
-		return availableDrivers;
-	}
+    public List<com.woc.entity.Driver> getAllAvailableDrivers() {
 
-	public void notifyNearestDrivers(String riderLocation, String destinationLocation, long rideRequestID) {
+        List<com.woc.entity.Driver> availableDrivers = driverRepository.getAllDriversWithStatus("Available");
+        return availableDrivers;
+    }
 
-		List<com.woc.entity.Driver> availableDrivers = getAllAvailableDrivers();
-		List<Driver> nearestDrivers = new ArrayList<Driver>();
+    public void notifyNearestDrivers(String riderLocation, String destinationLocation, long rideRequestID) {
 
-		for (com.woc.entity.Driver driver : availableDrivers) {
-			nearestDrivers.add(getDriverWithDistance(driver, riderLocation));
-		}
-		Collections.sort(nearestDrivers,new Comparator<Driver>() {
+        List<com.woc.entity.Driver> availableDrivers = getAllAvailableDrivers();
+        List<Driver> nearestDrivers = new ArrayList<Driver>();
 
-			@Override
-			public int compare(Driver o1, Driver o2) {
-				if(o1.getDistanceFromRider()> o2.getDistanceFromRider()) {
-					return 1;
-				}
-				else {
-				return 0;
-				}
-			}
-		});
-		
-		for(int i=0; i<5; i++) {
-			notificationService.send("", nearestDrivers.get(i).getDeviceID());
-		}
-	}
+        for (com.woc.entity.Driver driver : availableDrivers) {
+            nearestDrivers.add(getDriverWithDistance(driver, riderLocation));
+        }
+        Collections.sort(nearestDrivers, new Comparator<Driver>() {
 
-	public Driver getDriverWithDistance(com.woc.entity.Driver driverEntity, String riderLocation) {
+            @Override
+            public int compare(Driver o1, Driver o2) {
+                if (o1.getDistanceFromRider() > o2.getDistanceFromRider()) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            }
+        });
 
-		Driver driver = new Driver();
-		driver.setDriverID(driverEntity.getId());
-		driver.setDistanceFromRider(
-				locationService.getDistanceBetweenLocations(driverEntity.getLocation(), riderLocation));
-		return driver;
-	}
-	
-	public void acceptRideRequest(RideRequestUpdateObject requestObject, RideRequest rideRequest) {
-		
-		com.woc.entity.Driver driver = driverRepository.findByID(requestObject.getDriverID());
-		rideRequest.setDriverId(driver);
-		rideRequestRepository.updateRideRequest(rideRequest);
-		notificationService.send("", Long.toString(rideRequest.getRiderId().getDeviceID()));
-	}
+        for (int i = 0; i < 5; i++) {
+            notificationService.send("", nearestDrivers.get(i).getDeviceID());
+        }
+    }
+
+    public Driver getDriverWithDistance(com.woc.entity.Driver driverEntity, String riderLocation) {
+
+        Driver driver = new Driver();
+        driver.setDriverID(driverEntity.getId());
+        driver.setDistanceFromRider(
+                locationService.getDistanceBetweenLocations(driverEntity.getLocation(), riderLocation));
+        return driver;
+    }
+
+    public void acceptRideRequest(RideRequestUpdateObject requestObject, RideRequest rideRequest) {
+
+        com.woc.entity.Driver driver = driverRepository.findByID(requestObject.getDriverID());
+        rideRequest.setDriverId(driver);
+        rideRequestRepository.updateRideRequest(rideRequest);
+        notificationService.send("", Long.toString(rideRequest.getRiderId().getDeviceID()));
+    }
+
+    public long updateDriverLocation(DriverLocationUpdateRequest request) {
+        return driverRepository.updateDriverLocation(request);
+    }
 }

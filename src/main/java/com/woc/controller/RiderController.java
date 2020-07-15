@@ -100,11 +100,13 @@ public class RiderController {
         ;
     }
 
-    @GetMapping("getTrips")
-    public List<Trip> getTrips(@RequestBody TripSearchCriteria criteria) {
-
-        List<Trip> trips = new ArrayList<Trip>();
-        return trips;
+    @GetMapping("/getTrips")
+    public ResponseEntity getTrips(@RequestBody TripSearchCriteria criteria) {
+        List<Trip> trips = riderService.getRiderTrips(criteria);
+        if (trips.size() == 0) {
+            return new ResponseEntity("Data Not Found", HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity(trips, HttpStatus.OK);
 
     }
 

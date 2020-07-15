@@ -1,5 +1,6 @@
 package com.woc.repository;
 
+import com.woc.dto.TripSearchCriteria;
 import com.woc.entity.Trip;
 
 import java.util.List;
@@ -17,5 +18,7 @@ public interface TripRepository {
     public Trip createTrip(Trip trip);
     
     public Trip updateTrip(Trip trip);
+    
+    public List<Trip> getTrips(TripSearchCriteria searchCriteria);
 
 }

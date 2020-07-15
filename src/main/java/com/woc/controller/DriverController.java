@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.woc.dto.Driver;
 import com.woc.dto.DriverAvailability;
+import com.woc.dto.DriverLocationUpdateRequest;
 import com.woc.dto.DriverRegistrationRequest;
 import com.woc.dto.DriverSearchCriteria;
 import com.woc.dto.FeedBack;
@@ -28,11 +29,9 @@ public class DriverController {
 
     @Autowired
     DriverService driverService;
-    
+
     @Autowired
     RiderService riderService;
-    
-
 
     @PostMapping("/createProfile")
     public ResponseEntity createNewDriver(@RequestBody DriverRegistrationRequest request) {
@@ -85,13 +84,13 @@ public class DriverController {
 
     @PostMapping("/updateRideRequest")
     public ResponseEntity updateRideRequest(@RequestBody RideRequestUpdateObject rideRequestUpdateObject) {
-    	
-    	RideRequest request = riderService.getRideRequest(rideRequestUpdateObject);
-    	if(null == request || null != request.getDriverId()) {
-    		return new ResponseEntity(HttpStatus.NOT_FOUND);
-    	}
-    	driverService.acceptRideRequest(rideRequestUpdateObject,request);
-    	//if found and no driver alloted, then allot the driver, send push notification to rider
+
+        RideRequest request = riderService.getRideRequest(rideRequestUpdateObject);
+        if (null == request || null != request.getDriverId()) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        }
+        driverService.acceptRideRequest(rideRequestUpdateObject, request);
+        // if found and no driver alloted, then allot the driver, send push notification to rider
         return new ResponseEntity(HttpStatus.OK);
     }
 
@@ -103,7 +102,7 @@ public class DriverController {
     @PostMapping("/endRide")
     public Trip endRide(@RequestBody StartRideRequestObject startRideRequestObject) {
         Trip trip = new Trip();
-        trip.setFare(200L);
+        trip.setFare(200.0);
         return trip;
     }
 
@@ -117,5 +116,18 @@ public class DriverController {
         String status = driverAvailability.getStatus();
         long user_id = driverAvailability.getDriverID();
         driverService.toggleDriverAvailability(user_id, status);
+    }
+
+    @PutMapping("/update-current-location")
+    public ResponseEntity updateCurrentLocation(@RequestBody DriverLocationUpdateRequest updateLocationRequest) {
+        
+        if (updateLocationRequest.getDriverId() == 0l && (updateLocationRequest.getLocation()== null || !updateLocationRequest.getLocation().trim().isEmpty())) {
+            return new ResponseEntity("Need driverid and location for the update request", HttpStatus.BAD_REQUEST); 
+        } 
+        long updated = driverService.updateDriverLocation(updateLocationRequest);
+        if (updated != 0l) {
+            return new ResponseEntity("Driver Location Updated", HttpStatus.OK); 
+        }
+        return new ResponseEntity("Could not update driver location", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

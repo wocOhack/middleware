@@ -1,5 +1,6 @@
 package com.woc.service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -15,12 +16,15 @@ import com.woc.dto.RideRequestUpdateObject;
 import com.woc.dto.PINUpdateRequestObject;
 import com.woc.dto.Rider;
 import com.woc.dto.RiderSearchCriteria;
+import com.woc.dto.Trip;
+import com.woc.dto.TripSearchCriteria;
 import com.woc.entity.RideRequest;
 import com.woc.entity.ServiceableArea;
 import com.woc.entity.User;
 import com.woc.repository.RideRequestRepository;
 import com.woc.repository.RiderRepository;
 import com.woc.repository.ServicableAreaRepository;
+import com.woc.repository.TripRepository;
 import com.woc.repository.UserRepository;
 import com.woc.utilities.Utilities;
 
@@ -35,9 +39,12 @@ public class RiderService {
 
     @Autowired
     ServicableAreaRepository servicableAreaRepository;
-    
+
     @Autowired
     RideRequestRepository riderRequestsRepository;
+
+    @Autowired
+    TripRepository tripRepository;
 
     public ServiceableArea addArea(ServiceableArea area) {
         return servicableAreaRepository.addArea(area);
@@ -84,34 +91,32 @@ public class RiderService {
         Rider rider = riderRepository.getRider(search);
         return rider;
     }
-    
+
     public long createRideRequest(RideRequestObject rideRequest) {
-    	
-    	RideRequest request = new RideRequest();
-    	request.setRiderId(riderRepository.findByID(rideRequest.getRiderID()));
-    	request.setEndLocation(rideRequest.getDestinationLocation());
-    	request.setStartLocation(rideRequest.getSourceLocation());
-    	riderRequestsRepository.addRideRequest(request);
-    	return request.getId();
+
+        RideRequest request = new RideRequest();
+        request.setRiderId(riderRepository.findByID(rideRequest.getRiderID()));
+        request.setEndLocation(rideRequest.getDestinationLocation());
+        request.setStartLocation(rideRequest.getSourceLocation());
+        riderRequestsRepository.addRideRequest(request);
+        return request.getId();
     }
-    
+
     public void cancellRideRequest(CancellRideRequestObject request) {
-    	
-    	com.woc.entity.Rider rider = riderRepository.findByID(request.getRiderID());
-    	RideRequest rideRequest = riderRequestsRepository.findByRider(rider);
-    	riderRequestsRepository.deleteRideRequest(rideRequest);   	
-    	return;
+
+        com.woc.entity.Rider rider = riderRepository.findByID(request.getRiderID());
+        RideRequest rideRequest = riderRequestsRepository.findByRider(rider);
+        riderRequestsRepository.deleteRideRequest(rideRequest);
+        return;
     }
-    
+
     public RideRequest getRideRequest(RideRequestUpdateObject requestObject) {
-		return riderRequestsRepository.findById(requestObject.getRideRequestID());
+        return riderRequestsRepository.findById(requestObject.getRideRequestID());
     }
-    
 
     public long updateRider(Rider rider) {
 
-        if ((rider.getRiderID() == 0l)
-                && (rider.getPhoneNumber() == null || rider.getPhoneNumber().trim().isEmpty())) {
+        if ((rider.getRiderID() == 0l) && (rider.getPhoneNumber() == null || rider.getPhoneNumber().trim().isEmpty())) {
             return 0l;
         }
 
@@ -126,10 +131,11 @@ public class RiderService {
         System.out.println("fetched Rider : " + r.getName() + r.getRiderID());
         System.out.println("rider.name : " + rider.getName() + rider.getRiderID());
         System.out.println(r.getUserId());
-        if (rider.getEmail() != null && !rider.getEmail().trim().isEmpty() && rider.getName() != null && !rider.getName().trim().isEmpty()) { 
-            long user_update = userRepository.updateUser(rider.getName(), rider.getEmail(), rider.getPhoneNumber(), r.getUserId());
-        }
-        else if (rider.getEmail() != null && !rider.getEmail().trim().isEmpty()) {
+        if (rider.getEmail() != null && !rider.getEmail().trim().isEmpty() && rider.getName() != null
+                && !rider.getName().trim().isEmpty()) {
+            long user_update = userRepository.updateUser(rider.getName(), rider.getEmail(), rider.getPhoneNumber(),
+                    r.getUserId());
+        } else if (rider.getEmail() != null && !rider.getEmail().trim().isEmpty()) {
             long user_update = userRepository.updateUser("", rider.getEmail(), rider.getPhoneNumber(), r.getUserId());
             // if (user_update != 0) {
             // long updated = riderRepository.updateRiderData(rider);
@@ -138,8 +144,7 @@ public class RiderService {
             // return 0l;
             // }
             return user_update;
-        }
-        else if (rider.getName() != null && !rider.getName().trim().isEmpty()) {
+        } else if (rider.getName() != null && !rider.getName().trim().isEmpty()) {
             long user_update = userRepository.updateUser(rider.getName(), "", rider.getPhoneNumber(), r.getUserId());
             return user_update;
         }
@@ -150,11 +155,29 @@ public class RiderService {
     }
 
     public long updateDriverPin(PINUpdateRequestObject request) {
-        if ((request.getRiderID() == 0)
-                || (request.getPIN() == null && request.getPIN().trim().isEmpty())) {
+        if ((request.getRiderID() == 0) || (request.getPIN() == null && request.getPIN().trim().isEmpty())) {
             return -1l;
         }
         return riderRepository.updateRiderPin(request);
+    }
+
+    public List<Trip> getRiderTrips(TripSearchCriteria searchCriteria) {
+        List<Trip> fetchedTrips = new ArrayList<Trip>();
+        List<com.woc.entity.Trip> trips = tripRepository.getTrips(searchCriteria);
+
+        for (com.woc.entity.Trip each : trips) {
+            Trip t = new Trip();
+            t.setDistance(each.getDistance());
+            t.setDuration(each.getDuration().getTime());
+            t.setStartTime(each.getTripStartTime());
+            t.setEndTime(each.getTripEndTime());
+            t.setFare(each.getCost());
+            
+            t.setStartLocation(each.getStartLocation());
+            t.setEndLocation(each.getEndLocation());
+            fetchedTrips.add(t);
+        }
+        return fetchedTrips;
     }
 
     RiderService() {

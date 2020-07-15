@@ -3,6 +3,7 @@ package com.woc.repository;
 import java.util.List;
 
 import com.woc.dto.DriverAvailability;
+import com.woc.dto.DriverLocationUpdateRequest;
 import com.woc.dto.DriverSearchCriteria;
 import com.woc.dto.DrivingLicense;
 import com.woc.entity.Driver;
@@ -23,4 +24,6 @@ public interface DriverRepository {
     public long updateDriverData(com.woc.dto.Driver d, DrivingLicense license);
 
     public long updateDriverStatus(DriverAvailability availability);
+    
+    public long updateDriverLocation(DriverLocationUpdateRequest request);
 }

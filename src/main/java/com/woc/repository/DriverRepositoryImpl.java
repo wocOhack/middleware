@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.woc.dto.DriverAvailability;
+import com.woc.dto.DriverLocationUpdateRequest;
 import com.woc.dto.DriverSearchCriteria;
 import com.woc.dto.DrivingLicense;
 import com.woc.entity.Driver;
@@ -235,6 +236,16 @@ public class DriverRepositoryImpl implements DriverRepository {
         Query q = entityManager
                 .createNativeQuery("Update Driver d set d.status = :status where d.id = " + availability.getDriverID());
         q.setParameter("status", availability.getStatus());
+        long rowsUpdated = q.executeUpdate();
+        return updated;
+    }
+
+    @Override
+    public long updateDriverLocation(DriverLocationUpdateRequest request) {
+        long updated = 0;
+        Query q = entityManager
+                .createNativeQuery("Update Driver d set d.location = :location where d.id = " + request.getDriverId());
+        q.setParameter("location", request.getLocation());
         long rowsUpdated = q.executeUpdate();
         return updated;
     }
