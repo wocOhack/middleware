@@ -59,7 +59,7 @@ public class RiderService {
         return servicableAreaRepository.findAll();
     }
 
-    public void addRider(Rider rider) {
+    public long addRider(Rider rider) {
         System.out.println("Adding rider");
         Date now = new Date(System.currentTimeMillis());
 
@@ -69,9 +69,10 @@ public class RiderService {
         RiderSearchCriteria search = new RiderSearchCriteria();
         search.setPhoneNumber(rider.getPhoneNumber());
         Rider ifexisting = riderRepository.getRider(search);
-        if (ifexisting == null) {
+        if (ifexisting != null) {
             // send 400 bad request as user already exist....
             System.out.println("User already exist.....");
+            return 0;
         }
         u.setPhone(rider.getPhoneNumber());
         u.setEmail(rider.getEmail());
@@ -81,7 +82,7 @@ public class RiderService {
 
         userRepository.addUser(u);
         System.out.println("userId : " + u.getId());
-
+        
         r.setIs_verified(true);
         r.setPin(rider.getPIN());
         // Map<String, String> documents = new HashMap<String, String>();
@@ -89,7 +90,7 @@ public class RiderService {
         r.setVerification_date(now);
         r.setUser_id(u.getId());
         r.setIs_challenged(true);
-        riderRepository.addRider(r);
+        return riderRepository.addRider(r);   
     }
 
     public Rider getRider(RiderSearchCriteria search) {

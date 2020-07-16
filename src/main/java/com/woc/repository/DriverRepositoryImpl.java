@@ -140,17 +140,6 @@ public class DriverRepositoryImpl implements DriverRepository {
         // One thing to be updated at a time.
         long driver_id = 0l;
 
-        // List<User> users = entityManager
-        // .createNativeQuery("select * from User u where u.phone = " + d.getPhoneNumber(), User.class).getResultList();
-        // List<com.woc.dto.Rider> allRiders = new ArrayList();
-        // // for (User u : users) {
-        // System.out.println("user length : " + users.size());
-        //
-        // if (users.size() == 0) {
-        // return 0l;
-        // }
-        // User u = users.get(0);
-
         if (d.getPhoneNumber() != null && !d.getPhoneNumber().trim().isEmpty()) {
             DriverSearchCriteria search = new DriverSearchCriteria();
             search.setPhoneNumber(d.getPhoneNumber());
@@ -161,65 +150,46 @@ public class DriverRepositoryImpl implements DriverRepository {
         }
 
         long rowsUpdated = 0;
-        if ((d.getEmail() != null && !d.getEmail().trim().isEmpty())
-                && (d.getAddress() != null && d.getAddress().trim().isEmpty())) {
-            Query q = entityManager.createNativeQuery(
-                    "Update Driver d set d.email = :email, d.address = :address where d.id = " + driver_id);
-            q.setParameter("email", d.getEmail());
-            q.setParameter("address", d.getAddress());
-            rowsUpdated = q.executeUpdate();
-            // return rowsUpdated;
-        }
-
-        else if (d.getAddress() != null && d.getAddress().trim().isEmpty()) {
+        if (d.getAddress() != null && !d.getAddress().trim().isEmpty()) {
             Query q = entityManager
                     .createNativeQuery("Update Driver d set d.address = :address where d.id = " + driver_id);
             q.setParameter("address", d.getAddress());
 
             rowsUpdated = q.executeUpdate();
             // return rowsUpdated;
-        } else if ((d.getEmail() != null && !d.getEmail().trim().isEmpty())) {
-            Query q = entityManager.createNativeQuery("Update Driver d set d.email = :email where d.id = " + driver_id);
-            q.setParameter("email", d.getEmail());
-            rowsUpdated = q.executeUpdate();
-            // return rowsUpdated;
         }
-        // TODO: license number is non editable ? - will add here if required. How to handle on vehciles ? Can a driver
-        // have multiple vehciles.?
-        if (rowsUpdated != 0) {
-            if (license.getExpiryDate() != null
-                    && (license.getLicenseDocumentLink() != null && !license.getLicenseDocumentLink().trim().isEmpty())
-                    && license.getLicenceNumber() != null && !license.getLicenceNumber().trim().isEmpty()) {
-                Query q = entityManager.createNativeQuery(
-                        "Update Driver d set d.license_doc = :license_doc, d.license_expiry_date = :expiry_date, d.lcense_number = :license_number where d.id = "
-                                + driver_id);
-                q.setParameter("license_doc", license.getLicenseDocumentLink());
-                q.setParameter("expiry_date", license.getExpiryDate());
-                q.setParameter("license_number", license.getLicenceNumber());
-                rowsUpdated = q.executeUpdate();
-                return rowsUpdated;
-            }
+        if (license.getExpiryDate() != null
+                && (license.getLicenseDocumentLink() != null && !license.getLicenseDocumentLink().trim().isEmpty())
+                && license.getLicenceNumber() != null && !license.getLicenceNumber().trim().isEmpty()) {
+            Query q = entityManager.createNativeQuery(
+                    "Update Driver d set d.license_doc = :license_doc, d.license_expiry_date = :expiry_date, d.lcense_number = :license_number where d.id = "
+                            + driver_id);
+            q.setParameter("license_doc", license.getLicenseDocumentLink());
+            q.setParameter("expiry_date", license.getExpiryDate());
+            q.setParameter("license_number", license.getLicenceNumber());
+            rowsUpdated = q.executeUpdate();
+            return rowsUpdated;
+        }
 
-            if (license.getExpiryDate() != null) {
-                Query q = entityManager.createNativeQuery(
-                        "Update Driver d set d.license_expiry_date = :expiry_date where d.id = " + driver_id);
-                // q.setParameter("license_doc", license.getLicenseDocumentLink());
-                q.setParameter("expiry_date", license.getExpiryDate());
-                // q.setParameter("license_number", license.getLicenceNumber());
-                rowsUpdated = q.executeUpdate();
-                return rowsUpdated;
-            }
+        if (license.getExpiryDate() != null) {
+            Query q = entityManager.createNativeQuery(
+                    "Update Driver d set d.license_expiry_date = :expiry_date where d.id = " + driver_id);
+            // q.setParameter("license_doc", license.getLicenseDocumentLink());
+            q.setParameter("expiry_date", license.getExpiryDate());
+            // q.setParameter("license_number", license.getLicenceNumber());
+            rowsUpdated = q.executeUpdate();
+            return rowsUpdated;
+        }
 
-            if (license.getExpiryDate() != null && (license.getLicenseDocumentLink() != null
-                    && !license.getLicenseDocumentLink().trim().isEmpty())) {
-                Query q = entityManager.createNativeQuery(
-                        "Update Driver d set d.license_doc = :license_doc, d.license_expiry_date = :expiry_date where d.id = "
-                                + driver_id);
-                q.setParameter("license_doc", license.getLicenseDocumentLink());
-                q.setParameter("expiry_date", license.getExpiryDate());
-                rowsUpdated = q.executeUpdate();
-                return rowsUpdated;
-            }
+        if (license.getExpiryDate() != null
+                && (license.getLicenseDocumentLink() != null && !license.getLicenseDocumentLink().trim().isEmpty())) {
+            Query q = entityManager.createNativeQuery(
+                    "Update Driver d set d.license_doc = :license_doc, d.license_expiry_date = :expiry_date where d.id = "
+                            + driver_id);
+            q.setParameter("license_doc", license.getLicenseDocumentLink());
+            q.setParameter("expiry_date", license.getExpiryDate());
+            rowsUpdated = q.executeUpdate();
+            return rowsUpdated;
         }
         return rowsUpdated;
     }
@@ -231,22 +201,25 @@ public class DriverRepositoryImpl implements DriverRepository {
         return drivers;
     }
 
+    @Transactional
+    @Override
     public long updateDriverStatus(DriverAvailability availability) {
         long updated = 0;
         Query q = entityManager
                 .createNativeQuery("Update Driver d set d.status = :status where d.id = " + availability.getDriverID());
         q.setParameter("status", availability.getStatus());
-        long rowsUpdated = q.executeUpdate();
+        updated = q.executeUpdate();
         return updated;
     }
 
+    @Transactional
     @Override
     public long updateDriverLocation(DriverLocationUpdateRequest request) {
         long updated = 0;
         Query q = entityManager
                 .createNativeQuery("Update Driver d set d.location = :location where d.id = " + request.getDriverId());
         q.setParameter("location", request.getLocation());
-        long rowsUpdated = q.executeUpdate();
+        updated = q.executeUpdate();
         return updated;
     }
 }

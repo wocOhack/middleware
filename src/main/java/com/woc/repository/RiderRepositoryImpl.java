@@ -43,9 +43,10 @@ public class RiderRepositoryImpl implements RiderRepository {
 
     @Transactional
     @Override
-    public void addRider(Rider r) {
+    public long addRider(Rider r) {
         // TODO Auto-generated method stub
         entityManager.persist(r);
+        return r.getId();
     }
 
     @Override

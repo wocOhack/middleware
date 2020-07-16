@@ -171,11 +171,11 @@ public class DriverService {
             // } else {
             // return 0l;
             // }
-            return user_update;
+            // return user_update;
         }
         if (driver.getName() != null && !driver.getName().trim().isEmpty()) {
             long user_update = userRepository.updateUser(driver.getName(), "", driver.getPhoneNumber(), userId);
-            return user_update;
+            // return user_update;
         }
 
         if (license.getLicenseDocumentLink() != null && !license.getLicenseDocumentLink().trim().isEmpty()) {
@@ -241,7 +241,7 @@ public class DriverService {
 
         Trip trip = tripRepository.findTripById(feedbackDTO.getTripId());
 
-        if(trip == null) {
+        if (trip == null) {
             throw new FeedbackSubmissionException("Bad Request. Could not find trip.");
         }
 
@@ -250,9 +250,9 @@ public class DriverService {
         }
 
         List<Feedback> existingFeedbacksForTrip = feedbackRepository.getFeedbacksByTripId(trip.getId());
-        if(existingFeedbacksForTrip != null) {
-            for(Feedback f : existingFeedbacksForTrip) {
-                if(f.getFeedbackOwnerId() == trip.getDriverId()) {
+        if (existingFeedbacksForTrip != null) {
+            for (Feedback f : existingFeedbacksForTrip) {
+                if (f.getFeedbackOwnerId() == trip.getDriverId()) {
                     return;
                 }
             }
