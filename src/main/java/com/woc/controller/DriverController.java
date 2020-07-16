@@ -76,7 +76,7 @@ public class DriverController {
     public ResponseEntity updateDriverAvailability(@RequestBody DriverAvailability driverAvailability) {
         // return;
         long result = driverService.toggleDriverAvailability(driverAvailability);
-        if (result == 0l) {
+        if (result != 0l) {
             return new ResponseEntity(HttpStatus.OK);
         } else {
             return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -116,8 +116,8 @@ public class DriverController {
 
     @PutMapping("/update-current-location")
     public ResponseEntity updateCurrentLocation(@RequestBody DriverLocationUpdateRequest updateLocationRequest) {
-        
-        if (updateLocationRequest.getDriverId() == 0l && (updateLocationRequest.getLocation()== null || !updateLocationRequest.getLocation().trim().isEmpty())) {
+        System.out.println(updateLocationRequest.getDriverId() + " " + updateLocationRequest.getLocation());
+        if (updateLocationRequest.getDriverId() == 0l && (updateLocationRequest.getLocation()== null || updateLocationRequest.getLocation().trim().isEmpty())) {
             return new ResponseEntity("Need driverid and location for the update request", HttpStatus.BAD_REQUEST); 
         } 
         long updated = driverService.updateDriverLocation(updateLocationRequest);
