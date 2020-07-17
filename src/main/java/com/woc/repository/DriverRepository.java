@@ -24,6 +24,6 @@ public interface DriverRepository {
     public long updateDriverData(com.woc.dto.Driver d, DrivingLicense license);
 
     public long updateDriverStatus(DriverAvailability availability);
-
+    
     public long updateDriverLocation(DriverLocationUpdateRequest request);
 }

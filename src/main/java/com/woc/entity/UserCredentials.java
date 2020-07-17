@@ -25,7 +25,7 @@ public class UserCredentials {
 
     @Column(name = "user_pin", nullable = false, length = 30)
     private String user_pin;
-
+    
     @Column(name = "user_id", nullable = false, length = 30)
     private long user_id;
 

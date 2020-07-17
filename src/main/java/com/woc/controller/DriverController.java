@@ -145,11 +145,11 @@ public class DriverController {
     public ResponseEntity updateCurrentLocation(@RequestBody DriverLocationUpdateRequest updateLocationRequest) {
         System.out.println(updateLocationRequest.getDriverId() + " " + updateLocationRequest.getLocation());
         if (updateLocationRequest.getDriverId() == 0l && (updateLocationRequest.getLocation()== null || updateLocationRequest.getLocation().trim().isEmpty())) {
-            return new ResponseEntity("Need driverid and location for the update request", HttpStatus.BAD_REQUEST);
-        }
+            return new ResponseEntity("Need driverid and location for the update request", HttpStatus.BAD_REQUEST); 
+        } 
         long updated = driverService.updateDriverLocation(updateLocationRequest);
         if (updated != 0l) {
-            return new ResponseEntity("Driver Location Updated", HttpStatus.OK);
+            return new ResponseEntity("Driver Location Updated", HttpStatus.OK); 
         }
         return new ResponseEntity("Could not update driver location", HttpStatus.INTERNAL_SERVER_ERROR);
     }

@@ -37,7 +37,7 @@ public class RiderController {
 
     @PostMapping("/createProfile")
     public ResponseEntity createNewRider(@RequestBody Rider newRider) {
-
+        
         long id = riderService.addRider(newRider);
         if (id != 0) {
             String message = "Rider created sucessfully";

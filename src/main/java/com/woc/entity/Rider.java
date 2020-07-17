@@ -43,7 +43,7 @@ public class Rider {
 
     @Column(name = "user_id", nullable = false, length = 30)
     private long user_id;
-
+    
     @Column(name = "deviceID", nullable = false, length = 30)
     private long deviceID;
 
@@ -124,6 +124,6 @@ public class Rider {
                 + ", verification_date=" + verification_date + ", verified_date=" + verified_date
                 + ", proof_of_challenge=" + proof_of_challenge + ", user_id=" + user_id + "]";
     }
-
+    
 
 }
