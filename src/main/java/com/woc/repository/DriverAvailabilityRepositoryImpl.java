@@ -68,7 +68,7 @@ public class DriverAvailabilityRepositoryImpl implements DriverAvailabilityRepos
         }
         // entityManager.getTransaction().begin();
         Date updated_time = new Date(System.currentTimeMillis());
-        
+
         Query q = entityManager.createNativeQuery("Update Driver_Availability da set da.status = "
                 + String.valueOf(value) + ",da.updated_time = :updated_time" + " where user_id = " + user_id);
         q.setParameter("updated_time", updated_time);

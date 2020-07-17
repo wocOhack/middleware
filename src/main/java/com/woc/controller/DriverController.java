@@ -1,5 +1,6 @@
 package com.woc.controller;
 
+import com.woc.service.OTPService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,9 @@ import com.woc.entity.RideRequest;
 import com.woc.service.DriverService;
 import com.woc.service.RiderService;
 import com.woc.service.exceptions.FeedbackSubmissionException;
+import com.woc.dto.PhoneVerificationInitiationRequest;
+import com.woc.dto.DriverVerificationCompletionReply;
+import com.woc.dto.PhoneVerificationCompletionRequest;
 
 @RestController
 @RequestMapping("/woc/driver")
@@ -30,6 +34,9 @@ public class DriverController {
 
     @Autowired
     DriverService driverService;
+
+    @Autowired
+    OTPService otpService;
 
     @Autowired
     RiderService riderService;
@@ -107,6 +114,30 @@ public class DriverController {
         return trip;
     }
 
+	@PostMapping("/submitFeedBack")
+	public void submitFeedBack(@RequestBody FeedBack feedBack) {
+		return;
+	}
+
+    @PostMapping("/initiatePhoneVerification")
+    public Boolean initiatePhoneVerification(@RequestBody final PhoneVerificationInitiationRequest phoneVerificationInitiationRequest) {
+        return otpService.initiateVerification(phoneVerificationInitiationRequest);
+    }
+
+    @PutMapping("/completePhoneVerification")
+    public DriverVerificationCompletionReply completePhoneVerification(@RequestBody final PhoneVerificationCompletionRequest phoneVerificationCompletionRequest) {
+        Boolean isExistingUser=false;
+        Driver driver=null;
+        Boolean isVerified=otpService.completeVerification(phoneVerificationCompletionRequest);
+
+        if(isVerified){
+            String phoneNumber=phoneVerificationCompletionRequest.getPhoneNumber();
+            DriverSearchCriteria driverSearchCriteria=new DriverSearchCriteria();
+            driverSearchCriteria.setPhoneNumber(phoneNumber);
+            driver=driverService.getDriver(driverSearchCriteria);
+            isExistingUser=(driver!=null);
+        }
+        return new DriverVerificationCompletionReply(isVerified,isExistingUser,driver);
     @PutMapping("/toggleDriverAvailabilityStatus")
     public void toggleDriverAvailability(@RequestBody DriverAvailability driverAvailability) {
         String status = driverAvailability.getStatus();
@@ -118,11 +149,11 @@ public class DriverController {
     public ResponseEntity updateCurrentLocation(@RequestBody DriverLocationUpdateRequest updateLocationRequest) {
         System.out.println(updateLocationRequest.getDriverId() + " " + updateLocationRequest.getLocation());
         if (updateLocationRequest.getDriverId() == 0l && (updateLocationRequest.getLocation()== null || updateLocationRequest.getLocation().trim().isEmpty())) {
-            return new ResponseEntity("Need driverid and location for the update request", HttpStatus.BAD_REQUEST); 
-        } 
+            return new ResponseEntity("Need driverid and location for the update request", HttpStatus.BAD_REQUEST);
+        }
         long updated = driverService.updateDriverLocation(updateLocationRequest);
         if (updated != 0l) {
-            return new ResponseEntity("Driver Location Updated", HttpStatus.OK); 
+            return new ResponseEntity("Driver Location Updated", HttpStatus.OK);
         }
         return new ResponseEntity("Could not update driver location", HttpStatus.INTERNAL_SERVER_ERROR);
     }

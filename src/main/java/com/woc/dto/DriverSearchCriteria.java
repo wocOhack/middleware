@@ -7,7 +7,7 @@ public class DriverSearchCriteria implements Serializable{
 	private static final long serialVersionUID = -6779314507526973982L;
 	
 	private String phoneNumber;
-	private long driverId;
+	private String driverId;
 	
 	
 	public String getPhoneNumber() {
@@ -16,11 +16,11 @@ public class DriverSearchCriteria implements Serializable{
 	public void setPhoneNumber(String phoneNumber) {
 		this.phoneNumber = phoneNumber;
 	}
-	public long getDriverId() {
+	public String getRiderId() {
 		return driverId;
 	}
-	public void setDriverId(long driverId) {
-		this.driverId = driverId;
+	public void setRiderId(String riderId) {
+		this.driverId = riderId;
 	}
 
 }

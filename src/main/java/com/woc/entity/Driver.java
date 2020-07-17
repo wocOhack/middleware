@@ -1,12 +1,11 @@
 package com.woc.entity;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.sql.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -21,11 +20,10 @@ public class Driver implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "user_id", nullable = false, length = 30)
-    private long user_id;
+    private int user_id;
 
     @Column(name = "lcense_number", nullable = false, length = 30)
     private String lcense_number;
@@ -65,11 +63,11 @@ public class Driver implements Serializable {
         this.id = id;
     }
 
-    public long getUser_id() {
+    public int getUser_id() {
         return user_id;
     }
 
-    public void setUser_id(long user_id) {
+    public void setUser_id(int user_id) {
         this.user_id = user_id;
     }
 

@@ -42,7 +42,7 @@ public class UserRepositoryImpl implements UserRepository {
     public User addUser(User u) {
         // TODO Auto-generated method stub
         entityManager.persist(u);
-        return u;
+       return u;
     }
 
     @Transactional

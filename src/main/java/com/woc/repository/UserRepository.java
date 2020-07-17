@@ -11,8 +11,8 @@ public interface UserRepository {
 	public User createNewUser(User newUser);
 	
 	public User addUser(User u);
-	
+
 	public User findByID(long id);
-    
+
     public long updateUser(String name, String email, String phone, long userID);
 }

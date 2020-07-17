@@ -82,7 +82,7 @@ public class RiderService {
 
         userRepository.addUser(u);
         System.out.println("userId : " + u.getId());
-        
+
         r.setIs_verified(true);
         r.setPin(rider.getPIN());
         // Map<String, String> documents = new HashMap<String, String>();
@@ -90,7 +90,7 @@ public class RiderService {
         r.setVerification_date(now);
         r.setUser_id(u.getId());
         r.setIs_challenged(true);
-        return riderRepository.addRider(r);   
+        return riderRepository.addRider(r);
     }
 
     public Rider getRider(RiderSearchCriteria search) {
@@ -178,7 +178,7 @@ public class RiderService {
             t.setStartTime(each.getTripStartTime());
             t.setEndTime(each.getTripEndTime());
             t.setFare(each.getCost());
-            
+
             t.setStartLocation(each.getStartLocation());
             t.setEndLocation(each.getEndLocation());
             fetchedTrips.add(t);
