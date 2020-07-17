@@ -9,7 +9,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
-import com.woc.dto.DriverSearchCriteria;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,10 +45,11 @@ public class DriverRepositoryImpl implements DriverRepository {
 
     @Transactional
     @Override
-    public void addDriver(Driver driver) {
+    public Driver addDriver(Driver driver) {
         // Driver d= new
         // System.out.println(driver.toString());
         entityManager.persist(driver);
+        return driver;
     }
 
     @Override

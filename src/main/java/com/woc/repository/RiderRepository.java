@@ -2,6 +2,7 @@ package com.woc.repository;
 
 import java.util.List;
 
+import com.woc.dto.PINUpdateRequestObject;
 import com.woc.dto.RiderSearchCriteria;
 import com.woc.entity.Rider;
 

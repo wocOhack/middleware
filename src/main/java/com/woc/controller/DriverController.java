@@ -114,11 +114,6 @@ public class DriverController {
         return trip;
     }
 
-	@PostMapping("/submitFeedBack")
-	public void submitFeedBack(@RequestBody FeedBack feedBack) {
-		return;
-	}
-
     @PostMapping("/initiatePhoneVerification")
     public Boolean initiatePhoneVerification(@RequestBody final PhoneVerificationInitiationRequest phoneVerificationInitiationRequest) {
         return otpService.initiateVerification(phoneVerificationInitiationRequest);
@@ -126,18 +121,19 @@ public class DriverController {
 
     @PutMapping("/completePhoneVerification")
     public DriverVerificationCompletionReply completePhoneVerification(@RequestBody final PhoneVerificationCompletionRequest phoneVerificationCompletionRequest) {
-        Boolean isExistingUser=false;
-        Driver driver=null;
-        Boolean isVerified=otpService.completeVerification(phoneVerificationCompletionRequest);
+        Boolean isExistingUser = false;
+        Driver driver = null;
+        Boolean isVerified = otpService.completeVerification(phoneVerificationCompletionRequest);
 
-        if(isVerified){
-            String phoneNumber=phoneVerificationCompletionRequest.getPhoneNumber();
-            DriverSearchCriteria driverSearchCriteria=new DriverSearchCriteria();
+        if (isVerified) {
+            String phoneNumber = phoneVerificationCompletionRequest.getPhoneNumber();
+            DriverSearchCriteria driverSearchCriteria = new DriverSearchCriteria();
             driverSearchCriteria.setPhoneNumber(phoneNumber);
-            driver=driverService.getDriver(driverSearchCriteria);
-            isExistingUser=(driver!=null);
+            driver = driverService.getDriver(driverSearchCriteria);
+            isExistingUser = (driver != null);
         }
-        return new DriverVerificationCompletionReply(isVerified,isExistingUser,driver);
+        return new DriverVerificationCompletionReply(isVerified, isExistingUser, driver);
+    }
     @PutMapping("/toggleDriverAvailabilityStatus")
     public void toggleDriverAvailability(@RequestBody DriverAvailability driverAvailability) {
         String status = driverAvailability.getStatus();
