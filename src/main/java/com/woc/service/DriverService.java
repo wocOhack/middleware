@@ -100,6 +100,8 @@ public class DriverService {
 
         System.out.println("userId : " + createdUser.getId());
 
+        d.setAddress(driver.getAddress());
+        d.setStatus(driver.getStatus());
         d.setVerified_by("Admin");
         d.setVerification_date(now);
         d.setLcense_number(license.getLicenceNumber());

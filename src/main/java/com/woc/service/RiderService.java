@@ -82,15 +82,17 @@ public class RiderService {
 
         userRepository.addUser(u);
         System.out.println("userId : " + u.getId());
-        
+
         r.setIs_verified(true);
         r.setPin(rider.getPIN());
         // Map<String, String> documents = new HashMap<String, String>();
-        r.setProof_of_challenge(Utilities.convertWithStream(rider.getDocuments()));
+        if (rider.getDocuments() != null) {
+            r.setProof_of_challenge(Utilities.convertWithStream(rider.getDocuments()));
+        }
         r.setVerification_date(now);
         r.setUser_id(u.getId());
         r.setIs_challenged(true);
-        return riderRepository.addRider(r);   
+        return riderRepository.addRider(r);
     }
 
     public Rider getRider(RiderSearchCriteria search) {
@@ -136,12 +138,16 @@ public class RiderService {
         r = riderRepository.getRider(search);
         System.out.println("fetched Rider : " + r.getName() + r.getRiderID());
         System.out.println("rider.name : " + rider.getName() + rider.getRiderID());
+        System.out.println("rider.address : " + rider.getEmail() + rider.getRiderID());
         System.out.println(r.getUserId());
-        if (rider.getEmail() != null && !rider.getEmail().trim().isEmpty() && rider.getName() != null
-                && !rider.getName().trim().isEmpty()) {
+        if ((rider.getEmail() != null && !rider.getEmail().trim().isEmpty())
+                && (rider.getName() != null && !rider.getName().trim().isEmpty())) {
+            System.out.println("Gonna update rider with email and name");
             long user_update = userRepository.updateUser(rider.getName(), rider.getEmail(), rider.getPhoneNumber(),
                     r.getUserId());
         } else if (rider.getEmail() != null && !rider.getEmail().trim().isEmpty()) {
+            System.out.println("Gonna update rider with email alone");
+
             long user_update = userRepository.updateUser("", rider.getEmail(), rider.getPhoneNumber(), r.getUserId());
             // if (user_update != 0) {
             // long updated = riderRepository.updateRiderData(rider);
@@ -178,7 +184,7 @@ public class RiderService {
             t.setStartTime(each.getTripStartTime());
             t.setEndTime(each.getTripEndTime());
             t.setFare(each.getCost());
-            
+
             t.setStartLocation(each.getStartLocation());
             t.setEndLocation(each.getEndLocation());
             fetchedTrips.add(t);
@@ -195,7 +201,7 @@ public class RiderService {
 
         Trip trip = tripRepository.findTripById(feedbackDTO.getTripId());
 
-        if(trip == null) {
+        if (trip == null) {
             throw new FeedbackSubmissionException("BAD REQUEST. Could not find trip.");
         }
 
@@ -204,9 +210,9 @@ public class RiderService {
         }
 
         List<Feedback> existingFeedbacksForTrip = feedbackRepository.getFeedbacksByTripId(trip.getId());
-        if(existingFeedbacksForTrip != null) {
-            for(Feedback f : existingFeedbacksForTrip) {
-                if(f.getFeedbackOwnerId() == trip.getRiderId()) {
+        if (existingFeedbacksForTrip != null) {
+            for (Feedback f : existingFeedbacksForTrip) {
+                if (f.getFeedbackOwnerId() == trip.getRiderId()) {
                     return;
                 }
             }

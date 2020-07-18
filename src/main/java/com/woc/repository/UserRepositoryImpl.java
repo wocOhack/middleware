@@ -50,7 +50,7 @@ public class UserRepositoryImpl implements UserRepository {
     public long updateUser(String userName, String emailAdd, String phoneNum, long userId) {
         System.out.println("phone Number : " + phoneNum);
 
-        if (userName != "" && userName != null && (emailAdd != "" && emailAdd != null)) {
+        if (userName != null && !userName.trim().isEmpty() && (emailAdd != null && emailAdd.trim().isEmpty() )) {
             if (phoneNum != "" && phoneNum != null) {
                 System.out.println("phoneNum " +  phoneNum);
                 Query q = entityManager.createNativeQuery(
@@ -72,7 +72,7 @@ public class UserRepositoryImpl implements UserRepository {
                 return rowsUpdated;
             }
 
-        } else if (userName != "" && userName != null) {
+        } else if ( userName != null && !userName.trim().isEmpty()) {
             if (phoneNum != "" && phoneNum != null) {
                 Query q = entityManager
                         .createNativeQuery("Update User u set u.Name = :userName where u.phone = " + phoneNum);
@@ -90,8 +90,9 @@ public class UserRepositoryImpl implements UserRepository {
                 System.out.println("rowsUpdated : " + rowsUpdated);
                 return rowsUpdated;
             }
-        } else if (emailAdd != "" && emailAdd != null) {
-            if (phoneNum != "") {
+        } else if (!emailAdd.trim().isEmpty() && emailAdd != null) {
+            System.out.println("update email alone");
+            if (phoneNum != null && !phoneNum.trim().isEmpty()) {
                 Query q = entityManager
                         .createNativeQuery("Update User u set u.email = :emailAdd  where u.phone = " + phoneNum);
                 q.setParameter("emailAdd", emailAdd);
@@ -100,8 +101,9 @@ public class UserRepositoryImpl implements UserRepository {
                 return rowsUpdated;
             }
             if (userId != 0) {
+                System.out.println("userID : "+ userId);
                 Query q = entityManager
-                        .createNativeQuery("Update User u set u. email = :emailAdd where u.id = " + userId);
+                        .createNativeQuery("Update User u set u.email = :emailAdd where u.id = " + userId);
                 q.setParameter("emailAdd", emailAdd);
                 long rowsUpdated = q.executeUpdate();
                 System.out.println("rowsUpdated : " + rowsUpdated);
