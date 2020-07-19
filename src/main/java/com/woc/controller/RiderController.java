@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.woc.dto.*;
 import com.woc.service.exceptions.FeedbackSubmissionException;
+import com.woc.service.OTPService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.woc.entity.ServiceableArea;
 import com.woc.service.DriverService;
 import com.woc.service.RiderService;
-
+import com.woc.dto.PhoneVerificationInitiationRequest;
+import com.woc.dto.RiderVerificationCompletionReply;
+import com.woc.dto.PhoneVerificationCompletionRequest;
 @RestController
 @RequestMapping("/woc/rider")
 public class RiderController {
@@ -28,6 +31,9 @@ public class RiderController {
 
     @Autowired
     DriverService driverService;
+
+    @Autowired
+    OTPService otpService;
 
     @PostMapping("/createProfile")
     public ResponseEntity createNewRider(@RequestBody Rider newRider) {
@@ -132,4 +138,25 @@ public class RiderController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+    @PostMapping("/initiatePhoneVerification")
+    public Boolean initiatePhoneVerification(@RequestBody PhoneVerificationInitiationRequest phoneVerificationInitiationRequest) {
+        return otpService.initiateVerification(phoneVerificationInitiationRequest);
+    }
+
+    @PutMapping("/completePhoneVerification")
+    public RiderVerificationCompletionReply completePhoneVerification(@RequestBody PhoneVerificationCompletionRequest phoneVerificationCompletionRequest) {
+        Boolean isExistingUser=false;
+        Rider rider=null;
+        Boolean isVerified=otpService.completeVerification(phoneVerificationCompletionRequest);
+
+        if(isVerified){
+            String phoneNumber=phoneVerificationCompletionRequest.getPhoneNumber();
+            RiderSearchCriteria riderSearchCriteria=new RiderSearchCriteria();
+            riderSearchCriteria.setPhoneNumber(phoneNumber);
+            rider=riderService.getRider(riderSearchCriteria);
+            isExistingUser=(rider!=null);
+        }
+        return new RiderVerificationCompletionReply(isVerified,isExistingUser,rider);
+    }
+
 }
