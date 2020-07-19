@@ -11,6 +11,14 @@ public class PhoneVerificationCompletionRequest implements Serializable {
         this.OTP=OTP;
     }
 
+    public void setOTP(String OTP) {
+        this.OTP = OTP;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
     public String getOTP() {
         return OTP;
     }
