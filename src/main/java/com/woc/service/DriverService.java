@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import com.woc.dto.Driver;
 import com.woc.dto.DriverAvailability;
+import com.woc.dto.DriverLocationUpdateRequest;
 import com.woc.dto.DriverSearchCriteria;
 import com.woc.dto.DrivingLicense;
 import com.woc.dto.RideRequestUpdateObject;
@@ -24,6 +25,13 @@ import com.woc.repository.RideRequestRepository;
 import com.woc.repository.UserCredentialsRepository;
 import com.woc.repository.UserRepository;
 import com.woc.repository.VehicleRepository;
+import com.woc.dto.FeedBack;
+import com.woc.entity.Feedback;
+import com.woc.entity.Trip;
+import com.woc.repository.FeedbackRepository;
+import com.woc.repository.TripRepository;
+import com.woc.service.enums.TripStatus;
+import com.woc.service.exceptions.FeedbackSubmissionException;
 
 @Component
 public class DriverService {
@@ -52,7 +60,13 @@ public class DriverService {
 	@Autowired
 	RideRequestRepository rideRequestRepository;
 
-	public void toggleDriverAvailability(long user_id, boolean status) {
+	@Autowired
+	FeedbackRepository feedbackRepository;
+
+	@Autowired
+	TripRepository tripRepository;
+
+	public void toggleDriverAvailability(long user_id, String status) {
 		driverAvailabilityRepository.toggleDriverAvailability(user_id, status);
 	}
 
@@ -69,7 +83,7 @@ public class DriverService {
 		if (ifexisting != null) {
 			// send 400 bad request as user already exist....
 			System.out.println("User already exist.....");
-			return -1;
+			return -1l;
 		}
 		Date now = new Date(System.currentTimeMillis());
 		// int userId = Math.abs(new Random().nextInt());
@@ -86,6 +100,8 @@ public class DriverService {
 
 		System.out.println("userId : " + createdUser.getId());
 
+		d.setAddress(driver.getAddress());
+		d.setStatus(driver.getStatus());
 		d.setVerified_by("Admin");
 		d.setVerification_date(now);
 		d.setLcense_number(license.getLicenceNumber());
@@ -121,55 +137,94 @@ public class DriverService {
 	}
 
 	public long toggleDriverAvailability(DriverAvailability availability) {
-		long result = driverAvailabilityRepository.toggleDriverAvailability(availability.getDriverID(),
-				availability.getStatus());
+		if (availability.getDriverID() == 0
+				&& (availability.getStatus() == null || !availability.getStatus().trim().isEmpty())) {
+			return 0l;
+		}
+		long result = driverRepository.updateDriverStatus(availability);
 		return result;
 	}
+
+	public long updateDriver(Driver driver, Vehicle vehcile, DrivingLicense license) {
+		long idUpdated = 0l;
+
+		// returning -1 for badrequest mandate paramater missing
+		if (driver.getDriverID() == 0
+				&& (driver.getPhoneNumber().trim().isEmpty() || driver.getPhoneNumber() == null)) {
+			return 0l;
+		}
+
+		Driver d = new Driver();
+		DriverSearchCriteria search = new DriverSearchCriteria();
+
+		if (driver.getDriverID() != 0) {
+			search.setDriverId(driver.getDriverID());
+		} else {
+			search.setPhoneNumber(driver.getPhoneNumber());
+		}
+		d = driverRepository.getDriver(search);
+		long userId = d.getUserID();
+
+		if (driver.getEmail() != null && !driver.getEmail().trim().isEmpty()) {
+			long user_update = userRepository.updateUser("", driver.getEmail(), driver.getPhoneNumber(), userId);
+			// if (user_update != 0) {
+			// long updated = riderRepository.updateRiderData(rider);
+			// return updated;
+			// } else {
+			// return 0l;
+			// }
+			// return user_update;
+		}
+		if (driver.getName() != null && !driver.getName().trim().isEmpty()) {
+			long user_update = userRepository.updateUser(driver.getName(), "", driver.getPhoneNumber(), userId);
+			// return user_update;
+		}
+
+		if (license.getLicenseDocumentLink() != null && !license.getLicenseDocumentLink().trim().isEmpty()) {
+			return driverRepository.updateDriverData(driver, license);
+		}
+		return idUpdated;
+	}
+	
+    public void notifyNearestDrivers(String riderLocation, String destinationLocation, long rideRequestID) {
+
+        List<com.woc.entity.Driver> availableDrivers = getAllAvailableDrivers();
+        List<Driver> nearestDrivers = new ArrayList<Driver>();
+        List<Long> notifiedDrivers = new ArrayList<Long>();
+
+
+        for (com.woc.entity.Driver driver : availableDrivers) {
+            nearestDrivers.add(getDriverWithDistance(driver, riderLocation));
+        }
+        Collections.sort(nearestDrivers, new Comparator<Driver>() {
+
+            @Override
+            public int compare(Driver o1, Driver o2) {
+                if (o1.getDistanceFromRider() > o2.getDistanceFromRider()) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            }
+        });
+
+        StringBuffer deviceIDs = new StringBuffer("");
+        for (int i = 0; i < 5; i++) {
+            deviceIDs.append(nearestDrivers.get(i).getDeviceID()).append(",");
+            notifiedDrivers.add(nearestDrivers.get(i).getDriverID());
+
+        }
+        StringBuffer message = new StringBuffer("{Ride Offer: {rideRequestID:");
+        message.append(rideRequestID).append("}}");
+        notificationService.send("{Ride Offer: {rideRequestID:", deviceIDs.substring(0, deviceIDs.length() - 1));
+        driverRepository.updateDriversStatus("Blocked", notifiedDrivers);
+        updateRideRequestWithNotifiedDrivers(notifiedDrivers,rideRequestID);
+    }
 
 	public List<com.woc.entity.Driver> getAllAvailableDrivers() {
 
 		List<com.woc.entity.Driver> availableDrivers = driverRepository.getAllDriversWithStatus("Available");
 		return availableDrivers;
-	}
-
-	public void notifyNearestDrivers(String riderLocation, String destinationLocation, long rideRequestID) {
-
-		List<com.woc.entity.Driver> availableDrivers = getAllAvailableDrivers();
-		List<Long> notifiedDrivers = new ArrayList<Long>();
-
-		List<Driver> nearestDrivers = new ArrayList<Driver>();
-
-		for (com.woc.entity.Driver driver : availableDrivers) {
-			Driver driverWithDistance = getDriverWithDistance(driver, riderLocation);
-			/**
-			 * if(driverWithDistance.getDistanceFromRider() <=5) {
-			 * 
-			 * }
-			 **/
-			nearestDrivers.add(driverWithDistance);
-		}
-		Collections.sort(nearestDrivers, new Comparator<Driver>() {
-
-			@Override
-			public int compare(Driver o1, Driver o2) {
-				if (o1.getDistanceFromRider() > o2.getDistanceFromRider()) {
-					return 1;
-				} else {
-					return 0;
-				}
-			}
-		});
-		StringBuffer deviceIDs = new StringBuffer("");
-		for (int i = 0; i < 5; i++) {
-			deviceIDs.append(nearestDrivers.get(i).getDeviceID()).append(",");
-			notifiedDrivers.add(nearestDrivers.get(i).getDriverID());
-
-		}
-		StringBuffer message = new StringBuffer("{Ride Offer: {rideRequestID:");
-		message.append(rideRequestID).append("}}");
-		notificationService.send("{Ride Offer: {rideRequestID:", deviceIDs.substring(0, deviceIDs.length() - 1));
-		updateDriversStatus(notifiedDrivers, "Blocked");
-		updateRideRequestWithNotifiedDrivers(notifiedDrivers,rideRequestID);
 	}
 
 	public void updateRideRequestWithNotifiedDrivers(List<Long> notifiedDrivers, long rideRequestID) {
@@ -198,11 +253,41 @@ public class DriverService {
 		com.woc.entity.Driver driver = driverRepository.findByID(requestObject.getDriverID());
 		rideRequest.setDriverId(driver);
 		rideRequestRepository.updateRideRequest(rideRequest);
-		//To do send driver profile information
 		notificationService.send("", Long.toString(rideRequest.getRiderId().getDeviceID()));
 	}
 
-	public void updateDriversStatus(List<Long> driverIds, String status) {
-		// bulk update drivers with status
+
+	public long updateDriverLocation(DriverLocationUpdateRequest request) {
+		return driverRepository.updateDriverLocation(request);
+	}
+
+	public void submitFeedback(FeedBack feedbackDTO) throws FeedbackSubmissionException {
+		Feedback feedback = new Feedback();
+
+		Trip trip = tripRepository.findTripById(feedbackDTO.getTripId());
+
+		if (trip == null) {
+			throw new FeedbackSubmissionException("Bad Request. Could not find trip.");
+		}
+
+		if (!trip.getStatus().equals(TripStatus.TRIP_ENDED.toString())) {
+			throw new FeedbackSubmissionException("Bad Request. This trip has not ended yet.");
+		}
+
+		List<Feedback> existingFeedbacksForTrip = feedbackRepository.getFeedbacksByTripId(trip.getId());
+		if (existingFeedbacksForTrip != null) {
+			for (Feedback f : existingFeedbacksForTrip) {
+				if (f.getFeedbackOwnerId() == trip.getDriverId()) {
+					return;
+				}
+			}
+		}
+		feedback.setTripId(trip.getId());
+		feedback.setUserId(trip.getRiderId());
+		feedback.setFeedbackOwnerId(trip.getDriverId());
+		feedback.setRating(feedbackDTO.getRating());
+		feedback.setComment(feedbackDTO.getComments());
+
+		feedbackRepository.submitFeedback(feedback);
 	}
 }

@@ -73,4 +73,11 @@ public class UserLocation implements Serializable {
     public void setUpdatedTime(Date updatedTime) {
         this.updatedTime = updatedTime;
     }
+
+    @Override
+    public String toString() {
+        return "UserLocation [id=" + id + ", user=" + user + ", location=" + location + ", createdTime=" + createdTime
+                + ", updatedTime=" + updatedTime + "]";
+    }
+
 }

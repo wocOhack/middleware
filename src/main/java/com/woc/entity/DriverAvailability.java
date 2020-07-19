@@ -70,4 +70,11 @@ public class DriverAvailability implements Serializable {
     public void setUpdatedTime(Date updatedTime) {
         this.updatedTime = updatedTime;
     }
+
+    @Override
+    public String toString() {
+        return "DriverAvailability [id=" + id + ", user=" + user + ", status=" + status + ", createdTime=" + createdTime
+                + ", updatedTime=" + updatedTime + "]";
+    }
+    
 }

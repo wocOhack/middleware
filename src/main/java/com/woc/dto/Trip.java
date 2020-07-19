@@ -12,8 +12,10 @@ public class Trip implements Serializable{
 	private Date startTime;
 	private Date endTime;
 	private int distance;
-	private Long fare;
+	private Double fare;
 	private Long duration;
+	private String startLocation;
+	private String endLocation;
 	
 	
 	public Long getTripID() {
@@ -52,10 +54,10 @@ public class Trip implements Serializable{
 	public void setDistance(int distance) {
 		this.distance = distance;
 	}
-	public Long getFare() {
+	public Double getFare() {
 		return fare;
 	}
-	public void setFare(Long fare) {
+	public void setFare(Double fare) {
 		this.fare = fare;
 	}
 	public Long getDuration() {
@@ -64,6 +66,17 @@ public class Trip implements Serializable{
 	public void setDuration(Long duration) {
 		this.duration = duration;
 	}
-	
+    public String getStartLocation() {
+        return startLocation;
+    }
+    public void setStartLocation(String startLocation) {
+        this.startLocation = startLocation;
+    }
+    public String getEndLocation() {
+        return endLocation;
+    }
+    public void setEndLocation(String endLocation) {
+        this.endLocation = endLocation;
+    }
 
 }

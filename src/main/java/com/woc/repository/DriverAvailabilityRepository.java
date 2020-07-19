@@ -10,6 +10,6 @@ public interface DriverAvailabilityRepository {
 
     public DriverAvailability addDriverAvailabiliy(DriverAvailability driverAvail);
 
-    public long toggleDriverAvailability(long driver_id, boolean value);
+    public long toggleDriverAvailability(long driver_id, String value);
 
 }

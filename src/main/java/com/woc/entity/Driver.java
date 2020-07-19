@@ -16,7 +16,6 @@ import javax.persistence.Table;
 @NamedQuery(name = "Driver.findAll", query = "SELECT d FROM Driver d")
 @NamedQuery(name = "Driver.findById", query = "SELECT d FROM Driver d where id=?1")
 @NamedQuery(name="Driver.findAllWithStatus", query = "SELECT d FROM Driver d where status=?1")
-@NamedQuery(name="Driver.findAllWithStatus", query = "UPDATE Driver d FROM Driver d where status=?1")
 public class Driver implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -154,4 +153,12 @@ public class Driver implements Serializable {
 		this.location = location;
 	}
     
+    @Override
+    public String toString() {
+        return "Driver [id=" + id + ", user_id=" + user_id + ", lcense_number=" + lcense_number
+                + ", license_expiry_date=" + license_expiry_date + ", license_doc=" + license_doc + ", is_verified="
+                + is_verified + ", verification_date=" + verification_date + ", verified_by=" + verified_by
+                + ", address=" + address + "]";
+    }
+
 }

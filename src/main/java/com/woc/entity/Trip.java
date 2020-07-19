@@ -17,13 +17,11 @@ public class Trip implements Serializable {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "driver_id", referencedColumnName = "id")
-    private User driverId;
+    @Column(name = "driver_id", nullable = false, length = 6)
+    private Long driverId;
 
-    @ManyToOne
-    @JoinColumn(name = "rider_id", referencedColumnName = "id")
-    private User riderId;
+    @Column(name = "rider_id", nullable = false, length = 6)
+    private Long riderId;
 
     @Column(name = "start_location", length = 20)
     private String startLocation;
@@ -49,7 +47,7 @@ public class Trip implements Serializable {
     @Column(name = "cost")
     private Double cost;
 
-    @Column(name = "status")
+    @Column(name = "status", nullable = false)
     private String status;
 
     @Column(name = "cancelled_by")
@@ -68,31 +66,31 @@ public class Trip implements Serializable {
     }
 
     public Long getId() {
-        return this.id;
+        return id;
     }
 
     public void setId(Long id) {
         this.id = id;
     }
 
-    public User getDriverId() {
-        return this.driverId;
+    public Long getDriverId() {
+        return driverId;
     }
 
-    public void setDriverId(User driverId) {
+    public void setDriverId(Long driverId) {
         this.driverId = driverId;
     }
 
-    public User getRiderId() {
-        return this.riderId;
+    public Long getRiderId() {
+        return riderId;
     }
 
-    public void setRiderId(User riderId) {
+    public void setRiderId(Long riderId) {
         this.riderId = riderId;
     }
 
     public String getStartLocation() {
-        return this.startLocation;
+        return startLocation;
     }
 
     public void setStartLocation(String startLocation) {
@@ -100,7 +98,7 @@ public class Trip implements Serializable {
     }
 
     public String getEndLocation() {
-        return this.endLocation;
+        return endLocation;
     }
 
     public void setEndLocation(String endLocation) {
@@ -124,7 +122,7 @@ public class Trip implements Serializable {
     }
 
     public Date getDuration() {
-        return this.duration;
+        return duration;
     }
 
     public void setDuration(Date duration) {
@@ -132,7 +130,7 @@ public class Trip implements Serializable {
     }
 
     public Integer getDistance() {
-        return this.distance;
+        return distance;
     }
 
     public void setDistance(Integer distance) {
@@ -140,7 +138,7 @@ public class Trip implements Serializable {
     }
 
     public Double getCost() {
-        return this.cost;
+        return cost;
     }
 
     public void setCost(Double cost) {
@@ -156,7 +154,7 @@ public class Trip implements Serializable {
     }
 
     public Integer getCancelledBy() {
-        return this.cancelledBy;
+        return cancelledBy;
     }
 
     public void setCancelledBy(Integer cancelledBy) {
@@ -164,7 +162,7 @@ public class Trip implements Serializable {
     }
 
     public Date getCreatedTime() {
-        return this.createdTime;
+        return createdTime;
     }
 
     public void setCreatedTime(Date createdTime) {
@@ -172,7 +170,7 @@ public class Trip implements Serializable {
     }
 
     public Date getUpdatedTime() {
-        return this.updatedTime;
+        return updatedTime;
     }
 
     public void setUpdatedTime(Date updatedTime) {

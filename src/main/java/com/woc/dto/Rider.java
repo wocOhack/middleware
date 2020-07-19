@@ -7,7 +7,8 @@ public class Rider implements Serializable{
 
 	private static final long serialVersionUID = -7782768153302031010L;
 	private String name;
-	private long riderID;
+	private long userId;
+    private long riderID;
 	private String phoneNumber;
 	private String email;
 	private Map<String,String> documents;
@@ -20,6 +21,12 @@ public class Rider implements Serializable{
 	public void setRiderID(long riderID) {
 		this.riderID = riderID;
 	}
+	public long getUserId() {
+        return userId;
+    }
+    public void setUserId(long userId) {
+        this.userId = userId;
+    }
 	public String getName() {
 		return name;
 	}
@@ -50,5 +57,4 @@ public class Rider implements Serializable{
 	public void setPIN(String pIN) {
 		PIN = pIN;
 	}
-	
 }
