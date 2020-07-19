@@ -146,7 +146,7 @@ public class RiderService {
             long user_update = userRepository.updateUser(rider.getName(), rider.getEmail(), rider.getPhoneNumber(),
                     r.getUserId());
         } else if (rider.getEmail() != null && !rider.getEmail().trim().isEmpty()) {
-            System.out.println("Gonna update rider with email alone");
+            System.out.println("Gonna update rider with email alone ");
 
             long user_update = userRepository.updateUser("", rider.getEmail(), rider.getPhoneNumber(), r.getUserId());
             // if (user_update != 0) {
@@ -176,7 +176,9 @@ public class RiderService {
     public List<com.woc.dto.Trip> getRiderTrips(TripSearchCriteria searchCriteria) {
         List<com.woc.dto.Trip> fetchedTrips = new ArrayList<com.woc.dto.Trip>();
         List<com.woc.entity.Trip> trips = tripRepository.getTrips(searchCriteria);
-
+        if (trips == null) {
+            return fetchedTrips;
+        }
         for (com.woc.entity.Trip each : trips) {
             com.woc.dto.Trip t = new com.woc.dto.Trip();
             t.setDistance(each.getDistance());

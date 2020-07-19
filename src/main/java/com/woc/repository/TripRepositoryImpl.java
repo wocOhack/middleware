@@ -55,7 +55,7 @@ public class TripRepositoryImpl implements TripRepository {
         if (searchCriteria.getRiderID() != 0) {
             long id = searchCriteria.getRiderID();
             List<Trip> trips = entityManager
-                    .createNativeQuery("select * from Trip t where t.User.id = " + id, Trip.class).getResultList();
+                    .createNativeQuery("select * from Trip t where t.rider_id = " + id, Trip.class).getResultList();
             if (trips.size() == 0) {
                 return null;
             }
@@ -64,7 +64,7 @@ public class TripRepositoryImpl implements TripRepository {
         if (searchCriteria.getDriverID() != 0) {
             long id = searchCriteria.getDriverID();
             List<Trip> trips = entityManager
-                    .createNativeQuery("select * from Trip t where t.User.id = " + id, Trip.class).getResultList();
+                    .createNativeQuery("select * from Trip t where t.driver_id = " + id, Trip.class).getResultList();
             if (trips.size() == 0) {
                 return null;
             }
