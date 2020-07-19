@@ -12,4 +12,8 @@ public class PhoneVerificationInitiationRequest implements Serializable {
     public String getPhoneNumber() {
         return phoneNumber;
     }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
 }
