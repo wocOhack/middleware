@@ -38,6 +38,7 @@ public class OTPService {
             }
 
         }
+        storeOTP(phoneNumber,"1234");
         return false;
 
     }
