@@ -13,7 +13,7 @@ public class Driver implements Serializable{
 	private Map<String,String> documents;
 	private String PIN;
 	private String status;
-	private int distanceFromRider;
+	private double distanceFromRider;
 	private String deviceID;
 	
 	
@@ -60,10 +60,10 @@ public class Driver implements Serializable{
 	public void setStatus(String status) {
 		this.status = status;
 	}
-	public int getDistanceFromRider() {
+	public double getDistanceFromRider() {
 		return distanceFromRider;
 	}
-	public void setDistanceFromRider(int distance) {
+	public void setDistanceFromRider(double distance) {
 		this.distanceFromRider = distance;
 	}
 	public String getDeviceID() {

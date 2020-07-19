@@ -25,15 +25,15 @@ public class DriverRepositoryImpl implements DriverRepository {
 		List<Driver> drivers = entityManager.createNamedQuery("Driver.findAll", Driver.class).getResultList();
 		return drivers;
 	}
-	
+
 	@Override
 	public Driver findByID(long id) {
 		List<Driver> drivers = entityManager.createNamedQuery("Driver.findById").setParameter(1, id).getResultList();
-		if(!drivers.isEmpty()) {
+		if (!drivers.isEmpty()) {
 			return drivers.get(0);
 		}
 		return null;
-		
+
 	}
 
 	@Transactional
@@ -110,6 +110,17 @@ public class DriverRepositoryImpl implements DriverRepository {
 		List<Driver> drivers = entityManager.createNamedQuery("Driver.findAllWithStatus", Driver.class)
 				.setParameter(1, status).getResultList();
 		return drivers;
+	}
+
+	@Override
+	public void updateDriversStatus(String status, List<Long> driverIds) {
+		
+		for (Long driverid : driverIds) {
+			Driver driver = findByID(driverid);
+			driver.setStatus("status");
+			entityManager.merge(driver);
+		}
+
 	}
 
 }

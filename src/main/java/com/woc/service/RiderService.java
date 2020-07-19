@@ -1,6 +1,8 @@
 package com.woc.service;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -13,6 +15,7 @@ import com.woc.dto.RiderSearchCriteria;
 import com.woc.entity.RideRequest;
 import com.woc.entity.ServiceableArea;
 import com.woc.entity.User;
+import com.woc.repository.DriverRepository;
 import com.woc.repository.RideRequestRepository;
 import com.woc.repository.RiderRepository;
 import com.woc.repository.ServicableAreaRepository;
@@ -32,6 +35,12 @@ public class RiderService {
     
     @Autowired
     RideRequestRepository riderRequestsRepository;
+    
+    @Autowired
+    DriverRepository driverRepository;
+
+	@Autowired
+	PushNotificationService notificationService;
 
     public ServiceableArea addArea(ServiceableArea area) {
         return servicableAreaRepository.addArea(area);
@@ -93,7 +102,12 @@ public class RiderService {
     	
     	com.woc.entity.Rider rider = riderRepository.findByID(request.getRiderID());
     	RideRequest rideRequest = riderRequestsRepository.findByRider(rider);
-    	riderRequestsRepository.deleteRideRequest(rideRequest);   	
+    	com.woc.entity.Driver driver= rideRequest.getDriverId();
+    	List<Long> driverIds = new ArrayList<Long>();
+    	driverIds.add(driver.getId());
+    	driverRepository.updateDriversStatus("Available", driverIds);
+    	notificationService.send("Ride has been cancelled by Rider", driver.getDeviceID());
+    	riderRequestsRepository.deleteRideRequest(rideRequest);
     	return;
     }
     

@@ -26,12 +26,15 @@ public class RideRequest implements Serializable {
 	@JoinColumn(name = "driver_id", referencedColumnName = "id")
 	private Driver driverId;
 
-	@Column(name = "start_location", length = 20)
+	@Column(name = "start_location", length = 100)
 	private String startLocation;
 
-	@Column(name = "end_location", length = 20)
+	@Column(name = "end_location", length = 100)
 	private String endLocation;
-
+	
+	@Column(name = "notified_drivers", length = 200)
+	private String notifiedDrivers;
+	
 	public static long getSerialVersionUID() {
 		return serialVersionUID;
 	}
@@ -75,6 +78,14 @@ public class RideRequest implements Serializable {
 
 	public void setEndLocation(String endLocation) {
 		this.endLocation = endLocation;
+	}
+
+	public String getNotifiedDrivers() {
+		return notifiedDrivers;
+	}
+
+	public void setNotifiedDrivers(String notifiedDrivers) {
+		this.notifiedDrivers = notifiedDrivers;
 	}
 
 	public static long getSerialversionuid() {

@@ -45,10 +45,10 @@ public class DriverService {
 
 	@Autowired
 	LocationService locationService;
-	
+
 	@Autowired
 	PushNotificationService notificationService;
-	
+
 	@Autowired
 	RideRequestRepository rideRequestRepository;
 
@@ -135,27 +135,53 @@ public class DriverService {
 	public void notifyNearestDrivers(String riderLocation, String destinationLocation, long rideRequestID) {
 
 		List<com.woc.entity.Driver> availableDrivers = getAllAvailableDrivers();
+		List<Long> notifiedDrivers = new ArrayList<Long>();
+
 		List<Driver> nearestDrivers = new ArrayList<Driver>();
 
 		for (com.woc.entity.Driver driver : availableDrivers) {
-			nearestDrivers.add(getDriverWithDistance(driver, riderLocation));
+			Driver driverWithDistance = getDriverWithDistance(driver, riderLocation);
+			/**
+			 * if(driverWithDistance.getDistanceFromRider() <=5) {
+			 * 
+			 * }
+			 **/
+			nearestDrivers.add(driverWithDistance);
 		}
-		Collections.sort(nearestDrivers,new Comparator<Driver>() {
+		Collections.sort(nearestDrivers, new Comparator<Driver>() {
 
 			@Override
 			public int compare(Driver o1, Driver o2) {
-				if(o1.getDistanceFromRider()> o2.getDistanceFromRider()) {
+				if (o1.getDistanceFromRider() > o2.getDistanceFromRider()) {
 					return 1;
-				}
-				else {
-				return 0;
+				} else {
+					return 0;
 				}
 			}
 		});
-		
-		for(int i=0; i<5; i++) {
-			notificationService.send("", nearestDrivers.get(i).getDeviceID());
+		StringBuffer deviceIDs = new StringBuffer("");
+		for (int i = 0; i < 5; i++) {
+			deviceIDs.append(nearestDrivers.get(i).getDeviceID()).append(",");
+			notifiedDrivers.add(nearestDrivers.get(i).getDriverID());
+
 		}
+		StringBuffer message = new StringBuffer("{Ride Offer: {rideRequestID:");
+		message.append(rideRequestID).append("}}");
+		notificationService.send("{Ride Offer: {rideRequestID:", deviceIDs.substring(0, deviceIDs.length() - 1));
+		updateDriversStatus(notifiedDrivers, "Blocked");
+		updateRideRequestWithNotifiedDrivers(notifiedDrivers,rideRequestID);
+	}
+
+	public void updateRideRequestWithNotifiedDrivers(List<Long> notifiedDrivers, long rideRequestID) {
+
+		RideRequest rideRequest = rideRequestRepository.findById(rideRequestID);
+		StringBuffer notifiedDriverIds = new StringBuffer("");
+		for (long driverid : notifiedDrivers) {
+			notifiedDriverIds.append(driverid).append(",");
+		}
+		rideRequest.setNotifiedDrivers(notifiedDriverIds.substring(0, notifiedDriverIds.length() - 1));
+		rideRequestRepository.updateRideRequest(rideRequest);
+
 	}
 
 	public Driver getDriverWithDistance(com.woc.entity.Driver driverEntity, String riderLocation) {
@@ -166,12 +192,17 @@ public class DriverService {
 				locationService.getDistanceBetweenLocations(driverEntity.getLocation(), riderLocation));
 		return driver;
 	}
-	
+
 	public void acceptRideRequest(RideRequestUpdateObject requestObject, RideRequest rideRequest) {
-		
+
 		com.woc.entity.Driver driver = driverRepository.findByID(requestObject.getDriverID());
 		rideRequest.setDriverId(driver);
 		rideRequestRepository.updateRideRequest(rideRequest);
+		//To do send driver profile information
 		notificationService.send("", Long.toString(rideRequest.getRiderId().getDeviceID()));
+	}
+
+	public void updateDriversStatus(List<Long> driverIds, String status) {
+		// bulk update drivers with status
 	}
 }

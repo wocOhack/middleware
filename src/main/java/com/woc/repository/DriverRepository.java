@@ -17,4 +17,6 @@ public interface DriverRepository {
     public com.woc.dto.Driver getDriver(DriverSearchCriteria search);
 
 	public List<Driver> getAllDriversWithStatus(String status);
+	
+	public void updateDriversStatus(String status, List<Long> driverIds);
 }
