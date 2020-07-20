@@ -16,10 +16,11 @@ public class DriverSearchCriteria implements Serializable{
 	public void setPhoneNumber(String phoneNumber) {
 		this.phoneNumber = phoneNumber;
 	}
-	public long getDriverId() {
+
+	public long getDriverID() {
 		return driverID;
 	}
-	public void setDriverId(long driverID) {
+	public void setDriverID(long driverID) {
 		this.driverID = driverID;
 	}
 
