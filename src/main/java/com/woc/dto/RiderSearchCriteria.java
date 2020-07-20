@@ -17,11 +17,11 @@ public class RiderSearchCriteria implements Serializable {
         this.phoneNumber = phoneNumber;
     }
 
-    public long getRiderId() {
+    public long getRiderID() {
         return riderID;
     }
 
-    public void setRiderId(long riderID) {
+    public void setRiderID(long riderID) {
         this.riderID = riderID;
     }
 
