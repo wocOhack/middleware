@@ -144,7 +144,7 @@ public class RiderService {
         Rider r = new Rider();
         RiderSearchCriteria search = new RiderSearchCriteria();
         if (rider.getRiderID() != 0l) {
-            search.setRiderId(rider.getRiderID());
+            search.setRiderID(rider.getRiderID());
         } else {
             search.setPhoneNumber(rider.getPhoneNumber());
         }

@@ -102,7 +102,7 @@ public class DriverRepositoryImpl implements DriverRepository {
             return d;
 
         } else {
-            long driverId = search.getDriverId();
+            long driverId = search.getDriverID();
             List<Driver> drivers = entityManager
                     .createNativeQuery("select * from Driver d where d.id = " + driverId, Driver.class).getResultList();
             Driver driver = drivers.get(0);

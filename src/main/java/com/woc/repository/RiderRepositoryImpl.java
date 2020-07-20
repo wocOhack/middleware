@@ -94,7 +94,7 @@ public class RiderRepositoryImpl implements RiderRepository {
             return r;
 
         } else {
-            long riderId = searchRider.getRiderId();
+            long riderId = searchRider.getRiderID();
             List<Rider> riders = entityManager
                     .createNativeQuery("select * from Rider r where r.id = " + riderId, Rider.class).getResultList();
             if (riders.size() == 0) {
@@ -151,7 +151,7 @@ public class RiderRepositoryImpl implements RiderRepository {
             long userId = 0;
             if (r.getRiderID() != 0) {
                 RiderSearchCriteria search = new RiderSearchCriteria();
-                search.setRiderId(r.getRiderID());
+                search.setRiderID(r.getRiderID());
                 com.woc.dto.Rider fetched_Rider = getRider(search);
 
                 userId = fetched_Rider.getUserId();

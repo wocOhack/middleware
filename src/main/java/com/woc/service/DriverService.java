@@ -158,7 +158,7 @@ public class DriverService {
         DriverSearchCriteria search = new DriverSearchCriteria();
 
         if (driver.getDriverID() != 0) {
-            search.setDriverId(driver.getDriverID());
+            search.setDriverID(driver.getDriverID());
         } else {
             search.setPhoneNumber(driver.getPhoneNumber());
         }
