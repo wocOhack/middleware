@@ -39,25 +39,37 @@ public class RiderController {
     public ResponseEntity createNewRider(@RequestBody Rider newRider) {
         
         long id = riderService.addRider(newRider);
-        if (id != 0) {
-            String message = "Rider created sucessfully";
-            return new ResponseEntity(message, HttpStatus.CREATED);
+        WocResponseBody resp = new WocResponseBody();
+        if (id != 0 && id != -1) {
+            String message = "OK";
+            resp.setResponseStatus(message);
+            resp.setDetailedMessage("Rider Created Successfully with id:"  + id);
+            return new ResponseEntity(resp, HttpStatus.CREATED);
         } else if (id == -1) {
-            String message = "Rider already exist with following phone number";
-            return new ResponseEntity(message, HttpStatus.BAD_REQUEST);
+            String message = "Bad Request";
+            resp.setResponseStatus(message);
+            resp.setDetailedMessage("Rider already exist with following phone number");
+            return new ResponseEntity(resp, HttpStatus.BAD_REQUEST);
         } else {
-            String message = "Issue creating rider";
-            return new ResponseEntity(message, HttpStatus.INTERNAL_SERVER_ERROR);
+            String message = "Internal Server Error";
+            resp.setResponseStatus(message);
+            resp.setDetailedMessage("Issue creating rider");
+            return new ResponseEntity(resp, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PutMapping("/updateProfile")
     public ResponseEntity updateRiderProfile(@RequestBody Rider rider) {
+        WocResponseBody resp = new WocResponseBody();
         long id = riderService.updateRider(rider);
         if (id != 0) {
-            return new ResponseEntity("", HttpStatus.OK);
+            resp.setResponseStatus("OK");
+            resp.setDetailedMessage("Rider Updated Successfully");
+            return new ResponseEntity(resp, HttpStatus.OK);
         }
-        return new ResponseEntity("", HttpStatus.INTERNAL_SERVER_ERROR);
+        resp.setDetailedMessage("Issue Updating Rider");
+        resp.setResponseStatus("Internal Server Error");
+        return new ResponseEntity(resp, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @GetMapping("/getProfile")
@@ -66,23 +78,35 @@ public class RiderController {
         // rider.setName("Harry Potter");
         // rider.setPhoneNumber("123456789");
         Rider rider = riderService.getRider(searchCriteria);
+        WocResponseBody resp = new WocResponseBody();
         if (rider == null) {
-            String message = "Data Not Found";
-            return new ResponseEntity(message, HttpStatus.NOT_FOUND);
+            resp.setResponseStatus("Data Not Found");
+            resp.setDetailedMessage("No data Available for the given Rider");
+            return new ResponseEntity(resp, HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity(rider, HttpStatus.OK);
+        resp.setResponseStatus("OK");
+        resp.setDetailedMessage("Successfully Retrieved data");
+        resp.setResult(rider);
+        return new ResponseEntity(resp, HttpStatus.OK);
     }
 
     @PutMapping("/updatePIN")
     public ResponseEntity updatePIN(@RequestBody PINUpdateRequestObject pinUpdateRequestObject) {
         System.out.println(pinUpdateRequestObject.getPIN() + pinUpdateRequestObject.getRiderID());
         long id = riderService.updateDriverPin(pinUpdateRequestObject);
+        WocResponseBody resp = new WocResponseBody();
         if (id == -1) {
-            return new ResponseEntity("Both riderId and pin required for pin Update", HttpStatus.BAD_REQUEST);
+            resp.setResponseStatus("Bad Request");
+            resp.setDetailedMessage("Both riderId and pin required for pin Update");
+            return new ResponseEntity(resp, HttpStatus.BAD_REQUEST);
         }
         if (id == 0) {
+            resp.setResponseStatus("Internal Server Error");
+            resp.setDetailedMessage("Issue updating Pin");
             return new ResponseEntity("", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+        resp.setResponseStatus("OK");
+        resp.setDetailedMessage("Pin Successfully Updated");
         return new ResponseEntity("", HttpStatus.OK);
     }
 
@@ -104,10 +128,17 @@ public class RiderController {
     @GetMapping("/getTrips")
     public ResponseEntity getTrips(@RequestBody TripSearchCriteria criteria) {
         List<Trip> trips = riderService.getRiderTrips(criteria);
+        WocResponseBody resp = new WocResponseBody();
+
         if (trips.size() == 0) {
-            return new ResponseEntity("Data Not Found", HttpStatus.NOT_FOUND);
+            resp.setDetailedMessage("No data avilable for the request");
+            resp.setResponseStatus("Data Not Found");
+            return new ResponseEntity(resp, HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity(trips, HttpStatus.OK);
+        resp.setDetailedMessage("OK");
+        resp.setResponseStatus("Successfully Retrieved data");
+        resp.setResult(trips);
+        return new ResponseEntity(resp, HttpStatus.OK);
 
     }
 
