@@ -45,7 +45,7 @@ public class Rider {
     private long user_id;
     
     @Column(name = "deviceID", nullable = false, length = 30)
-    private long deviceID;
+    private String deviceID;
 
     public Long getId() {
         return id;
@@ -111,11 +111,11 @@ public class Rider {
         this.user_id = user_id;
     }
 
-	public long getDeviceID() {
+	public String getDeviceID() {
 		return deviceID;
 	}
 
-	public void setDeviceID(long deviceID) {
+	public void setDeviceID(String deviceID) {
 		this.deviceID = deviceID;
 	}
     @Override

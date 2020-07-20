@@ -20,6 +20,7 @@ import com.woc.dto.FeedBack;
 import com.woc.dto.RideRequestUpdateObject;
 import com.woc.dto.StartRideRequestObject;
 import com.woc.dto.Trip;
+import com.woc.dto.WocResponseBody;
 import com.woc.entity.RideRequest;
 import com.woc.service.DriverService;
 import com.woc.service.RiderService;
@@ -45,37 +46,55 @@ public class DriverController {
     public ResponseEntity createNewDriver(@RequestBody DriverRegistrationRequest request) {
         long id = driverService.addDriver(request.getDriver(), request.getVehicle(), request.getInsurance());
         // return 2L;
+        WocResponseBody resp = new WocResponseBody();
         if (id != 0 && id != -1) {
-            String message = "Driver created sucessfully";
-            return new ResponseEntity(message, HttpStatus.CREATED);
+            resp.setDetailedMessage("OK");
+            resp.setResponseStatus("Driver created sucessfully");
+            return new ResponseEntity(resp, HttpStatus.CREATED);
         } else if (id == -1) {
-            String message = "Driver already exist with following phone number";
-            return new ResponseEntity(message, HttpStatus.BAD_REQUEST);
+            resp.setDetailedMessage("Bad Request");
+            resp.setResponseStatus("Driver already exist with following phone number");
+            
+            return new ResponseEntity(resp, HttpStatus.BAD_REQUEST);
         } else {
-            String message = "Issue creating driver";
-            return new ResponseEntity(message, HttpStatus.INTERNAL_SERVER_ERROR);
+            resp.setDetailedMessage("Internal Server Error");
+            resp.setResponseStatus("Issue creating driver");
+
+            return new ResponseEntity(resp, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PutMapping("/updateProfile")
     public ResponseEntity updateDriverProfile(@RequestBody DriverRegistrationRequest request) {
         long id = driverService.updateDriver(request.getDriver(), request.getVehicle(), request.getInsurance());
+        WocResponseBody resp = new WocResponseBody();
         if (id == 0) {
-            return new ResponseEntity("Issue updating Driver", HttpStatus.INTERNAL_SERVER_ERROR);
+            resp.setDetailedMessage("Internal Server Error");
+            resp.setResponseStatus("Issue updating Driver");
+            
+            return new ResponseEntity(resp, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+        resp.setDetailedMessage("OK");
+        resp.setResponseStatus("Successfully Updated Driver");
         return new ResponseEntity("Successfully Updated Driver", HttpStatus.OK);
     }
 
     @GetMapping("/getProfile")
     public ResponseEntity getDriverProfile(@RequestBody DriverSearchCriteria searchCriteria) {
         Driver driver = driverService.getDriver(searchCriteria);
+        WocResponseBody resp = new WocResponseBody();
         // driver.setName("Ron Weisly");
         // driver.setPhoneNumber("9876543210");
         if (driver == null) {
-            String message = "Data Not Found";
-            return new ResponseEntity(message, HttpStatus.NOT_FOUND);
+            resp.setDetailedMessage("Data Not Found");
+            resp.setResponseStatus("Data Not available for requested driver");
+            
+            return new ResponseEntity(resp, HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity(driver, HttpStatus.OK);
+        resp.setDetailedMessage("OK");
+        resp.setResponseStatus("Successfully Retrieved data");
+        resp.setResult(driver);
+        return new ResponseEntity(resp, HttpStatus.OK);
 
     }
 
@@ -83,9 +102,14 @@ public class DriverController {
     public ResponseEntity updateDriverAvailability(@RequestBody DriverAvailability driverAvailability) {
         // return;
         long result = driverService.toggleDriverAvailability(driverAvailability);
+        WocResponseBody resp = new WocResponseBody();
         if (result != 0l) {
-            return new ResponseEntity(HttpStatus.OK);
+            resp.setDetailedMessage("OK");
+            resp.setResponseStatus("Successfully Updated Driver Availability");
+            return new ResponseEntity(resp, HttpStatus.OK);
         } else {
+            resp.setDetailedMessage("Internal Server Error");
+            resp.setResponseStatus("Issue Updating Driver Availability");
             return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -144,14 +168,24 @@ public class DriverController {
     @PutMapping("/update-current-location")
     public ResponseEntity updateCurrentLocation(@RequestBody DriverLocationUpdateRequest updateLocationRequest) {
         System.out.println(updateLocationRequest.getDriverId() + " " + updateLocationRequest.getLocation());
+        WocResponseBody resp = new WocResponseBody();
         if (updateLocationRequest.getDriverId() == 0l && (updateLocationRequest.getLocation()== null || updateLocationRequest.getLocation().trim().isEmpty())) {
-            return new ResponseEntity("Need driverid and location for the update request", HttpStatus.BAD_REQUEST); 
+            resp.setDetailedMessage("Bad Request");
+            resp.setResponseStatus("Need driverid and location for the update request");
+            
+            return new ResponseEntity(resp, HttpStatus.BAD_REQUEST); 
         } 
         long updated = driverService.updateDriverLocation(updateLocationRequest);
         if (updated != 0l) {
-            return new ResponseEntity("Driver Location Updated", HttpStatus.OK); 
+            resp.setDetailedMessage("OK");
+            resp.setResponseStatus("Driver Location Updated");
+            
+            return new ResponseEntity(resp, HttpStatus.OK); 
         }
-        return new ResponseEntity("Could not update driver location", HttpStatus.INTERNAL_SERVER_ERROR);
+        resp.setDetailedMessage("Internal Server Error");
+        resp.setResponseStatus("Issue Updating Driver Location");
+        
+        return new ResponseEntity(resp, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 	@PostMapping("/submitFeedBack")

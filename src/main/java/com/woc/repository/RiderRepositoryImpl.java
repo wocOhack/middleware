@@ -81,9 +81,12 @@ public class RiderRepositoryImpl implements RiderRepository {
             r.setPhoneNumber(u.getPhone());
             r.setRiderID(each.getId());
             r.setUserId(userId);
+            r.setDisabled(each.isIs_challenged());
+            r.setDeviceID(each.getDeviceID());
             Map<String, String> docs = new HashMap<String, String>();
             docs.put("document_proof", each.getProof_of_challenge());
             // allRiders.add(r);
+            
             // }
 
             // }
@@ -112,9 +115,11 @@ public class RiderRepositoryImpl implements RiderRepository {
             // r.setPIN(u.get);
             r.setPhoneNumber(u.getPhone());
             r.setRiderID(rider.getId());
+            r.setDisabled(rider.isIs_challenged());
             Map<String, String> docs = new HashMap<String, String>();
             docs.put("document_proof", rider.getProof_of_challenge());
             r.setUserId(u.getId());
+            r.setDeviceID(rider.getDeviceID());
             return r;
             // } // return riders;
         }
@@ -160,11 +165,28 @@ public class RiderRepositoryImpl implements RiderRepository {
                 userId = u.getId();
             }
 
-            if (r.getDocuments() != null) {
+            if (r.getDocuments() != null && (r.getDeviceID() != null && !r.getDeviceID().trim().isEmpty())) {
+                Query q = entityManager.createNativeQuery(
+                        "update Rider r set r.proof_of_challenge = :proof_of_challenge, r.deviceID = :deviceid where r.user_id ="
+                                + userId,
+                        Rider.class);
+                q.setParameter("proof_of_challenge", Utilities.convertWithStream(r.getDocuments()));
+                q.setParameter("deviceid", r.getDeviceID());
+                rowsUpdated = q.executeUpdate();
+                System.out.println("updated row : " + rowsUpdated);
+                return rowsUpdated;
+            } else if (r.getDocuments() != null) {
                 Query q = entityManager.createNativeQuery(
                         "update Rider r set r.proof_of_challenge = :proof_of_challenge where r.user_id =" + userId,
                         Rider.class);
                 q.setParameter("proof_of_challenge", Utilities.convertWithStream(r.getDocuments()));
+                rowsUpdated = q.executeUpdate();
+                System.out.println("updated row : " + rowsUpdated);
+                return rowsUpdated;
+            } else if (r.getDeviceID() != null && !r.getDeviceID().trim().isEmpty()) {
+                Query q = entityManager.createNativeQuery(
+                        "update Rider r set r.deviceID = :deviceid where r.user_id =" + userId, Rider.class);
+                q.setParameter("deviceid", r.getDeviceID());
                 rowsUpdated = q.executeUpdate();
                 System.out.println("updated row : " + rowsUpdated);
                 return rowsUpdated;

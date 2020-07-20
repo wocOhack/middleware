@@ -79,7 +79,7 @@ public class RiderService {
         if (ifexisting != null) {
             // send 400 bad request as user already exist....
             System.out.println("User already exist.....");
-            return 0;
+            return -1;
         }
         u.setPhone(rider.getPhoneNumber());
         u.setEmail(rider.getEmail());
@@ -98,7 +98,8 @@ public class RiderService {
         }
         r.setVerification_date(now);
         r.setUser_id(u.getId());
-        r.setIs_challenged(true);
+        r.setIs_challenged(rider.isDisabled());
+        r.setDeviceID(rider.getDeviceID());
         return riderRepository.addRider(r);
     }
 
@@ -152,30 +153,33 @@ public class RiderService {
         System.out.println("rider.name : " + rider.getName() + rider.getRiderID());
         System.out.println("rider.address : " + rider.getEmail() + rider.getRiderID());
         System.out.println(r.getUserId());
+
+        long user_update = 0l;
         if ((rider.getEmail() != null && !rider.getEmail().trim().isEmpty())
                 && (rider.getName() != null && !rider.getName().trim().isEmpty())) {
             System.out.println("Gonna update rider with email and name");
-            long user_update = userRepository.updateUser(rider.getName(), rider.getEmail(), rider.getPhoneNumber(),
+            user_update = userRepository.updateUser(rider.getName(), rider.getEmail(), rider.getPhoneNumber(),
                     r.getUserId());
         } else if (rider.getEmail() != null && !rider.getEmail().trim().isEmpty()) {
             System.out.println("Gonna update rider with email alone ");
 
-            long user_update = userRepository.updateUser("", rider.getEmail(), rider.getPhoneNumber(), r.getUserId());
+            user_update = userRepository.updateUser("", rider.getEmail(), rider.getPhoneNumber(), r.getUserId());
             // if (user_update != 0) {
             // long updated = riderRepository.updateRiderData(rider);
             // return updated;
             // } else {
             // return 0l;
             // }
-            return user_update;
+            // return user_update;
         } else if (rider.getName() != null && !rider.getName().trim().isEmpty()) {
-            long user_update = userRepository.updateUser(rider.getName(), "", rider.getPhoneNumber(), r.getUserId());
-            return user_update;
+            user_update = userRepository.updateUser(rider.getName(), "", rider.getPhoneNumber(), r.getUserId());
+            // return user_update;
         }
-        if (rider.getDocuments() != null) {
+
+        if (rider.getDocuments() != null || (rider.getDeviceID()!=null && !rider.getDeviceID().trim().isEmpty())) {
             return riderRepository.updateRiderData(rider);
         }
-        return 0l;
+        return user_update;
     }
 
     public long updateDriverPin(PINUpdateRequestObject request) {
