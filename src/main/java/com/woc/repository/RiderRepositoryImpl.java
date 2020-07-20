@@ -86,6 +86,7 @@ public class RiderRepositoryImpl implements RiderRepository {
             Map<String, String> docs = new HashMap<String, String>();
             docs.put("document_proof", each.getProof_of_challenge());
             // allRiders.add(r);
+            r.setDocuments(docs);
             
             // }
 
@@ -120,6 +121,7 @@ public class RiderRepositoryImpl implements RiderRepository {
             docs.put("document_proof", rider.getProof_of_challenge());
             r.setUserId(u.getId());
             r.setDeviceID(rider.getDeviceID());
+            r.setDocuments(docs);
             return r;
             // } // return riders;
         }
