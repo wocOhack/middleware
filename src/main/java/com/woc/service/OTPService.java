@@ -50,7 +50,7 @@ public class OTPService {
 
         String phoneNumber=phoneVerificationCompletionRequest.getPhoneNumber();
         OTP otp=getOTP(phoneNumber);
-        if(verifyOTP(phoneVerificationCompletionRequest,otp)){
+        if(otp!=null && verifyOTP(phoneVerificationCompletionRequest,otp)){
             otpRepository.removeOTP(otp);
             return true;
         }
@@ -109,10 +109,7 @@ public class OTPService {
         }
     }
 
-    public static void main(String args[]) throws IOException {
-        OTPService otpService=new OTPService();
-        otpService.sendOTP("8971728134","1234");
-    }
+    
 
     private String getResposeBody(HttpURLConnection httpURLConnection) throws IOException {
         BufferedReader in = new BufferedReader(new InputStreamReader(
