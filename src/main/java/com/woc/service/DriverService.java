@@ -1,13 +1,16 @@
 package com.woc.service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
+import com.woc.service.enums.PushNotificationIdentifierEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import com.woc.entity.User;
+import com.woc.entity.Trip;
+import com.woc.entity.Feedback;
+import com.woc.entity.UserCredentials;
+import com.woc.entity.RideRequest;
 
 import com.woc.dto.Driver;
 import com.woc.dto.DriverAvailability;
@@ -16,22 +19,21 @@ import com.woc.dto.DriverSearchCriteria;
 import com.woc.dto.DrivingLicense;
 import com.woc.dto.RideRequestUpdateObject;
 import com.woc.dto.Vehicle;
-import com.woc.entity.RideRequest;
-import com.woc.entity.User;
-import com.woc.entity.UserCredentials;
+import com.woc.dto.FeedbackDto;
+import com.woc.dto.StartRideRequestDto;
+
 import com.woc.repository.DriverAvailabilityRepository;
 import com.woc.repository.DriverRepository;
+import com.woc.repository.RiderRepository;
+import com.woc.repository.PricingRepository;
 import com.woc.repository.RideRequestRepository;
 import com.woc.repository.UserCredentialsRepository;
 import com.woc.repository.UserRepository;
 import com.woc.repository.VehicleRepository;
-import com.woc.dto.FeedBack;
-import com.woc.entity.Feedback;
-import com.woc.entity.Trip;
 import com.woc.repository.FeedbackRepository;
 import com.woc.repository.TripRepository;
-import com.woc.service.enums.TripStatus;
-import com.woc.service.exceptions.FeedbackSubmissionException;
+
+import com.woc.service.enums.TripStatusEnum;
 
 @Component
 public class DriverService {
@@ -46,6 +48,9 @@ public class DriverService {
     DriverRepository driverRepository;
 
     @Autowired
+    RiderRepository riderRepository;
+
+    @Autowired
     VehicleRepository vehicleRepository;
 
     @Autowired
@@ -53,9 +58,6 @@ public class DriverService {
 
     @Autowired
     LocationService locationService;
-
-    @Autowired
-    PushNotificationService notificationService;
 
     @Autowired
     RideRequestRepository rideRequestRepository;
@@ -66,11 +68,17 @@ public class DriverService {
     @Autowired
     TripRepository tripRepository;
 
+    @Autowired
+    PricingRepository pricingRepository;
+
+    @Autowired
+    PushNotificationService pushNotificationService;
+
     public void toggleDriverAvailability(long user_id, String status) {
         driverAvailabilityRepository.toggleDriverAvailability(user_id, status);
     }
 
-    public long addDriver(Driver driver, Vehicle vehcile, DrivingLicense license) {
+    public long addDriver(com.woc.dto.Driver driver, Vehicle vehcile, DrivingLicense license) {
 
         com.woc.entity.Driver d = new com.woc.entity.Driver();
         com.woc.entity.Vehicle v = new com.woc.entity.Vehicle();
@@ -225,7 +233,7 @@ public class DriverService {
         }
         StringBuffer message = new StringBuffer("{Ride Offer: {rideRequestID:");
         message.append(rideRequestID).append("}}");
-        notificationService.send("{Ride Offer: {rideRequestID:", deviceIDs.substring(0, deviceIDs.length() - 1));
+        //pushNotificationService.send("{Ride Offer: {rideRequestID:", deviceIDs.substring(0, deviceIDs.length() - 1));
         driverRepository.updateDriversStatus("Blocked", notifiedDrivers);
         updateRideRequestWithNotifiedDrivers(notifiedDrivers,rideRequestID);
     }
@@ -262,7 +270,8 @@ public class DriverService {
         com.woc.entity.Driver driver = driverRepository.findByID(requestObject.getDriverID());
         rideRequest.setDriverId(driver);
         rideRequestRepository.updateRideRequest(rideRequest);
-        notificationService.send("", (rideRequest.getRiderId().getDeviceID()));
+
+        //pushNotificationService.send("","","", Long.toString(rideRequest.getRiderId().getDeviceID()));
     }
 
 
@@ -270,34 +279,123 @@ public class DriverService {
         return driverRepository.updateDriverLocation(request);
     }
 
-    public void submitFeedback(FeedBack feedbackDTO) throws FeedbackSubmissionException {
-        Feedback feedback = new Feedback();
+//    public void submitFeedback(FeedbackDto feedbackDTO) throws Exception {
+//        Feedback feedback = new Feedback();
+//
+//        com.woc.entity.Trip trip = tripRepository.findTripById(feedbackDTO.getTripId());
+//
+//        if(trip == null) {
+//            throw new Exception("NOT_FOUND");
+//        }
+//
+//        if (!trip.getStatus().equals(TripStatusEnum.TRIP_ENDED.toString())) {
+//            throw new Exception("BAD_REQUEST");
+//        }
+//
+//        List<Feedback> existingFeedbacksForTrip = feedbackRepository.getFeedbacksByTripId(trip.getId());
+//        if (existingFeedbacksForTrip != null) {
+//            for (Feedback f : existingFeedbacksForTrip) {
+//                if (f.getFeedbackOwnerId() == trip.getDriverId()) {
+//                    return;
+//                }
+//            }
+//        }
+//        feedback.setTripId(trip.getId());
+//        feedback.setUserId(trip.getRiderId());
+//        feedback.setFeedbackOwnerId(trip.getDriverId());
+//        feedback.setRating(feedbackDTO.getRating());
+//        feedback.setComment(feedbackDTO.getComments());
+//
+//        feedbackRepository.submitFeedback(feedback);
+//    }
 
-        Trip trip = tripRepository.findTripById(feedbackDTO.getTripId());
+    public Long startRide(StartRideRequestDto startRideRequestDto) throws Exception {
 
-        if (trip == null) {
-            throw new FeedbackSubmissionException("Bad Request. Could not find trip.");
+        RideRequest rideRequest = rideRequestRepository.findById(startRideRequestDto.getRideRequestId());
+
+        if(rideRequest == null || rideRequest.getDriverId() == null || rideRequest.getRiderId() == null
+            || rideRequest.getStartLocation() == null || rideRequest.getEndLocation() == null) {
+            return -1l;
         }
 
-        if (!trip.getStatus().equals(TripStatus.TRIP_ENDED.toString())) {
-            throw new FeedbackSubmissionException("Bad Request. This trip has not ended yet.");
+        if(!rideRequest.getRiderId().getPin().equals(startRideRequestDto.getPin())) {
+            return -2l;
         }
 
-        List<Feedback> existingFeedbacksForTrip = feedbackRepository.getFeedbacksByTripId(trip.getId());
-        if (existingFeedbacksForTrip != null) {
-            for (Feedback f : existingFeedbacksForTrip) {
-                if (f.getFeedbackOwnerId() == trip.getDriverId()) {
-                    return;
-                }
-            }
-        }
-        feedback.setTripId(trip.getId());
-        feedback.setUserId(trip.getRiderId());
-        feedback.setFeedbackOwnerId(trip.getDriverId());
-        feedback.setRating(feedbackDTO.getRating());
-        feedback.setComment(feedbackDTO.getComments());
+        List<String> deviceIdListForPushNotif = new ArrayList<String>();
+        deviceIdListForPushNotif.add(rideRequest.getRiderId().getDeviceID());
 
-        feedbackRepository.submitFeedback(feedback);
+        Long ongoingTripId = tripRepository.isTripInProgress(rideRequest.getDriverId().getId(), rideRequest.getRiderId().getId());
+        if(ongoingTripId != 0l) {
+            pushNotificationService.send(PushNotificationIdentifierEnum.TRIP_START, null, deviceIdListForPushNotif);
+            return ongoingTripId;
+        }
+
+        Trip trip = new Trip();
+        trip.setRiderId(rideRequest.getRiderId().getId());
+        trip.setDriverId(rideRequest.getDriverId().getId());
+        trip.setStartLocation(rideRequest.getStartLocation());
+        trip.setEndLocation(rideRequest.getEndLocation());
+
+        trip.setTripStartTime(new Date());
+        trip.setDistance(locationService.getDistanceBetweenLocations(rideRequest.getStartLocation(), rideRequest.getEndLocation()));
+        trip.setStatus(TripStatusEnum.TRIP_IN_PROGRESS.toString());
+        trip.setCreatedTime(trip.getTripStartTime());
+        trip.setUpdatedTime(trip.getTripStartTime());
+
+        Trip persistedTrip = tripRepository.createTrip(trip);
+
+        pushNotificationService.send(PushNotificationIdentifierEnum.TRIP_START, null, deviceIdListForPushNotif);
+
+        return persistedTrip.getId();
     }
 
+//    public TripDto endTrip(EndRideRequestObject endRideRequestObject) throw URISyntaxException {
+//        com.woc.entity.Trip trip = tripRepository.findTripById(endRideRe);
+//
+//        if(trip == null) {
+//
+//        }
+//
+//        if(!trip.getStatus().equals(TripStatusEnum.TRIP_IN_PROGRESS.toString())) {
+//
+//        }
+//
+//        TripDto tripDto = new TripDto();
+//        tripDto.setTripID(trip.getId());
+//        tripDto.setStartTime(trip.getTripStartTime());
+//        tripDto.setDistance(trip.getDistance());
+//
+//        RiderSearchCriteria riderSearchCriteria = new RiderSearchCriteria();
+//        riderSearchCriteria.setRiderID(trip.getRiderId());
+//        tripDto.setRider(riderRepository.getRider(riderSearchCriteria));
+//
+//        DriverSearchCriteria driverSearchCriteria = new DriverSearchCriteria();
+//        driverSearchCriteria.setDriverID(trip.getDriverId());
+//        tripDto.setDriver(driverRepository.getDriver(driverSearchCriteria));
+//
+//        if(tripDto.getDriver() == null || tripDto.getRider() == null) {
+//
+//        }
+//
+//        tripDto.setEndTime(new Date());
+//        tripDto.setDuration(tripDto.getEndTime().getTime() - tripDto.getStartTime().getTime());
+//
+//        Double durationInMins = tripDto.getDuration()/60000.00;
+//
+//        //Pricing pricing = pricingRepository.getPricingById(endRideRequestObject.getCityId());
+//        //Double fare = (pricing.getCostPerKm()*tripDto.getDistance()) + (pricing.getCostPerMin()*durationInMins) + (pricing.getExtraCharges());
+//        //tripDto.setFare(fare);
+//
+//        //TODO: Update trip table with values
+//
+//        //TODO: send Push notif to rider
+//        List<String> androidIds = new ArrayList<String>();
+//        androidIds.add("xyz");
+//        try {
+//            pushNotificationService.send(END_TRIP_NOTIF_TITLE, END_TRIP_NOTIF_BODY, null, androidIds);
+//        } catch (URISyntaxException e) {
+//            e.printStackTrace();
+//        }
+//    }
 }

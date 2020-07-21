@@ -6,8 +6,15 @@ public class StartRideResponseDto {
     private String code;
     private String message;
 
+    public StartRideResponseDto() {}
+
     public StartRideResponseDto(long tripId, String code, String message) {
         this.tripId = tripId;
+        this.code = code;
+        this.message = message;
+    }
+
+    public StartRideResponseDto(String code, String message) {
         this.code = code;
         this.message = message;
     }

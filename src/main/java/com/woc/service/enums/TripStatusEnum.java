@@ -1,8 +1,6 @@
 package com.woc.service.enums;
 
 public enum TripStatusEnum {
-    TRIP_CREATED("C"),
-    TRIP_ACCEPTED("A"),
     TRIP_IN_PROGRESS("P"),
     TRIP_ENDED("E"),
     TRIP_CANCELLED_BY_DRIVER("CD"),

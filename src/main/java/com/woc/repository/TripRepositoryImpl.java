@@ -2,7 +2,6 @@ package com.woc.repository;
 
 import com.woc.dto.TripSearchCriteria;
 import com.woc.entity.Trip;
-import com.woc.entity.User;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 @Repository
@@ -71,6 +72,23 @@ public class TripRepositoryImpl implements TripRepository {
             return trips;
         }
         return null;
+    }
+
+    public Long isTripInProgress(Long driverId, Long riderId) {
+        List<Trip> tripsInProgress = entityManager
+                .createNativeQuery("select * from Trip t where t.rider_id=" + riderId + " and t.driver_id=" + driverId + " and t.status='P'", Trip.class)
+                .getResultList();
+        if(tripsInProgress.size() == 0) {
+            return 0l;
+        }
+        Collections.sort(tripsInProgress, new Comparator<Trip>() {
+
+            @Override
+            public int compare(Trip t1, Trip t2) {
+                return (int) (t2.getUpdatedTime().getTime() - t1.getUpdatedTime().getTime());
+            }
+        });
+        return tripsInProgress.get(0).getId();
     }
 
 }

@@ -1,6 +1,7 @@
 package com.woc.controller;
 
 import com.woc.service.OTPService;
+import com.woc.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,15 +17,11 @@ import com.woc.dto.DriverAvailability;
 import com.woc.dto.DriverLocationUpdateRequest;
 import com.woc.dto.DriverRegistrationRequest;
 import com.woc.dto.DriverSearchCriteria;
-import com.woc.dto.FeedBack;
 import com.woc.dto.RideRequestUpdateObject;
-import com.woc.dto.StartRideRequestObject;
-import com.woc.dto.Trip;
 import com.woc.dto.WocResponseBody;
 import com.woc.entity.RideRequest;
 import com.woc.service.DriverService;
 import com.woc.service.RiderService;
-import com.woc.service.exceptions.FeedbackSubmissionException;
 import com.woc.dto.PhoneVerificationInitiationRequest;
 import com.woc.dto.DriverVerificationCompletionReply;
 import com.woc.dto.PhoneVerificationCompletionRequest;
@@ -32,6 +29,11 @@ import com.woc.dto.PhoneVerificationCompletionRequest;
 @RestController
 @RequestMapping("/woc/driver")
 public class DriverController {
+
+    private static final String INTERNAL_ERROR = "INTERNAL_ERROR";
+    private static final String INTERNAL_ERROR_MESSAGE = "Internal server error";
+    private static final String BAD_REQUEST = "BAD_REQUEST";
+    private static final String BAD_REQUEST_MESSAGE = "Client error";
 
     @Autowired
     DriverService driverService;
@@ -126,18 +128,6 @@ public class DriverController {
         return new ResponseEntity(HttpStatus.OK);
     }
 
-    @PostMapping("/startRide")
-    public void startRide(@RequestBody StartRideRequestObject startRideRequestObject) {
-        return;
-    }
-
-    @PostMapping("/endRide")
-    public Trip endRide(@RequestBody StartRideRequestObject startRideRequestObject) {
-        Trip trip = new Trip();
-        trip.setFare(200.0);
-        return trip;
-    }
-
     @PostMapping("/initiatePhoneVerification")
     public Boolean initiatePhoneVerification(@RequestBody final PhoneVerificationInitiationRequest phoneVerificationInitiationRequest) {
         return otpService.initiateVerification(phoneVerificationInitiationRequest);
@@ -158,6 +148,7 @@ public class DriverController {
         }
         return new DriverVerificationCompletionReply(isVerified, isExistingUser, driver);
     }
+
     @PutMapping("/toggleDriverAvailabilityStatus")
     public void toggleDriverAvailability(@RequestBody DriverAvailability driverAvailability) {
         String status = driverAvailability.getStatus();
@@ -188,16 +179,47 @@ public class DriverController {
         return new ResponseEntity(resp, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-	@PostMapping("/submitFeedBack")
-	public ResponseEntity submitFeedBack(@RequestBody FeedBack feedBack) {
-		try {
-			driverService.submitFeedback(feedBack);
-			return ResponseEntity.status(HttpStatus.OK).build();
-		} catch (Exception e) {
-		    if(e instanceof FeedbackSubmissionException) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+//	@PostMapping("/submitFeedBack")
+//	public ResponseEntity submitFeedBack(@RequestBody FeedbackDto feedbackDto) {
+//		try {
+//			driverService.submitFeedback(feedbackDto);
+//			return ResponseEntity.status(HttpStatus.CREATED).build();
+//		} catch (Exception e) {
+//		    return new ResponseEntity(HttpStatus.OK);
+//		}
+//	}
+
+	@PostMapping("/startRide")
+    public ResponseEntity startRide(@RequestBody StartRideRequestDto startRideRequestDto) {
+        StartRideResponseDto startRideResponseDto = new StartRideResponseDto();
+        try {
+            Long tripId = driverService.startRide(startRideRequestDto);
+            if(tripId < 0) {
+                if(tripId == -1l) {
+                    startRideResponseDto = new StartRideResponseDto(tripId, BAD_REQUEST, BAD_REQUEST_MESSAGE);
+                } else if (tripId == -2l) {
+                    startRideResponseDto = new StartRideResponseDto(tripId,"INVALID_PIN",
+                            "PIN entered by the driver does not match");
+                }
+                return new ResponseEntity(startRideResponseDto, HttpStatus.BAD_REQUEST);
+            } else {
+                startRideResponseDto = new StartRideResponseDto(tripId,
+                        "TRIP_IN_PROGRESS", "The trip has started successfully");
             }
-		    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-		}
-	}
+            return new ResponseEntity(startRideResponseDto, HttpStatus.CREATED);
+        } catch (Exception e) {
+            startRideResponseDto = new StartRideResponseDto(INTERNAL_ERROR, INTERNAL_ERROR_MESSAGE);
+            return new ResponseEntity(startRideResponseDto, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+//    @PostMapping("/endRide")
+//    public ResponseEntity endRide(@RequestBody EndRideRequestObject endRideRequestObject) {
+//        try {
+//            //TripDto tripDto = driverService.endTrip(endRideRequestObject);
+//            return ResponseEntity.status(HttpStatus.OK).body("");
+//        } catch (Exception e) {
+//            return new ResponseEntity(HttpStatus.OK);
+//        }
+//    }
 }
