@@ -32,6 +32,6 @@ public class OTPRepositoryImpl implements OTPRepository {
     @Override
     public void removeOTP(OTP otp) {
         String phoneNumber= otp.getPhone();
-        entityManager.createNativeQuery("delete from OTP otp where otp.phone = " + phoneNumber);
+        entityManager.remove(otp);
     }
 }
