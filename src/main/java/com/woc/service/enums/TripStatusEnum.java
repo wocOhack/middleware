@@ -1,6 +1,6 @@
 package com.woc.service.enums;
 
-public enum TripStatus {
+public enum TripStatusEnum {
     TRIP_CREATED("C"),
     TRIP_ACCEPTED("A"),
     TRIP_IN_PROGRESS("P"),
@@ -10,7 +10,7 @@ public enum TripStatus {
 
     private String tripStatus;
 
-    TripStatus(String tripStatus) {
+    TripStatusEnum(String tripStatus) {
         this.tripStatus = tripStatus;
     }
 
