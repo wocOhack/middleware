@@ -1,6 +1,6 @@
 package com.woc.dto;
 
-public class StartRideDto {
+public class StartRideRequestDto {
 
     private long rideRequestId;
     private String pin;

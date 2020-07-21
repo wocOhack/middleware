@@ -13,7 +13,6 @@ import com.woc.dto.SinglePushNotificationRequestBodyDto;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
 
 @Component
 public class PushNotificationService {
@@ -21,8 +20,8 @@ public class PushNotificationService {
 	private static final String PUSH_NOTIF_ENDPOINT = "https://fcm.googleapis.com/fcm/send";
 	private static final String FCM_SERVER_KEY = "AAAAiQ--Yns:APA91bFmgiNOhreo6kA3bfQN5DFqeSSEN6V8uEJYPyuQR1-GOYl5BJgcWa3qI7n8K-foQieSuelaS_6_8RLzAkGBh9Bnwga6vWPh4mJqBXpNw7KI-mRffLZGbodJu10R5MvK7Mxmlnmv";
 
-	public void send(String identifier, Object payload, List<String> androidIds) throws URISyntaxException {
-		if(androidIds == null || androidIds.size() == 0) {
+	public void send(String identifier, Object payload, String[] androidIds) throws URISyntaxException {
+		if(androidIds == null || androidIds.length == 0) {
 			return;
 		}
 
@@ -36,9 +35,9 @@ public class PushNotificationService {
 		try {
 			URI uri = new URI(PUSH_NOTIF_ENDPOINT);
 
-			if (androidIds.size() == 1) {
+			if (androidIds.length == 1) {
 				SinglePushNotificationRequestBodyDto singlePushNotificationRequestBodyDto = new SinglePushNotificationRequestBodyDto();
-				singlePushNotificationRequestBodyDto.setTo(androidIds.get(0));
+				singlePushNotificationRequestBodyDto.setTo(androidIds[0]);
 
 				NotificationBodyDto notification = new NotificationBodyDto(identifier, payload);
 				singlePushNotificationRequestBodyDto.setData(notification);
@@ -46,7 +45,7 @@ public class PushNotificationService {
 				httpEntity = new HttpEntity<>(singlePushNotificationRequestBodyDto, headers);
 			} else {
 				MultiplePushNotificationRequestBodyDto multiplePushNotificationRequestBodyDto = new MultiplePushNotificationRequestBodyDto();
-				multiplePushNotificationRequestBodyDto.setRegistrationIds((String[]) androidIds.toArray());
+				multiplePushNotificationRequestBodyDto.setRegistrationIds(androidIds);
 
 				NotificationBodyDto notification = new NotificationBodyDto(identifier, payload);
 				multiplePushNotificationRequestBodyDto.setData(notification);

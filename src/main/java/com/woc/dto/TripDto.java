@@ -3,7 +3,7 @@ package com.woc.dto;
 import java.io.Serializable;
 import java.util.Date;
 
-public class Trip implements Serializable{
+public class TripDto implements Serializable{
 	
 	private static final long serialVersionUID = 5525658357068526063L;
 	private Long tripID;
