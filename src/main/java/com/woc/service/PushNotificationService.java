@@ -14,6 +14,7 @@ import com.woc.service.enums.PushNotificationIdentifierEnum;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class PushNotificationService {
@@ -21,7 +22,7 @@ public class PushNotificationService {
 	private static final String PUSH_NOTIF_ENDPOINT = "https://fcm.googleapis.com/fcm/send";
 	private static final String FCM_SERVER_KEY = "AAAAiQ--Yns:APA91bFmgiNOhreo6kA3bfQN5DFqeSSEN6V8uEJYPyuQR1-GOYl5BJgcWa3qI7n8K-foQieSuelaS_6_8RLzAkGBh9Bnwga6vWPh4mJqBXpNw7KI-mRffLZGbodJu10R5MvK7Mxmlnmv";
 
-	public void send(PushNotificationIdentifierEnum identifier, Object payload, List<String> androidIds) throws URISyntaxException {
+	public void send(PushNotificationIdentifierEnum identifier, Map<String, Object> payload, List<String> androidIds) throws URISyntaxException {
 		if(androidIds == null || androidIds.size() == 0) {
 			return;
 		}
