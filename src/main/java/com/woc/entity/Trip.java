@@ -23,10 +23,10 @@ public class Trip implements Serializable {
     @Column(name = "rider_id", nullable = false, length = 6)
     private Long riderId;
 
-    @Column(name = "start_location", length = 20)
+    @Column(name = "start_location", nullable = false, length = 20)
     private String startLocation;
 
-    @Column(name = "end_location", length = 20)
+    @Column(name = "end_location", nullable = false, length = 20)
     private String endLocation;
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -42,7 +42,7 @@ public class Trip implements Serializable {
     private Date duration;
 
     @Column(name = "distance")
-    private Integer distance;
+    private Double distance;
 
     @Column(name = "cost")
     private Double cost;
@@ -54,11 +54,11 @@ public class Trip implements Serializable {
     private Integer cancelledBy;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "created_time")
+    @Column(name = "created_time", nullable = false)
     private Date createdTime;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "updated_time")
+    @Column(name = "updated_time", nullable = false)
     private Date updatedTime;
 
     public static long getSerialVersionUID() {
@@ -129,11 +129,11 @@ public class Trip implements Serializable {
         this.duration = duration;
     }
 
-    public Integer getDistance() {
+    public Double getDistance() {
         return distance;
     }
 
-    public void setDistance(Integer distance) {
+    public void setDistance(Double distance) {
         this.distance = distance;
     }
 

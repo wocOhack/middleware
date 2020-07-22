@@ -1,8 +1,6 @@
 package com.woc.service.enums;
 
-public enum TripStatus {
-    TRIP_CREATED("C"),
-    TRIP_ACCEPTED("A"),
+public enum TripStatusEnum {
     TRIP_IN_PROGRESS("P"),
     TRIP_ENDED("E"),
     TRIP_CANCELLED_BY_DRIVER("CD"),
@@ -10,7 +8,7 @@ public enum TripStatus {
 
     private String tripStatus;
 
-    TripStatus(String tripStatus) {
+    TripStatusEnum(String tripStatus) {
         this.tripStatus = tripStatus;
     }
 
