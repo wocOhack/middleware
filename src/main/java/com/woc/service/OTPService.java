@@ -73,7 +73,7 @@ public class OTPService {
         otpRepository.addOTP(otp);
     }
 
-    private OTP getOTP(String phoneNumber){
+    public OTP getOTP(String phoneNumber){
         OTP otp=otpRepository.getOTP(phoneNumber);
         return otp;
     }
