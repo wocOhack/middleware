@@ -7,4 +7,6 @@ import com.woc.entity.Pricing;
 public interface PricingRepository{
 
 	public List<Pricing> findAll();
+
+	public Pricing getPricingByName(String city);
 }

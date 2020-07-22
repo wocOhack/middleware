@@ -49,7 +49,7 @@ public class User implements Serializable {
     private String deviceId;
 
     @Column(name = "ratings", nullable = true)
-    private Integer rating;
+    private Double rating;
 
     @Column(name = "status", nullable = false, length = 15)
     private String status;
@@ -113,11 +113,11 @@ public class User implements Serializable {
         this.deviceId = deviceId;
     }
 
-    public Integer getRating() {
+    public Double getRating() {
         return rating;
     }
 
-    public void setRating(Integer rating) {
+    public void setRating(Double rating) {
         this.rating = rating;
     }
 
