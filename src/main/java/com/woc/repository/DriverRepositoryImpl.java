@@ -146,6 +146,7 @@ public class DriverRepositoryImpl implements DriverRepository {
         // One thing to be updated at a time.
         long driver_id = 0l;
 
+        System.out.println("Updating driver row");
         if (d.getPhoneNumber() != null && !d.getPhoneNumber().trim().isEmpty()) {
             DriverSearchCriteria search = new DriverSearchCriteria();
             search.setPhoneNumber(d.getPhoneNumber());
@@ -174,6 +175,7 @@ public class DriverRepositoryImpl implements DriverRepository {
             q.setParameter("expiry_date", license.getExpiryDate());
             q.setParameter("license_number", license.getLicenceNumber());
             rowsUpdated = q.executeUpdate();
+            System.out.println("Updated all license info "+rowsUpdated);
             return rowsUpdated;
         }
 
@@ -184,6 +186,7 @@ public class DriverRepositoryImpl implements DriverRepository {
             q.setParameter("expiry_date", license.getExpiryDate());
             // q.setParameter("license_number", license.getLicenceNumber());
             rowsUpdated = q.executeUpdate();
+            System.out.println("Updated all expDate info" + rowsUpdated);
 //            return rowsUpdated;
         }
        
@@ -195,6 +198,7 @@ public class DriverRepositoryImpl implements DriverRepository {
             q.setParameter("license_doc", license.getLicenseDocumentLink());
 //            q.setParameter("expiry_date", license.getExpiryDate());
             rowsUpdated = q.executeUpdate();
+            System.out.println("Updated all docLink info" + rowsUpdated);
 //            return rowsUpdated;
         }
         
@@ -203,7 +207,8 @@ public class DriverRepositoryImpl implements DriverRepository {
                     "Update Driver d set d.lcense_number = :license_num where d.id = "
                             + driver_id);
             q.setParameter("license_num", license.getLicenceNumber());
-           
+            System.out.println("Updated all LicNum info" + rowsUpdated);
+
             rowsUpdated = q.executeUpdate();
 //            return rowsUpdated;
         }
