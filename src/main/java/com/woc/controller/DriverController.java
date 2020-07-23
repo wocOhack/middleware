@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.woc.dto.AcceptRideRequestDTO;
 import com.woc.dto.Driver;
 import com.woc.dto.DriverAvailability;
 import com.woc.dto.DriverLocationUpdateRequest;
@@ -25,6 +26,7 @@ import com.woc.service.DriverService;
 import com.woc.service.RiderService;
 import com.woc.service.exceptions.FeedbackSubmissionException;
 import com.woc.dto.PhoneVerificationInitiationRequest;
+import com.woc.dto.RejectRideRequestDTO;
 import com.woc.dto.DriverVerificationCompletionReply;
 import com.woc.dto.PhoneVerificationCompletionRequest;
 
@@ -90,16 +92,26 @@ public class DriverController {
         }
     }
 
-    @PostMapping("/updateRideRequest")
-    public ResponseEntity updateRideRequest(@RequestBody RideRequestUpdateObject rideRequestUpdateObject) {
+    @PostMapping("/acceptRideRequest")
+    public ResponseEntity acceptRideRequest(@RequestBody AcceptRideRequestDTO acceptRideRequestDTO) {
 
-        RideRequest request = riderService.getRideRequest(rideRequestUpdateObject);
+        RideRequest request = riderService.getRideRequest(acceptRideRequestDTO.getRideId());
         if (null == request || null != request.getDriverId()) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
-        driverService.acceptRideRequest(rideRequestUpdateObject, request);
-        // if found and no driver alloted, then allot the driver, send push notification to rider
-        return new ResponseEntity(HttpStatus.OK);
+        driverService.acceptRideRequest(acceptRideRequestDTO.getDriverId(), request);
+        StringBuffer responseBody = new StringBuffer("");
+        responseBody.append("rideId:").append(acceptRideRequestDTO.getRideId()).append(",");
+        responseBody.append("source:").append(request.getStartLocation()).append(",");
+        responseBody.append("destination:").append(request.getEndLocation()).append("}");
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseBody.toString());
+    }
+    
+    @PostMapping("/rejectRideRequest")
+    public ResponseEntity rejectRideRequest(@RequestBody RejectRideRequestDTO rejectRideRequestDTO) {
+
+    	return new ResponseEntity(" ", HttpStatus.OK);
     }
 
     @PostMapping("/startRide")

@@ -87,18 +87,17 @@ public class RiderController {
     }
 
     @PostMapping("/requestRide")
-    public void requestRide(@RequestBody RideRequestObject rideRequest) {
+    public ResponseEntity requestRide(@RequestBody RideRequestObject rideRequest) {
 
         long rideRequestID = riderService.createRideRequest(rideRequest);
-        driverService.notifyNearestDrivers(rideRequest.getSourceLocation(), rideRequest.getDestinationLocation(),
-                rideRequestID);
-        return;
+        String sourceLocation = rideRequest.getSourceLattitude() + ":" + rideRequest.getSourceLongitude();
+        driverService.notifyNearestDrivers(sourceLocation, rideRequestID);
+        return new ResponseEntity("", HttpStatus.CREATED);
     }
 
     @PostMapping("/cancelRide")
     public void cancelRide(@RequestBody CancellRideRequestObject request) {
         riderService.cancellRideRequest(request);
-        ;
     }
 
     @GetMapping("/getTrips")
