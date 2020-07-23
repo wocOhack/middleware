@@ -131,6 +131,8 @@ public class DriverRepositoryImpl implements DriverRepository {
             d.setUserID(u.getId());
             d.setDocuments(vehiclesData);
             d.setDeviceID(driver.getDeviceID());
+            d.setStatus(driver.getStatus());
+            d.setAddress(driver.getAddress());
             return d;
             // } // return riders;
         }
