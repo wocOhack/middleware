@@ -131,6 +131,7 @@ public class DriverService {
         System.out.println("driverId : " + createdDriver.getId());
 
         v.setInsuranceDoc(vehcile.getInsuranceDocumentLink());
+        v.setInsuranceNumber(vehcile.getInsuranceNumber());
         v.setVehicleDoc(vehcile.getRCDocumentLink());
         v.setIsVerified(true);
         v.setVehicleNumber(vehcile.getRegistrationNumber());
