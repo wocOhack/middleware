@@ -10,5 +10,7 @@ public interface FeedbackRepository {
 
     public void submitFeedback(Feedback feedback);
 
-    public List<Feedback> getFeedbacksByTripId(long tripId);
+    public boolean doesFeedbackAlreadyExist(long tripId, long feedbackOwnerId);
+
+    public Long getFeedbackCountForUser(Long userId);
 }
