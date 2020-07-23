@@ -131,12 +131,17 @@ public class DriverController {
     }
 
     @PostMapping("/initiatePhoneVerification")
-    public Boolean initiatePhoneVerification(@RequestBody final PhoneVerificationInitiationRequest phoneVerificationInitiationRequest) {
-        return otpService.initiateVerification(phoneVerificationInitiationRequest);
+    public WocResponseBody initiatePhoneVerification(@RequestBody final PhoneVerificationInitiationRequest phoneVerificationInitiationRequest) {
+        Boolean result=otpService.initiateVerification(phoneVerificationInitiationRequest);
+        if(result){
+            return new WocResponseBody(result,"OK","OTP generated and sent");
+        }
+        return new WocResponseBody(result,"OTP_SENDING_ERROR","OTP generated but not sent");
+        
     }
 
     @PutMapping("/completePhoneVerification")
-    public DriverVerificationCompletionReply completePhoneVerification(@RequestBody final PhoneVerificationCompletionRequest phoneVerificationCompletionRequest) {
+    public WocResponseBody completePhoneVerification(@RequestBody final PhoneVerificationCompletionRequest phoneVerificationCompletionRequest) {
         Boolean isExistingUser = false;
         Driver driver = null;
         Boolean isVerified = otpService.completeVerification(phoneVerificationCompletionRequest);
@@ -148,7 +153,16 @@ public class DriverController {
             driver = driverService.getDriver(driverSearchCriteria);
             isExistingUser = (driver != null);
         }
-        return new DriverVerificationCompletionReply(isVerified, isExistingUser, driver);
+        
+        DriverVerificationCompletionReply driverVerificationCompletionReply= new DriverVerificationCompletionReply(isVerified, isExistingUser, driver);
+        
+        if(!driverVerificationCompletionReply.getIsVerified()){
+            return new WocResponseBody(driverVerificationCompletionReply,"OTP_VERIFICATION_FAILURE","OTP did not match or verification is yet to be initiated");
+        }
+        else{
+            return new WocResponseBody(driverVerificationCompletionReply,"OTP_VERIFICATION_SUCCESS","OTP VERIFIED SUCCESSFULLY");
+        }
+        
     }
 
     @PutMapping("/toggleDriverAvailabilityStatus")

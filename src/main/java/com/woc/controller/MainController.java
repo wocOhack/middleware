@@ -1,6 +1,7 @@
 package com.woc.controller;
 
 import com.woc.dto.PhoneVerificationInitiationRequest;
+import com.woc.dto.WocResponseBody;
 import com.woc.entity.*;
 import com.woc.service.OTPService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +42,11 @@ public class MainController {
     }
     
     @GetMapping("/getOtp")
-    public com.woc.entity.OTP getOTP(@RequestBody PhoneVerificationInitiationRequest phoneVerificationInitiationRequest){
-       return otpService.getOTP(phoneVerificationInitiationRequest.getPhoneNumber()); 
+    public WocResponseBody getOTP(@RequestBody PhoneVerificationInitiationRequest phoneVerificationInitiationRequest){
+        OTP otp=otpService.getOTP(phoneVerificationInitiationRequest.getPhoneNumber());
+        if(otp!=null){
+            return new WocResponseBody(otp,"OTP_FOUND","otp found in database");
+        }
+       return new WocResponseBody(otp,"OTP_NOT_FOUND","otp not found in database");
     }
 }
