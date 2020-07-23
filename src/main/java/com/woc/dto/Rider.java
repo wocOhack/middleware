@@ -11,10 +11,12 @@ public class Rider implements Serializable {
     private long riderID;
     private String phoneNumber;
     private String email;
-    private Map<String, String> documents;
+//    private Map<String, String> documents;
+    private RiderDocuments documents;
     private String PIN;
     private boolean isDisabled;
     private String deviceID;
+    private String location;
     
     public long getRiderID() {
         return riderID;
@@ -56,11 +58,11 @@ public class Rider implements Serializable {
         this.email = email;
     }
 
-    public Map<String, String> getDocuments() {
+    public RiderDocuments getDocuments() {
         return documents;
     }
 
-    public void setDocuments(Map<String, String> documents) {
+    public void setDocuments(RiderDocuments documents) {
         this.documents = documents;
     }
 
@@ -87,5 +89,14 @@ public class Rider implements Serializable {
     public void setDeviceID(String deviceID) {
         this.deviceID = deviceID;
     }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+    
     
 }

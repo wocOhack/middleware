@@ -49,16 +49,21 @@ public class DriverController {
     @PostMapping("/createProfile")
     public ResponseEntity createNewDriver(@RequestBody DriverRegistrationRequest request) {
         long id = driverService.addDriver(request.getDriver(), request.getVehicle(), request.getInsurance());
+
         // return 2L;
         WocResponseBody resp = new WocResponseBody();
         if (id != 0 && id != -1) {
+            Driver d = request.getDriver();
+            d.setDriverID(id);
+            request.setDriver(d);
+            resp.setResult(request);
             resp.setDetailedMessage("OK");
             resp.setResponseStatus("Driver created sucessfully");
             return new ResponseEntity(resp, HttpStatus.CREATED);
         } else if (id == -1) {
             resp.setDetailedMessage("Bad Request");
             resp.setResponseStatus("Driver already exist with following phone number");
-            
+
             return new ResponseEntity(resp, HttpStatus.BAD_REQUEST);
         } else {
             resp.setDetailedMessage("Internal Server Error");
@@ -75,7 +80,7 @@ public class DriverController {
         if (id == 0) {
             resp.setDetailedMessage("Internal Server Error");
             resp.setResponseStatus("Issue updating Driver");
-            
+
             return new ResponseEntity(resp, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         resp.setDetailedMessage("OK");
@@ -92,7 +97,7 @@ public class DriverController {
         if (driver == null) {
             resp.setDetailedMessage("Data Not Found");
             resp.setResponseStatus("Data Not available for requested driver");
-            
+
             return new ResponseEntity(resp, HttpStatus.NOT_FOUND);
         }
         resp.setDetailedMessage("OK");
@@ -119,7 +124,8 @@ public class DriverController {
     }
 
     @PostMapping("/updateRideRequest")
-    public ResponseEntity updateRideRequest(@RequestBody RideRequestUpdateObject rideRequestUpdateObject) throws URISyntaxException {
+    public ResponseEntity updateRideRequest(@RequestBody RideRequestUpdateObject rideRequestUpdateObject)
+            throws URISyntaxException {
 
         RideRequest request = riderService.getRideRequest(rideRequestUpdateObject);
         if (null == request || null != request.getDriverId()) {
@@ -131,12 +137,14 @@ public class DriverController {
     }
 
     @PostMapping("/initiatePhoneVerification")
-    public Boolean initiatePhoneVerification(@RequestBody final PhoneVerificationInitiationRequest phoneVerificationInitiationRequest) {
+    public Boolean initiatePhoneVerification(
+            @RequestBody final PhoneVerificationInitiationRequest phoneVerificationInitiationRequest) {
         return otpService.initiateVerification(phoneVerificationInitiationRequest);
     }
 
     @PutMapping("/completePhoneVerification")
-    public DriverVerificationCompletionReply completePhoneVerification(@RequestBody final PhoneVerificationCompletionRequest phoneVerificationCompletionRequest) {
+    public DriverVerificationCompletionReply completePhoneVerification(
+            @RequestBody final PhoneVerificationCompletionRequest phoneVerificationCompletionRequest) {
         Boolean isExistingUser = false;
         Driver driver = null;
         Boolean isVerified = otpService.completeVerification(phoneVerificationCompletionRequest);
@@ -162,32 +170,33 @@ public class DriverController {
     public ResponseEntity updateCurrentLocation(@RequestBody DriverLocationUpdateRequest updateLocationRequest) {
         System.out.println(updateLocationRequest.getDriverId() + " " + updateLocationRequest.getLocation());
         WocResponseBody resp = new WocResponseBody();
-        if (updateLocationRequest.getDriverId() == 0l && (updateLocationRequest.getLocation()== null || updateLocationRequest.getLocation().trim().isEmpty())) {
+        if (updateLocationRequest.getDriverId() == 0l && (updateLocationRequest.getLocation() == null
+                || updateLocationRequest.getLocation().trim().isEmpty())) {
             resp.setDetailedMessage("Bad Request");
             resp.setResponseStatus("Need driverid and location for the update request");
-            
-            return new ResponseEntity(resp, HttpStatus.BAD_REQUEST); 
-        } 
+
+            return new ResponseEntity(resp, HttpStatus.BAD_REQUEST);
+        }
         long updated = driverService.updateDriverLocation(updateLocationRequest);
         if (updated != 0l) {
             resp.setDetailedMessage("OK");
             resp.setResponseStatus("Driver Location Updated");
-            
-            return new ResponseEntity(resp, HttpStatus.OK); 
+
+            return new ResponseEntity(resp, HttpStatus.OK);
         }
         resp.setDetailedMessage("Internal Server Error");
         resp.setResponseStatus("Issue Updating Driver Location");
-        
+
         return new ResponseEntity(resp, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-	@PostMapping("/submitFeedBack")
-	public ResponseEntity submitFeedBack(@RequestBody FeedbackDto feedbackDto) {
+    @PostMapping("/submitFeedBack")
+    public ResponseEntity submitFeedBack(@RequestBody FeedbackDto feedbackDto) {
         WocResponseBody wocResponseBody = null;
-		try {
-			int status = driverService.submitFeedback(feedbackDto);
-			if(status < 1) {
-                if(status == -1) {
+        try {
+            int status = driverService.submitFeedback(feedbackDto);
+            if (status < 1) {
+                if (status == -1) {
                     wocResponseBody = new WocResponseBody();
                     wocResponseBody.setResponseStatus(BAD_REQUEST);
                     wocResponseBody.setDetailedMessage(BAD_REQUEST_MESSAGE);
@@ -198,38 +207,39 @@ public class DriverController {
                 }
                 return new ResponseEntity(wocResponseBody, HttpStatus.BAD_REQUEST);
             } else {
-			    wocResponseBody = new WocResponseBody();
-			    wocResponseBody.setResponseStatus("FEEDBACK_RECEIVED");
-			    wocResponseBody.setDetailedMessage("Feedback submitted successfully");
+                wocResponseBody = new WocResponseBody();
+                wocResponseBody.setResponseStatus("FEEDBACK_RECEIVED");
+                wocResponseBody.setDetailedMessage("Feedback submitted successfully");
             }
-			return new ResponseEntity(wocResponseBody, HttpStatus.CREATED);
-		} catch (Exception e) {
-		    wocResponseBody = new WocResponseBody();
-		    wocResponseBody.setResponseStatus(INTERNAL_ERROR);
-		    wocResponseBody.setDetailedMessage(INTERNAL_ERROR_MESSAGE);
-		    return new ResponseEntity(wocResponseBody, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}
+            return new ResponseEntity(wocResponseBody, HttpStatus.CREATED);
+        } catch (Exception e) {
+            wocResponseBody = new WocResponseBody();
+            wocResponseBody.setResponseStatus(INTERNAL_ERROR);
+            wocResponseBody.setDetailedMessage(INTERNAL_ERROR_MESSAGE);
+            return new ResponseEntity(wocResponseBody, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
-	@PostMapping("/startRide")
+    @PostMapping("/startRide")
     public ResponseEntity startRide(@RequestBody StartRideRequestDto startRideRequestDto) {
         WocResponseBody wocResponseBody = null;
         StartRideResponseDto startRideResponseDto;
         try {
             Long tripId = driverService.startRide(startRideRequestDto);
-            if(tripId < 1) {
-                if(tripId == -1l) {
+            if (tripId < 1) {
+                if (tripId == -1l) {
                     startRideResponseDto = new StartRideResponseDto(null);
                     wocResponseBody = new WocResponseBody(startRideResponseDto, BAD_REQUEST, BAD_REQUEST_MESSAGE);
                 } else if (tripId == -2l) {
                     startRideResponseDto = new StartRideResponseDto(null);
-                    wocResponseBody = new WocResponseBody(startRideResponseDto,"INVALID_PIN",
+                    wocResponseBody = new WocResponseBody(startRideResponseDto, "INVALID_PIN",
                             "PIN entered by the driver does not match");
                 }
                 return new ResponseEntity(wocResponseBody, HttpStatus.BAD_REQUEST);
             } else {
                 startRideResponseDto = new StartRideResponseDto(tripId);
-                wocResponseBody = new WocResponseBody( startRideResponseDto, "TRIP_IN_PROGRESS", "The trip has started successfully");
+                wocResponseBody = new WocResponseBody(startRideResponseDto, "TRIP_IN_PROGRESS",
+                        "The trip has started successfully");
             }
             return new ResponseEntity(wocResponseBody, HttpStatus.CREATED);
         } catch (Exception e) {
@@ -246,7 +256,7 @@ public class DriverController {
         EndRideResponseDto endRideResponseDto;
         try {
             endRideResponseDto = driverService.endRide(endRideRequestDto);
-            if(endRideResponseDto == null ) {
+            if (endRideResponseDto == null) {
                 wocResponseBody = new WocResponseBody(endRideResponseDto, BAD_REQUEST, BAD_REQUEST_MESSAGE);
                 return new ResponseEntity(wocResponseBody, HttpStatus.BAD_REQUEST);
             }

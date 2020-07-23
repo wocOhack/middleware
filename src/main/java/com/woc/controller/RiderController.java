@@ -19,9 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.woc.entity.ServiceableArea;
 import com.woc.service.DriverService;
 import com.woc.service.RiderService;
-import com.woc.dto.PhoneVerificationInitiationRequest;
-import com.woc.dto.RiderVerificationCompletionReply;
-import com.woc.dto.PhoneVerificationCompletionRequest;
 
 @RestController
 @RequestMapping("/woc/rider")
@@ -44,14 +41,15 @@ public class RiderController {
     @PostMapping("/createProfile")
     public ResponseEntity createNewRider(@RequestBody Rider newRider) {
         
-        long id = riderService.addRider(newRider);
+        Rider rider = riderService.addRider(newRider);
         WocResponseBody resp = new WocResponseBody();
-        if (id != 0 && id != -1) {
+        if (rider.getRiderID() != 0 && rider.getRiderID() != -1) {
             String message = "OK";
+            resp.setResult(rider);
             resp.setResponseStatus(message);
-            resp.setDetailedMessage("Rider Created Successfully with id:"  + id);
+            resp.setDetailedMessage("Rider Created Successfully");
             return new ResponseEntity(resp, HttpStatus.CREATED);
-        } else if (id == -1) {
+        } else if (rider.getRiderID() == -1) {
             String message = "Bad Request";
             resp.setResponseStatus(message);
             resp.setDetailedMessage("Rider already exist with following phone number");
@@ -67,8 +65,9 @@ public class RiderController {
     @PutMapping("/updateProfile")
     public ResponseEntity updateRiderProfile(@RequestBody Rider rider) {
         WocResponseBody resp = new WocResponseBody();
-        long id = riderService.updateRider(rider);
-        if (id != 0) {
+        Rider r = riderService.updateRider(rider);
+        if (r != null) {
+            resp.setResult(r);
             resp.setResponseStatus("OK");
             resp.setDetailedMessage("Rider Updated Successfully");
             return new ResponseEntity(resp, HttpStatus.OK);
@@ -96,24 +95,49 @@ public class RiderController {
         return new ResponseEntity(resp, HttpStatus.OK);
     }
 
+    @PutMapping("/update-current-location")
+    public ResponseEntity updateCurrentLocation(@RequestBody RiderLocaionUpdateRequest updateLocationRequest) {
+        System.out.println(updateLocationRequest.getRiderId() + " " + updateLocationRequest.getLocation());
+        WocResponseBody resp = new WocResponseBody();
+        if (updateLocationRequest.getRiderId() == 0l && (updateLocationRequest.getLocation() == null
+                || updateLocationRequest.getLocation().trim().isEmpty())) {
+            resp.setDetailedMessage("Bad Request");
+            resp.setResponseStatus("Need riderId and location for the update request");
+
+            return new ResponseEntity(resp, HttpStatus.BAD_REQUEST);
+        }
+        long updated = riderService.updateRiderLocation(updateLocationRequest);
+        if (updated != 0l) {
+            resp.setDetailedMessage("OK");
+            resp.setResponseStatus("Driver Location Updated");
+
+            return new ResponseEntity(resp, HttpStatus.OK);
+        }
+        resp.setDetailedMessage("Internal Server Error");
+        resp.setResponseStatus("Issue Updating Rider Location");
+
+        return new ResponseEntity(resp, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     @PutMapping("/updatePIN")
     public ResponseEntity updatePIN(@RequestBody PINUpdateRequestObject pinUpdateRequestObject) {
         System.out.println(pinUpdateRequestObject.getPIN() + pinUpdateRequestObject.getRiderID());
-        long id = riderService.updateDriverPin(pinUpdateRequestObject);
+        Rider rider = riderService.updateRiderPin(pinUpdateRequestObject);
         WocResponseBody resp = new WocResponseBody();
-        if (id == -1) {
+        if (rider == null) {
             resp.setResponseStatus("Bad Request");
             resp.setDetailedMessage("Both riderId and pin required for pin Update");
             return new ResponseEntity(resp, HttpStatus.BAD_REQUEST);
         }
-        if (id == 0) {
+        if (rider.getRiderID() == 0) {
             resp.setResponseStatus("Internal Server Error");
             resp.setDetailedMessage("Issue updating Pin");
-            return new ResponseEntity("", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity(resp, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         resp.setResponseStatus("OK");
         resp.setDetailedMessage("Pin Successfully Updated");
-        return new ResponseEntity("", HttpStatus.OK);
+        resp.setResult(rider);
+        return new ResponseEntity(resp, HttpStatus.OK);
     }
 
     @PostMapping("/requestRide")

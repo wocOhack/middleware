@@ -24,6 +24,9 @@ public class Vehicle implements Serializable {
     @Column(name = "insurance_doc", nullable = false, length = 200)
     private String insuranceDoc;
 
+    @Column(name = "insurance_number", nullable = false, length = 200)
+    private String insuranceNumber;
+
     @Column(name = "vehicle_model", length = 20)
     private String vehicleModel;
 
@@ -77,6 +80,14 @@ public class Vehicle implements Serializable {
         this.insuranceDoc = insuranceDoc;
     }
 
+    public String getInsuranceNumber() {
+        return this.insuranceNumber;
+    }
+
+    public void setInsuranceNumber(String insuranceNumber) {
+        this.insuranceNumber = insuranceNumber;
+    }
+
     public String getVehicleModel() {
         return this.vehicleModel;
     }
@@ -125,11 +136,4 @@ public class Vehicle implements Serializable {
         this.verificationDate = verificationDate;
     }
 
-    @Override
-    public String toString() {
-        return "Vehicle [id=" + id + ", user_id=" + user_id + ", vehicleNumber=" + vehicleNumber + ", insuranceDoc="
-                + insuranceDoc + ", vehicleModel=" + vehicleModel + ", vehicleType=" + vehicleType + ", vehicleDoc="
-                + vehicleDoc + ", isVerified=" + isVerified + ", verifiedBy=" + verifiedBy + ", verificationDate="
-                + verificationDate + "]";
-    }
 }
