@@ -93,6 +93,12 @@ public class DriverService {
         User u = new User();
 
         DriverSearchCriteria search = new DriverSearchCriteria();
+        if (driver == null || license == null) {
+            return -1l;
+        }
+        if (driver.getPhoneNumber() == null || !driver.getPhoneNumber().trim().isEmpty()) {
+            return -1l;
+        }
         search.setPhoneNumber(driver.getPhoneNumber());
         Driver ifexisting = driverRepository.getDriver(search);
         if (ifexisting != null) {
@@ -165,9 +171,12 @@ public class DriverService {
         long idUpdated = 0l;
 
         // returning -1 for badrequest mandate paramater missing
+        if (driver == null ){
+            return -1l;
+        }
         if (driver.getDriverID() == 0
                 && (driver.getPhoneNumber().trim().isEmpty() || driver.getPhoneNumber() == null)) {
-            return 0l;
+            return -1l;
         }
 
         Driver d = new Driver();
@@ -178,18 +187,20 @@ public class DriverService {
         } else {
             search.setPhoneNumber(driver.getPhoneNumber());
         }
+
         d = driverRepository.getDriver(search);
+        System.out.println("Driver Found to be updated - " + d.getDriverID());
         long userId = d.getUserID();
         long user_update = 0l;
         if ((driver.getEmail() != null && !driver.getEmail().trim().isEmpty())
                 && (driver.getName() != null && !driver.getName().trim().isEmpty())) {
             System.out.println("Gonna update rider with email and name");
-             user_update = userRepository.updateUser(driver.getName(), driver.getEmail(), driver.getPhoneNumber(),
-                   d.getUserID());
+            user_update = userRepository.updateUser(driver.getName(), driver.getEmail(), driver.getPhoneNumber(),
+                    d.getUserID());
         } else if (driver.getEmail() != null && !driver.getEmail().trim().isEmpty()) {
             System.out.println("Gonna update rider with email alone ");
 
-             user_update = userRepository.updateUser("", driver.getEmail(), driver.getPhoneNumber(), d.getUserID());
+            user_update = userRepository.updateUser("", driver.getEmail(), driver.getPhoneNumber(), d.getUserID());
             // if (user_update != 0) {
             // long updated = riderRepository.updateRiderData(rider);
             // return updated;
@@ -198,25 +209,30 @@ public class DriverService {
             // }
             // return user_update;
         } else if (driver.getName() != null && !driver.getName().trim().isEmpty()) {
-             user_update = userRepository.updateUser(driver.getName(), "", driver.getPhoneNumber(), d.getUserID());
+            user_update = userRepository.updateUser(driver.getName(), "", driver.getPhoneNumber(), d.getUserID());
             // return user_update;
         }
-        
-//        if ((license.getLicenseDocumentLink() != null && !license.getLicenseDocumentLink().trim().isEmpty()) || driver.get) {
-          if (user_update !=0 && license != null) {
-              idUpdated = driverRepository.updateDriverData(driver, license);
-          }
-         
-//        }
-        return idUpdated;
+
+        // if ((license.getLicenseDocumentLink() != null && !license.getLicenseDocumentLink().trim().isEmpty()) ||
+        // driver.get) {
+        if (license != null) {
+            idUpdated = driverRepository.updateDriverData(driver, license);
+        }
+
+        // }
+        if (idUpdated != 0 || user_update != 0) {
+            return 1;
+        }
+
+        return 0l;
     }
 
-    public void notifyNearestDrivers(String riderLocation, String destinationLocation, long rideRequestID) throws URISyntaxException {
+    public void notifyNearestDrivers(String riderLocation, String destinationLocation, long rideRequestID)
+            throws URISyntaxException {
 
         List<com.woc.entity.Driver> availableDrivers = getAllAvailableDrivers();
         List<Driver> nearestDrivers = new ArrayList<Driver>();
         List<Long> notifiedDrivers = new ArrayList<Long>();
-
 
         for (com.woc.entity.Driver driver : availableDrivers) {
             nearestDrivers.add(getDriverWithDistance(driver, riderLocation));
@@ -246,13 +262,14 @@ public class DriverService {
         notificationPayload.put("rideRequestId", rideRequestID);
 
         List<String> androidIds = new ArrayList<>();
-        for(int i = 0; i < 5; i++) {
+        for (int i = 0; i < 5; i++) {
             androidIds.add(nearestDrivers.get(i).getDeviceID());
         }
-        pushNotificationService.send(PushNotificationIdentifierEnum.RIDE_REQUEST_FOUND, notificationPayload, androidIds);
+        pushNotificationService.send(PushNotificationIdentifierEnum.RIDE_REQUEST_FOUND, notificationPayload,
+                androidIds);
 
         driverRepository.updateDriversStatus("Blocked", notifiedDrivers);
-        updateRideRequestWithNotifiedDrivers(notifiedDrivers,rideRequestID);
+        updateRideRequestWithNotifiedDrivers(notifiedDrivers, rideRequestID);
     }
 
     public List<com.woc.entity.Driver> getAllAvailableDrivers() {
@@ -282,7 +299,8 @@ public class DriverService {
         return driver;
     }
 
-    public void acceptRideRequest(RideRequestUpdateObject requestObject, RideRequest rideRequest) throws URISyntaxException {
+    public void acceptRideRequest(RideRequestUpdateObject requestObject, RideRequest rideRequest)
+            throws URISyntaxException {
 
         com.woc.entity.Driver driver = driverRepository.findByID(requestObject.getDriverID());
         rideRequest.setDriverId(driver);
@@ -300,9 +318,9 @@ public class DriverService {
         List<String> riderAndroidId = new ArrayList<>();
         riderAndroidId.add(rideRequest.getRiderId().getDeviceID());
 
-        pushNotificationService.send(PushNotificationIdentifierEnum.DRIVER_ENROUTE, notificationPayload, riderAndroidId);
+        pushNotificationService.send(PushNotificationIdentifierEnum.DRIVER_ENROUTE, notificationPayload,
+                riderAndroidId);
     }
-
 
     public long updateDriverLocation(DriverLocationUpdateRequest request) {
         return driverRepository.updateDriverLocation(request);
@@ -313,7 +331,7 @@ public class DriverService {
         Feedback feedback = new Feedback();
         Trip trip = tripRepository.findTripById(feedbackDTO.getTripId());
 
-        if(trip == null) {
+        if (trip == null) {
             return -1;
         }
 
@@ -324,13 +342,15 @@ public class DriverService {
         User riderProfile = userRepository.findByID(riderRepository.findByID(trip.getRiderId()).getUser_id());
         User driverProfile = userRepository.findByID(driverRepository.findByID(trip.getDriverId()).getUser_id());
 
-        boolean feedbackAlreadyExists = feedbackRepository.doesFeedbackAlreadyExist(trip.getId(), driverProfile.getId());
-        if(feedbackAlreadyExists) {
-           return 1;
+        boolean feedbackAlreadyExists = feedbackRepository.doesFeedbackAlreadyExist(trip.getId(),
+                driverProfile.getId());
+        if (feedbackAlreadyExists) {
+            return 1;
         }
 
-        Long count  = feedbackRepository.getFeedbackCountForUser(riderProfile.getId());
-        Double updateRating = count == 0 ? feedbackDTO.getRating() : ((riderProfile.getRating()*count + feedbackDTO.getRating())/(count + 1));
+        Long count = feedbackRepository.getFeedbackCountForUser(riderProfile.getId());
+        Double updateRating = count == 0 ? feedbackDTO.getRating()
+                : ((riderProfile.getRating() * count + feedbackDTO.getRating()) / (count + 1));
         userRepository.updateUserRating(updateRating, riderProfile.getId());
 
         feedback.setTripId(trip.getId());
@@ -347,20 +367,21 @@ public class DriverService {
 
         RideRequest rideRequest = rideRequestRepository.findById(startRideRequestDto.getRideRequestId());
 
-        if(rideRequest == null || rideRequest.getDriverId() == null || rideRequest.getRiderId() == null
-            || rideRequest.getStartLocation() == null || rideRequest.getEndLocation() == null) {
+        if (rideRequest == null || rideRequest.getDriverId() == null || rideRequest.getRiderId() == null
+                || rideRequest.getStartLocation() == null || rideRequest.getEndLocation() == null) {
             return -1l;
         }
 
-        if(!rideRequest.getRiderId().getPin().equals(startRideRequestDto.getPin())) {
+        if (!rideRequest.getRiderId().getPin().equals(startRideRequestDto.getPin())) {
             return -2l;
         }
 
         List<String> deviceIdListForPushNotif = new ArrayList<String>();
         deviceIdListForPushNotif.add(rideRequest.getRiderId().getDeviceID());
 
-        Long ongoingTripId = tripRepository.isTripInProgress(rideRequest.getDriverId().getId(), rideRequest.getRiderId().getId());
-        if(ongoingTripId != 0l) {
+        Long ongoingTripId = tripRepository.isTripInProgress(rideRequest.getDriverId().getId(),
+                rideRequest.getRiderId().getId());
+        if (ongoingTripId != 0l) {
             pushNotificationService.send(PushNotificationIdentifierEnum.TRIP_START, null, deviceIdListForPushNotif);
             return ongoingTripId;
         }
@@ -372,7 +393,8 @@ public class DriverService {
         trip.setEndLocation(rideRequest.getEndLocation());
 
         trip.setTripStartTime(new Date());
-        trip.setDistance(locationService.getDistanceBetweenLocations(rideRequest.getStartLocation(), rideRequest.getEndLocation()));
+        trip.setDistance(locationService.getDistanceBetweenLocations(rideRequest.getStartLocation(),
+                rideRequest.getEndLocation()));
         trip.setStatus(TripStatusEnum.TRIP_IN_PROGRESS.toString());
         trip.setCreatedTime(trip.getTripStartTime());
         trip.setUpdatedTime(trip.getTripStartTime());
@@ -389,26 +411,26 @@ public class DriverService {
         EndRideResponseDto endRideResponseDto = new EndRideResponseDto();
         Trip trip = tripRepository.findTripById(endRideRequestDto.getTripId());
 
-        if(trip == null) {
+        if (trip == null) {
             return null;
         }
 
         List<String> riderAndroidId = new ArrayList<String>();
         riderAndroidId.add(riderRepository.findByID(trip.getRiderId()).getDeviceID());
 
-        if(trip.getStatus().equals(TripStatusEnum.TRIP_ENDED.toString())) {
+        if (trip.getStatus().equals(TripStatusEnum.TRIP_ENDED.toString())) {
             endRideResponseDto.setPickup(trip.getStartLocation());
             endRideResponseDto.setDestination(trip.getEndLocation());
             endRideResponseDto.setCity(endRideRequestDto.getCity());
             endRideResponseDto.setDistance(trip.getDistance());
-            endRideResponseDto.setDuration((trip.getDuration()/60) + " minutes");
+            endRideResponseDto.setDuration((trip.getDuration() / 60) + " minutes");
             endRideResponseDto.setFare(trip.getCost());
 
             Map<String, Object> notificationPayload = new HashMap<String, Object>();
             notificationPayload.put("tripId", trip.getId());
             notificationPayload.put("source", trip.getStartLocation());
             notificationPayload.put("destination", trip.getEndLocation());
-            notificationPayload.put("duration", (trip.getDuration()/60) + " minutes");
+            notificationPayload.put("duration", (trip.getDuration() / 60) + " minutes");
             notificationPayload.put("distance", trip.getDistance());
             notificationPayload.put("fare", trip.getCost());
 
@@ -416,28 +438,28 @@ public class DriverService {
             return endRideResponseDto;
         }
 
-        if(!trip.getStatus().equals(TripStatusEnum.TRIP_IN_PROGRESS.toString())) {
+        if (!trip.getStatus().equals(TripStatusEnum.TRIP_IN_PROGRESS.toString())) {
             return null;
         }
 
         Pricing pricing = pricingRepository.getPricingByName(endRideRequestDto.getCity());
-        if(pricing == null) {
+        if (pricing == null) {
             return null;
         }
 
-        Double fare = (pricing.getCostPerKm()*endRideRequestDto.getDistance())
-                + (pricing.getCostPerMin()*(endRideRequestDto.getDuration()/60)) + pricing.getExtraCharges();
-        if(endRideRequestDto.getPickup() != null) {
+        Double fare = (pricing.getCostPerKm() * endRideRequestDto.getDistance())
+                + (pricing.getCostPerMin() * (endRideRequestDto.getDuration() / 60)) + pricing.getExtraCharges();
+        if (endRideRequestDto.getPickup() != null) {
             trip.setStartLocation(endRideRequestDto.getPickup());
         }
-        if(endRideRequestDto.getDestination() != null) {
+        if (endRideRequestDto.getDestination() != null) {
             trip.setEndLocation(endRideRequestDto.getDestination());
         }
-        if(endRideRequestDto.getDistance() != null) {
+        if (endRideRequestDto.getDistance() != null) {
             trip.setDistance(endRideRequestDto.getDistance());
         }
         trip.setDuration(endRideRequestDto.getDuration());
-        trip.setTripEndTime(new Date(trip.getTripStartTime().getTime() + (endRideRequestDto.getDuration()*1000)));
+        trip.setTripEndTime(new Date(trip.getTripStartTime().getTime() + (endRideRequestDto.getDuration() * 1000)));
         trip.setCost(fare);
         trip.setStatus(TripStatusEnum.TRIP_ENDED.toString());
         trip.setUpdatedTime(new Date());
@@ -448,14 +470,14 @@ public class DriverService {
         endRideResponseDto.setPickup(persistedTrip.getStartLocation());
         endRideResponseDto.setDestination(persistedTrip.getEndLocation());
         endRideResponseDto.setDistance(persistedTrip.getDistance());
-        endRideResponseDto.setDuration((persistedTrip.getDuration()/60) + " minutes");
+        endRideResponseDto.setDuration((persistedTrip.getDuration() / 60) + " minutes");
         endRideResponseDto.setFare(persistedTrip.getCost());
 
         Map<String, Object> notificationPayload = new HashMap<String, Object>();
         notificationPayload.put("tripId", persistedTrip.getId());
         notificationPayload.put("source", persistedTrip.getStartLocation());
         notificationPayload.put("destination", persistedTrip.getEndLocation());
-        notificationPayload.put("duration", (persistedTrip.getDuration()/60) + " minutes");
+        notificationPayload.put("duration", (persistedTrip.getDuration() / 60) + " minutes");
         notificationPayload.put("distance", persistedTrip.getDistance());
         notificationPayload.put("fare", persistedTrip.getCost());
 
