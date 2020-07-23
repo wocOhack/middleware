@@ -26,6 +26,8 @@ import com.woc.dto.PhoneVerificationInitiationRequest;
 import com.woc.dto.DriverVerificationCompletionReply;
 import com.woc.dto.PhoneVerificationCompletionRequest;
 
+import java.net.URISyntaxException;
+
 @RestController
 @RequestMapping("/woc/driver")
 public class DriverController {
@@ -117,7 +119,7 @@ public class DriverController {
     }
 
     @PostMapping("/updateRideRequest")
-    public ResponseEntity updateRideRequest(@RequestBody RideRequestUpdateObject rideRequestUpdateObject) {
+    public ResponseEntity updateRideRequest(@RequestBody RideRequestUpdateObject rideRequestUpdateObject) throws URISyntaxException {
 
         RideRequest request = riderService.getRideRequest(rideRequestUpdateObject);
         if (null == request || null != request.getDriverId()) {
@@ -179,47 +181,80 @@ public class DriverController {
         return new ResponseEntity(resp, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-//	@PostMapping("/submitFeedBack")
-//	public ResponseEntity submitFeedBack(@RequestBody FeedbackDto feedbackDto) {
-//		try {
-//			driverService.submitFeedback(feedbackDto);
-//			return ResponseEntity.status(HttpStatus.CREATED).build();
-//		} catch (Exception e) {
-//		    return new ResponseEntity(HttpStatus.OK);
-//		}
-//	}
+	@PostMapping("/submitFeedBack")
+	public ResponseEntity submitFeedBack(@RequestBody FeedbackDto feedbackDto) {
+        WocResponseBody wocResponseBody = null;
+		try {
+			int status = driverService.submitFeedback(feedbackDto);
+			if(status < 1) {
+                if(status == -1) {
+                    wocResponseBody = new WocResponseBody();
+                    wocResponseBody.setResponseStatus(BAD_REQUEST);
+                    wocResponseBody.setDetailedMessage(BAD_REQUEST_MESSAGE);
+                } else if (status == -2) {
+                    wocResponseBody = new WocResponseBody();
+                    wocResponseBody.setResponseStatus("TRIP_STATUS_CONTINGENCY");
+                    wocResponseBody.setDetailedMessage("Trip is in cancelled state or still in progress");
+                }
+                return new ResponseEntity(wocResponseBody, HttpStatus.BAD_REQUEST);
+            } else {
+			    wocResponseBody = new WocResponseBody();
+			    wocResponseBody.setResponseStatus("FEEDBACK_RECEIVED");
+			    wocResponseBody.setDetailedMessage("Feedback submitted successfully");
+            }
+			return new ResponseEntity(wocResponseBody, HttpStatus.CREATED);
+		} catch (Exception e) {
+		    wocResponseBody = new WocResponseBody();
+		    wocResponseBody.setResponseStatus(INTERNAL_ERROR);
+		    wocResponseBody.setDetailedMessage(INTERNAL_ERROR_MESSAGE);
+		    return new ResponseEntity(wocResponseBody, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 
 	@PostMapping("/startRide")
     public ResponseEntity startRide(@RequestBody StartRideRequestDto startRideRequestDto) {
-        StartRideResponseDto startRideResponseDto = new StartRideResponseDto();
+        WocResponseBody wocResponseBody = null;
+        StartRideResponseDto startRideResponseDto;
         try {
             Long tripId = driverService.startRide(startRideRequestDto);
-            if(tripId < 0) {
+            if(tripId < 1) {
                 if(tripId == -1l) {
-                    startRideResponseDto = new StartRideResponseDto(tripId, BAD_REQUEST, BAD_REQUEST_MESSAGE);
+                    startRideResponseDto = new StartRideResponseDto(null);
+                    wocResponseBody = new WocResponseBody(startRideResponseDto, BAD_REQUEST, BAD_REQUEST_MESSAGE);
                 } else if (tripId == -2l) {
-                    startRideResponseDto = new StartRideResponseDto(tripId,"INVALID_PIN",
+                    startRideResponseDto = new StartRideResponseDto(null);
+                    wocResponseBody = new WocResponseBody(startRideResponseDto,"INVALID_PIN",
                             "PIN entered by the driver does not match");
                 }
-                return new ResponseEntity(startRideResponseDto, HttpStatus.BAD_REQUEST);
+                return new ResponseEntity(wocResponseBody, HttpStatus.BAD_REQUEST);
             } else {
-                startRideResponseDto = new StartRideResponseDto(tripId,
-                        "TRIP_IN_PROGRESS", "The trip has started successfully");
+                startRideResponseDto = new StartRideResponseDto(tripId);
+                wocResponseBody = new WocResponseBody( startRideResponseDto, "TRIP_IN_PROGRESS", "The trip has started successfully");
             }
-            return new ResponseEntity(startRideResponseDto, HttpStatus.CREATED);
+            return new ResponseEntity(wocResponseBody, HttpStatus.CREATED);
         } catch (Exception e) {
-            startRideResponseDto = new StartRideResponseDto(INTERNAL_ERROR, INTERNAL_ERROR_MESSAGE);
-            return new ResponseEntity(startRideResponseDto, HttpStatus.INTERNAL_SERVER_ERROR);
+            wocResponseBody = new WocResponseBody();
+            wocResponseBody.setResponseStatus(INTERNAL_ERROR);
+            wocResponseBody.setDetailedMessage(INTERNAL_ERROR_MESSAGE);
+            return new ResponseEntity(wocResponseBody, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-//    @PostMapping("/endRide")
-//    public ResponseEntity endRide(@RequestBody EndRideRequestObject endRideRequestObject) {
-//        try {
-//            //TripDto tripDto = driverService.endTrip(endRideRequestObject);
-//            return ResponseEntity.status(HttpStatus.OK).body("");
-//        } catch (Exception e) {
-//            return new ResponseEntity(HttpStatus.OK);
-//        }
-//    }
+    @PostMapping("/endRide")
+    public ResponseEntity endRide(@RequestBody EndRideRequestDto endRideRequestDto) {
+        WocResponseBody wocResponseBody = null;
+        EndRideResponseDto endRideResponseDto;
+        try {
+            endRideResponseDto = driverService.endRide(endRideRequestDto);
+            if(endRideResponseDto == null ) {
+                wocResponseBody = new WocResponseBody(endRideResponseDto, BAD_REQUEST, BAD_REQUEST_MESSAGE);
+                return new ResponseEntity(wocResponseBody, HttpStatus.BAD_REQUEST);
+            }
+            wocResponseBody = new WocResponseBody(endRideResponseDto, "TRIP_ENDED", "The trip has ended successfully.");
+            return new ResponseEntity(wocResponseBody, HttpStatus.OK);
+        } catch (Exception e) {
+            wocResponseBody = new WocResponseBody(null, INTERNAL_ERROR, INTERNAL_ERROR_MESSAGE);
+            return new ResponseEntity(wocResponseBody, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

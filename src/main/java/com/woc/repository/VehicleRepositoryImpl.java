@@ -1,5 +1,7 @@
 package com.woc.repository;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -33,5 +35,18 @@ public class VehicleRepositoryImpl implements VehicleRepository {
     public long updateVehcile(com.woc.dto.Vehicle v) {
         // TODO Auto-generated method stub
         return 0;
+    }
+
+    @Override
+    public Vehicle findVehicleByUserId(long userId) {
+        List<Vehicle> vehicles = entityManager.createNativeQuery("select * from Vehicle v where v.user_id=" + userId, Vehicle.class).getResultList();
+        Collections.sort(vehicles, new Comparator<Vehicle>() {
+
+            @Override
+            public int compare(Vehicle v1, Vehicle v2) {
+                return (int) (v2.getVerificationDate().getTime() - v1.getVerificationDate().getTime());
+            }
+        });
+        return vehicles.get(0);
     }
 }

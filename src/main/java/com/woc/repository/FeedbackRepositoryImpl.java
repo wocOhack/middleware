@@ -34,8 +34,20 @@ public class FeedbackRepositoryImpl implements FeedbackRepository{
     }
 
     @Override
-    public List<Feedback> getFeedbacksByTripId(long tripId) {
-        List<Feedback> feedbacks = entityManager.createNativeQuery("select * from FEEDBACK f where f.trip_id = " + tripId, Feedback.class).getResultList();
-        return feedbacks;
+    public boolean doesFeedbackAlreadyExist(long tripId, long feedbackOwnerId) {
+        List<Feedback> feedbacks = entityManager.createNativeQuery("select * from FEEDBACK f where f.trip_id = " + tripId + " and f.feedback_owner_id=" + feedbackOwnerId, Feedback.class).getResultList();
+        if(feedbacks == null || feedbacks.size() < 1) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public Long getFeedbackCountForUser(Long userId) {
+        List<Feedback> feedbacksForUser = entityManager.createNativeQuery("select * from FEEDBACK f where f.user_id=" + userId, Feedback.class).getResultList();
+        if(feedbacksForUser == null || feedbacksForUser.size() < 1) {
+            return 0l;
+        }
+        return Long.valueOf(feedbacksForUser.size());
     }
 }

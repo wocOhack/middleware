@@ -2,9 +2,18 @@ package com.woc.dto;
 
 public class WocResponseBody {
 
-    private String responseStatus;
     private Object result;
+    private String responseStatus;
     private String detailedMessage;
+
+    public WocResponseBody() {}
+
+    public WocResponseBody(Object result, String responseStatus, String detailedMessage) {
+        this.responseStatus = responseStatus;
+        this.result = result;
+        this.detailedMessage = detailedMessage;
+    }
+
     public String getResponseStatus() {
         return responseStatus;
     }

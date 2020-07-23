@@ -37,9 +37,8 @@ public class Trip implements Serializable {
     @Column(name = "trip_end_time")
     private Date tripEndTime;
 
-    @Temporal(TemporalType.TIME)
     @Column(name = "duration")
-    private Date duration;
+    private Long duration;
 
     @Column(name = "distance")
     private Double distance;
@@ -121,11 +120,11 @@ public class Trip implements Serializable {
         this.tripEndTime = tripEndTime;
     }
 
-    public Date getDuration() {
+    public Long getDuration() {
         return duration;
     }
 
-    public void setDuration(Date duration) {
+    public void setDuration(Long duration) {
         this.duration = duration;
     }
 

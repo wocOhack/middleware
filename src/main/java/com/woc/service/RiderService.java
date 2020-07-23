@@ -1,25 +1,19 @@
 package com.woc.service;
 
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.woc.dto.*;
+import com.woc.service.enums.PushNotificationIdentifierEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.woc.dto.CancellRideRequestObject;
-import com.woc.dto.RideRequestObject;
-import com.woc.dto.RideRequestUpdateObject;
-import com.woc.dto.PINUpdateRequestObject;
-import com.woc.dto.FeedBack;
 import com.woc.entity.Feedback;
 import com.woc.entity.Trip;
 import com.woc.repository.*;
-import com.woc.service.enums.TripStatus;
-import com.woc.service.exceptions.FeedbackSubmissionException;
-import com.woc.dto.Rider;
-import com.woc.dto.RiderSearchCriteria;
-import com.woc.dto.TripSearchCriteria;
+import com.woc.service.enums.TripStatusEnum;
 import com.woc.entity.RideRequest;
 import com.woc.entity.ServiceableArea;
 import com.woc.entity.User;
@@ -50,7 +44,7 @@ public class RiderService {
     DriverRepository driverRepository;
 
 	@Autowired
-	PushNotificationService notificationService;
+	PushNotificationService pushNotificationService;
 
     @Autowired
     TripRepository tripRepository;
@@ -118,7 +112,7 @@ public class RiderService {
         return request.getId();
     }
 
-    public void cancellRideRequest(CancellRideRequestObject request) {
+    public void cancellRideRequest(CancellRideRequestObject request) throws URISyntaxException {
 	
     	com.woc.entity.Rider rider = riderRepository.findByID(request.getRiderID());
     	RideRequest rideRequest = riderRequestsRepository.findByRider(rider);
@@ -126,7 +120,10 @@ public class RiderService {
     	List<Long> driverIds = new ArrayList<Long>();
     	driverIds.add(driver.getId());
     	driverRepository.updateDriversStatus("Available", driverIds);
-    	notificationService.send("Ride has been cancelled by Rider", driver.getDeviceID());
+
+    	List<String> driverAndroidId = new ArrayList<>();
+    	driverAndroidId.add(driver.getDeviceID());
+    	pushNotificationService.send(PushNotificationIdentifierEnum.RIDE_CANCELLED_BY_RIDER, null, driverAndroidId);
     	riderRequestsRepository.deleteRideRequest(rideRequest);
     	return;
     }
@@ -189,59 +186,62 @@ public class RiderService {
         return riderRepository.updateRiderPin(request);
     }
 
-    public List<com.woc.dto.Trip> getRiderTrips(TripSearchCriteria searchCriteria) {
-        List<com.woc.dto.Trip> fetchedTrips = new ArrayList<com.woc.dto.Trip>();
+    public List<TripDto> getRiderTrips(TripSearchCriteria searchCriteria) {
+        List<TripDto> fetchedTripDtos = new ArrayList<TripDto>();
         List<com.woc.entity.Trip> trips = tripRepository.getTrips(searchCriteria);
         if (trips == null) {
-            return fetchedTrips;
+            return fetchedTripDtos;
         }
         for (com.woc.entity.Trip each : trips) {
-            com.woc.dto.Trip t = new com.woc.dto.Trip();
+            TripDto t = new TripDto();
             t.setDistance(each.getDistance());
-            t.setDuration(each.getDuration().getTime());
+            t.setDuration(each.getDuration());
             t.setStartTime(each.getTripStartTime());
             t.setEndTime(each.getTripEndTime());
             t.setFare(each.getCost());
 
             t.setStartLocation(each.getStartLocation());
             t.setEndLocation(each.getEndLocation());
-            fetchedTrips.add(t);
+            fetchedTripDtos.add(t);
         }
-        return fetchedTrips;
+        return fetchedTripDtos;
     }
 
     RiderService() {
         super();
     }
 
-    public void submitFeedback(FeedBack feedbackDTO) throws FeedbackSubmissionException {
+    public int submitFeedback(FeedbackDto feedbackDTO) throws Exception {
         Feedback feedback = new Feedback();
-
         Trip trip = tripRepository.findTripById(feedbackDTO.getTripId());
 
-        if (trip == null) {
-            throw new FeedbackSubmissionException("BAD REQUEST. Could not find trip.");
+        if(trip == null) {
+            return -1;
         }
 
-        if (!trip.getStatus().equals(TripStatus.TRIP_ENDED.toString())) {
-            throw new FeedbackSubmissionException("BAD REQUEST. This trip has not ended yet.");
+        if (!trip.getStatus().equals(TripStatusEnum.TRIP_ENDED.toString())) {
+            return -2;
         }
 
-        List<Feedback> existingFeedbacksForTrip = feedbackRepository.getFeedbacksByTripId(trip.getId());
-        if (existingFeedbacksForTrip != null) {
-            for (Feedback f : existingFeedbacksForTrip) {
-                if (f.getFeedbackOwnerId() == trip.getRiderId()) {
-                    return;
-                }
-            }
+        User riderProfile = userRepository.findByID(riderRepository.findByID(trip.getRiderId()).getUser_id());
+        User driverProfile = userRepository.findByID(driverRepository.findByID(trip.getDriverId()).getUser_id());
+
+        boolean feedbackAlreadyExists = feedbackRepository.doesFeedbackAlreadyExist(trip.getId(), riderProfile.getId());
+        if(feedbackAlreadyExists) {
+            return 1;
         }
+
+        long count  = feedbackRepository.getFeedbackCountForUser(driverProfile.getId());
+        Double updateRating = count == 0 ? feedbackDTO.getRating() : ((driverProfile.getRating()*count + feedbackDTO.getRating())/(count + 1));
+        userRepository.updateUserRating(updateRating, driverProfile.getId());
 
         feedback.setTripId(trip.getId());
-        feedback.setUserId(trip.getDriverId());
-        feedback.setFeedbackOwnerId(trip.getRiderId());
+        feedback.setUserId(driverProfile.getId());
+        feedback.setFeedbackOwnerId(riderProfile.getId());
         feedback.setRating(feedbackDTO.getRating());
         feedback.setComment(feedbackDTO.getComments());
 
         feedbackRepository.submitFeedback(feedback);
+        return 1;
     }
 }
