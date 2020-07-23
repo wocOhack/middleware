@@ -5,25 +5,33 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.woc.dto.*;
-import com.woc.service.enums.PushNotificationIdentifierEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.woc.dto.CancellRideRequestObject;
+import com.woc.dto.FeedbackDto;
+import com.woc.dto.PINUpdateRequestObject;
+import com.woc.dto.RideRequestObject;
+import com.woc.dto.RideRequestUpdateObject;
+import com.woc.dto.Rider;
+import com.woc.dto.RiderLocaionUpdateRequest;
+import com.woc.dto.RiderSearchCriteria;
+import com.woc.dto.TripDto;
+import com.woc.dto.TripSearchCriteria;
 import com.woc.entity.Feedback;
-import com.woc.entity.Trip;
-import com.woc.repository.*;
-import com.woc.service.enums.TripStatusEnum;
 import com.woc.entity.RideRequest;
 import com.woc.entity.ServiceableArea;
+import com.woc.entity.Trip;
 import com.woc.entity.User;
 import com.woc.repository.DriverRepository;
+import com.woc.repository.FeedbackRepository;
 import com.woc.repository.RideRequestRepository;
 import com.woc.repository.RiderRepository;
 import com.woc.repository.ServicableAreaRepository;
 import com.woc.repository.TripRepository;
 import com.woc.repository.UserRepository;
-import com.woc.utilities.Utilities;
+import com.woc.service.enums.PushNotificationIdentifierEnum;
+import com.woc.service.enums.TripStatusEnum;
 
 @Component
 public class RiderService {
@@ -39,12 +47,12 @@ public class RiderService {
 
     @Autowired
     RideRequestRepository riderRequestsRepository;
-    
+
     @Autowired
     DriverRepository driverRepository;
 
-	@Autowired
-	PushNotificationService pushNotificationService;
+    @Autowired
+    PushNotificationService pushNotificationService;
 
     @Autowired
     TripRepository tripRepository;
@@ -60,7 +68,11 @@ public class RiderService {
         return servicableAreaRepository.findAll();
     }
 
-    public long addRider(Rider rider) {
+    public long updateRiderLocation(RiderLocaionUpdateRequest request) {
+        return riderRepository.updateRiderLocation(request);
+    }
+    
+    public Rider addRider(Rider rider) {
         System.out.println("Adding rider");
         Date now = new Date(System.currentTimeMillis());
 
@@ -70,10 +82,13 @@ public class RiderService {
         RiderSearchCriteria search = new RiderSearchCriteria();
         search.setPhoneNumber(rider.getPhoneNumber());
         Rider ifexisting = riderRepository.getRider(search);
+        System.out.println("ifexisting : " + ifexisting);
         if (ifexisting != null) {
             // send 400 bad request as user already exist....
             System.out.println("User already exist.....");
-            return -1;
+            rider.setRiderID(-1);
+            return rider;
+            // return -1;
         }
         u.setPhone(rider.getPhoneNumber());
         u.setEmail(rider.getEmail());
@@ -88,13 +103,20 @@ public class RiderService {
         r.setPin(rider.getPIN());
         // Map<String, String> documents = new HashMap<String, String>();
         if (rider.getDocuments() != null) {
-            r.setProof_of_challenge(Utilities.convertWithStream(rider.getDocuments()));
+            if (rider.getDocuments().getDisabilityProof() != null && !rider.getDocuments().getDisabilityProof().isEmpty()) {
+                r.setProof_of_challenge(rider.getDocuments().getDisabilityProof());
+            }
+          
         }
+        r.setLocation(rider.getLocation());
         r.setVerification_date(now);
         r.setUser_id(u.getId());
         r.setIs_challenged(rider.isDisabled());
         r.setDeviceID(rider.getDeviceID());
-        return riderRepository.addRider(r);
+
+        long riderid = riderRepository.addRider(r);
+        rider.setRiderID(riderid);
+        return rider;
     }
 
     public Rider getRider(RiderSearchCriteria search) {
@@ -113,29 +135,29 @@ public class RiderService {
     }
 
     public void cancellRideRequest(CancellRideRequestObject request) throws URISyntaxException {
-	
-    	com.woc.entity.Rider rider = riderRepository.findByID(request.getRiderID());
-    	RideRequest rideRequest = riderRequestsRepository.findByRider(rider);
-    	com.woc.entity.Driver driver= rideRequest.getDriverId();
-    	List<Long> driverIds = new ArrayList<Long>();
-    	driverIds.add(driver.getId());
-    	driverRepository.updateDriversStatus("Available", driverIds);
 
-    	List<String> driverAndroidId = new ArrayList<>();
-    	driverAndroidId.add(driver.getDeviceID());
-    	pushNotificationService.send(PushNotificationIdentifierEnum.RIDE_CANCELLED_BY_RIDER, null, driverAndroidId);
-    	riderRequestsRepository.deleteRideRequest(rideRequest);
-    	return;
+        com.woc.entity.Rider rider = riderRepository.findByID(request.getRiderID());
+        RideRequest rideRequest = riderRequestsRepository.findByRider(rider);
+        com.woc.entity.Driver driver = rideRequest.getDriverId();
+        List<Long> driverIds = new ArrayList<Long>();
+        driverIds.add(driver.getId());
+        driverRepository.updateDriversStatus("Available", driverIds);
+
+        List<String> driverAndroidId = new ArrayList<>();
+        driverAndroidId.add(driver.getDeviceID());
+        pushNotificationService.send(PushNotificationIdentifierEnum.RIDE_CANCELLED_BY_RIDER, null, driverAndroidId);
+        riderRequestsRepository.deleteRideRequest(rideRequest);
+        return;
     }
 
     public RideRequest getRideRequest(RideRequestUpdateObject requestObject) {
         return riderRequestsRepository.findById(requestObject.getRideRequestID());
     }
 
-    public long updateRider(Rider rider) {
+    public Rider updateRider(Rider rider) {
 
         if ((rider.getRiderID() == 0l) && (rider.getPhoneNumber() == null || rider.getPhoneNumber().trim().isEmpty())) {
-            return 0l;
+            return null;
         }
 
         Rider r = new Rider();
@@ -157,10 +179,14 @@ public class RiderService {
             System.out.println("Gonna update rider with email and name");
             user_update = userRepository.updateUser(rider.getName(), rider.getEmail(), rider.getPhoneNumber(),
                     r.getUserId());
+            // r.setEmail(rider.getEmail());
+            // r.setName(rider.getName());
         } else if (rider.getEmail() != null && !rider.getEmail().trim().isEmpty()) {
             System.out.println("Gonna update rider with email alone ");
 
             user_update = userRepository.updateUser("", rider.getEmail(), rider.getPhoneNumber(), r.getUserId());
+            r.setEmail(rider.getEmail());
+
             // if (user_update != 0) {
             // long updated = riderRepository.updateRiderData(rider);
             // return updated;
@@ -171,17 +197,23 @@ public class RiderService {
         } else if (rider.getName() != null && !rider.getName().trim().isEmpty()) {
             user_update = userRepository.updateUser(rider.getName(), "", rider.getPhoneNumber(), r.getUserId());
             // return user_update;
+            // r.setName(rider.getName());
         }
 
-        if (rider.getDocuments() != null || (rider.getDeviceID()!=null && !rider.getDeviceID().trim().isEmpty())) {
-            return riderRepository.updateRiderData(rider);
+        if (rider.getDocuments() != null || (rider.getDeviceID() != null && !rider.getDeviceID().trim().isEmpty())) {
+            user_update = riderRepository.updateRiderData(rider);
+
         }
-        return user_update;
+
+        if (user_update == 0) {
+
+        }
+        return riderRepository.getRider(search);
     }
 
-    public long updateDriverPin(PINUpdateRequestObject request) {
+    public Rider updateRiderPin(PINUpdateRequestObject request) {
         if ((request.getRiderID() == 0) || (request.getPIN() == null && request.getPIN().trim().isEmpty())) {
-            return -1l;
+            return null;
         }
         return riderRepository.updateRiderPin(request);
     }
@@ -215,7 +247,7 @@ public class RiderService {
         Feedback feedback = new Feedback();
         Trip trip = tripRepository.findTripById(feedbackDTO.getTripId());
 
-        if(trip == null) {
+        if (trip == null) {
             return -1;
         }
 
@@ -227,12 +259,13 @@ public class RiderService {
         User driverProfile = userRepository.findByID(driverRepository.findByID(trip.getDriverId()).getUser_id());
 
         boolean feedbackAlreadyExists = feedbackRepository.doesFeedbackAlreadyExist(trip.getId(), riderProfile.getId());
-        if(feedbackAlreadyExists) {
+        if (feedbackAlreadyExists) {
             return 1;
         }
 
-        long count  = feedbackRepository.getFeedbackCountForUser(driverProfile.getId());
-        Double updateRating = count == 0 ? feedbackDTO.getRating() : ((driverProfile.getRating()*count + feedbackDTO.getRating())/(count + 1));
+        long count = feedbackRepository.getFeedbackCountForUser(driverProfile.getId());
+        Double updateRating = count == 0 ? feedbackDTO.getRating()
+                : ((driverProfile.getRating() * count + feedbackDTO.getRating()) / (count + 1));
         userRepository.updateUserRating(updateRating, driverProfile.getId());
 
         feedback.setTripId(trip.getId());

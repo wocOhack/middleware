@@ -1,28 +1,45 @@
 package com.woc.service;
 
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import com.woc.dto.*;
-import com.woc.dto.Driver;
-import com.woc.dto.DriverAvailability;
-import com.woc.dto.Vehicle;
-import com.woc.entity.*;
-import com.woc.service.enums.PushNotificationIdentifierEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.woc.dto.Driver;
+import com.woc.dto.DriverAvailability;
+import com.woc.dto.DriverLocationUpdateRequest;
+import com.woc.dto.DriverSearchCriteria;
+import com.woc.dto.DrivingLicense;
+import com.woc.dto.EndRideRequestDto;
+import com.woc.dto.EndRideResponseDto;
+import com.woc.dto.FeedbackDto;
+import com.woc.dto.RideRequestUpdateObject;
+import com.woc.dto.StartRideRequestDto;
+import com.woc.dto.Vehicle;
+import com.woc.entity.Feedback;
+import com.woc.entity.Pricing;
+import com.woc.entity.RideRequest;
+import com.woc.entity.Trip;
+import com.woc.entity.User;
+import com.woc.entity.UserCredentials;
 import com.woc.repository.DriverAvailabilityRepository;
 import com.woc.repository.DriverRepository;
-import com.woc.repository.RiderRepository;
+import com.woc.repository.FeedbackRepository;
 import com.woc.repository.PricingRepository;
 import com.woc.repository.RideRequestRepository;
+import com.woc.repository.RiderRepository;
+import com.woc.repository.TripRepository;
 import com.woc.repository.UserCredentialsRepository;
 import com.woc.repository.UserRepository;
 import com.woc.repository.VehicleRepository;
-import com.woc.repository.FeedbackRepository;
-import com.woc.repository.TripRepository;
-
+import com.woc.service.enums.PushNotificationIdentifierEnum;
 import com.woc.service.enums.TripStatusEnum;
 
 @Component
