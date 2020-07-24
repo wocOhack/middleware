@@ -35,14 +35,17 @@ public class PushNotificationRequestBodyUtility {
                 break;
             case RIDE_CANCELLED_BY_DRIVER:
                 data.put(IDENTIFIER, PushNotificationIdentifierEnum.RIDE_CANCELLED_BY_DRIVER.toString());
+                data.put(TITLE, "Driver Cancelled Ride");
+                data.put(BODY, "Your ride request got cancelled. Kindly search for rides again.");
                 break;
             case DRIVER_ENROUTE:
                 data.put(IDENTIFIER, PushNotificationIdentifierEnum.DRIVER_ENROUTE.toString());
                 data.put("rideRequestId", payload.get("rideRequestId"));
                 data.put("driverName", payload.get("driverName"));
                 data.put("rating", payload.get("rating"));
-                data.put("vehicleNum", payload.get("vehicleNum"));
-                data.put("contactNum", payload.get("contactNum"));
+                data.put("vehicle", payload.get("vehicle"));
+                data.put("phone", payload.get("phone"));
+                data.put("liveLocation", payload.get("liveLocation"));
                 break;
             case RIDE_CANCELLED_BY_RIDER:
                 data.put(TITLE, "Ride cancelled");
@@ -54,9 +57,6 @@ public class PushNotificationRequestBodyUtility {
                 break;
             case TRIP_END:
                 data.put(IDENTIFIER, PushNotificationIdentifierEnum.TRIP_END.toString());
-                data.put("tripId", payload.get("tripId"));
-                data.put("source", payload.get("source"));
-                data.put("destination", payload.get("destination"));
                 data.put("duration", payload.get("duration"));
                 data.put("distance", payload.get("distance"));
                 data.put("fare", payload.get("fare"));
