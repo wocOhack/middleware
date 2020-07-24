@@ -236,9 +236,7 @@ public class DriverService {
         return new Driver();
     }
 
-    public void notifyNearestDrivers(String riderLocation, String destinationLocation, long rideRequestID)
-            throws URISyntaxException {
-
+    public void notifyNearestDrivers(String riderLocation, long rideRequestID) throws URISyntaxException {
         List<com.woc.entity.Driver> availableDrivers = getAllAvailableDrivers();
         List<Driver> nearestDrivers = new ArrayList<Driver>();
         List<Long> notifiedDrivers = new ArrayList<Long>();
@@ -259,27 +257,21 @@ public class DriverService {
         });
 
         StringBuffer deviceIDs = new StringBuffer("");
+        List<String> androidIds = new ArrayList<>();
         int numOfNearestDrivers = nearestDrivers.size() > 5 ? 5 : nearestDrivers.size();
         for (int i = 0; i < numOfNearestDrivers; i++) {
-            deviceIDs.append(nearestDrivers.get(i).getDeviceID()).append(",");
+            androidIds.add(nearestDrivers.get(i).getDeviceID());
             notifiedDrivers.add(nearestDrivers.get(i).getDriverID());
 
         }
-        StringBuffer message = new StringBuffer("{Ride Offer: {rideRequestID:");
-        message.append(rideRequestID).append("}}");
 
         Map<String, Object> notificationPayload = new HashMap<>();
         notificationPayload.put("rideRequestId", rideRequestID);
-
-        List<String> androidIds = new ArrayList<>();
-        for (int i = 0; i < numOfNearestDrivers; i++) {
-            androidIds.add(nearestDrivers.get(i).getDeviceID());
-        }
         pushNotificationService.send(PushNotificationIdentifierEnum.RIDE_REQUEST_FOUND, notificationPayload,
                 androidIds);
 
         driverRepository.updateDriversStatus("Blocked", notifiedDrivers);
-        updateRideRequestWithNotifiedDrivers(notifiedDrivers, rideRequestID);
+        updateRideRequestWithNotifiedDrivers(notifiedDrivers,rideRequestID);
     }
 
     public List<com.woc.entity.Driver> getAllAvailableDrivers() {
@@ -304,16 +296,14 @@ public class DriverService {
 
         Driver driver = new Driver();
         driver.setDriverID(driverEntity.getId());
-        driver.setDeviceID(driverEntity.getDeviceID());
         driver.setDistanceFromRider(
                 locationService.getDistanceBetweenLocations(driverEntity.getLocation(), riderLocation));
         return driver;
     }
 
-    public void acceptRideRequest(RideRequestUpdateObject requestObject, RideRequest rideRequest)
-            throws URISyntaxException {
+    public void acceptRideRequest(long driverID, RideRequest rideRequest) throws URISyntaxException {
 
-        com.woc.entity.Driver driver = driverRepository.findByID(requestObject.getDriverID());
+        com.woc.entity.Driver driver = driverRepository.findByID(driverID);
         rideRequest.setDriverId(driver);
         rideRequestRepository.updateRideRequest(rideRequest);
 
@@ -333,6 +323,7 @@ public class DriverService {
         pushNotificationService.send(PushNotificationIdentifierEnum.DRIVER_ENROUTE, notificationPayload,
                 riderAndroidId);
     }
+
 
     public long updateDriverLocation(DriverLocationUpdateRequest request) {
         return driverRepository.updateDriverLocation(request);

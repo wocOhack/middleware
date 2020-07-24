@@ -150,8 +150,8 @@ public class RiderService {
         return;
     }
 
-    public RideRequest getRideRequest(RideRequestUpdateObject requestObject) {
-        return riderRequestsRepository.findById(requestObject.getRideRequestID());
+    public RideRequest getRideRequest(long rideID) {
+        return riderRequestsRepository.findById(rideID);
     }
 
     public Rider updateRider(Rider rider) {

@@ -144,18 +144,27 @@ public class RiderController {
     }
 
     @PostMapping("/requestRide")
-    public void requestRide(@RequestBody RideRequestObject rideRequest) throws URISyntaxException {
-
+    public ResponseEntity requestRide(@RequestBody RideRequestObject rideRequest) {
+    	
+        WocResponseBody wocResponseBody = null;
         long rideRequestID = riderService.createRideRequest(rideRequest);
-        driverService.notifyNearestDrivers(rideRequest.getSourceLocation(), rideRequest.getDestinationLocation(),
-                rideRequestID);
-        return;
+        String sourceLocation = rideRequest.getSourceLattitude() + ":" + rideRequest.getSourceLongitude();
+        try {
+			driverService.notifyNearestDrivers(sourceLocation, rideRequestID);
+			wocResponseBody = new WocResponseBody();
+		} 
+		catch (Exception e) {
+	            wocResponseBody = new WocResponseBody();
+	            wocResponseBody.setResponseStatus(INTERNAL_ERROR);
+	            wocResponseBody.setDetailedMessage(INTERNAL_ERROR_MESSAGE);
+	            return new ResponseEntity(wocResponseBody, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+        return new ResponseEntity(wocResponseBody, HttpStatus.CREATED);
     }
 
     @PostMapping("/cancelRide")
     public void cancelRide(@RequestBody CancellRideRequestObject request) throws URISyntaxException {
         riderService.cancellRideRequest(request);
-        ;
     }
 
     @GetMapping("/getTrips")
