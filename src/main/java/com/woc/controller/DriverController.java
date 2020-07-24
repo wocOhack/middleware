@@ -75,18 +75,19 @@ public class DriverController {
 
     @PutMapping("/updateProfile")
     public ResponseEntity updateDriverProfile(@RequestBody DriverRegistrationRequest request) {
-        long id = driverService.updateDriver(request.getDriver(), request.getVehicle(), request.getInsurance());
+        Driver driver = driverService.updateDriver(request.getDriver(), request.getVehicle(), request.getInsurance());
         WocResponseBody resp = new WocResponseBody();
-        if (id == -1) {
+        if (driver == null) {
             resp.setDetailedMessage("DriverId or phoneNumber is required to identify driver");
             resp.setResponseStatus("Bad Request");
             return new ResponseEntity(resp, HttpStatus.BAD_REQUEST);
         }
-        if (id == 0) {
+        if (driver.getDriverID() == 0) {
             resp.setDetailedMessage("Internal Server Error");
             resp.setResponseStatus("Issue updating Driver");
             return new ResponseEntity(resp, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+        resp.setResult(driver);
         resp.setDetailedMessage("OK");
         resp.setResponseStatus("Successfully Updated Driver");
         return new ResponseEntity(resp, HttpStatus.OK);
