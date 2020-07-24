@@ -97,6 +97,13 @@ public class Rider implements Serializable {
     public void setLocation(String location) {
         this.location = location;
     }
+
+    @Override
+    public String toString() {
+        return "Rider [name=" + name + ", userId=" + userId + ", riderID=" + riderID + ", phoneNumber=" + phoneNumber
+                + ", email=" + email + ", documents=" + documents + ", PIN=" + PIN + ", isDisabled=" + isDisabled
+                + ", deviceID=" + deviceID + ", location=" + location + "]";
+    }
     
     
 }

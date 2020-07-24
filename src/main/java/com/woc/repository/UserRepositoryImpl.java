@@ -50,7 +50,8 @@ public class UserRepositoryImpl implements UserRepository {
     public long updateUser(String userName, String emailAdd, String phoneNum, long userId) {
         System.out.println("phone Number : " + phoneNum);
 
-        if (userName != null && !userName.trim().isEmpty() && (emailAdd != null && emailAdd.trim().isEmpty() )) {
+        if (userName != null && !userName.trim().isEmpty() && (emailAdd != null && !emailAdd.trim().isEmpty())) {
+            System.out.println("updating name and email");
             if (phoneNum != "" && phoneNum != null) {
                 System.out.println("phoneNum " +  phoneNum);
                 Query q = entityManager.createNativeQuery(
@@ -73,6 +74,7 @@ public class UserRepositoryImpl implements UserRepository {
             }
 
         } else if ( userName != null && !userName.trim().isEmpty()) {
+            System.out.println("updating name");
             if (phoneNum != "" && phoneNum != null) {
                 Query q = entityManager
                         .createNativeQuery("Update User u set u.Name = :userName where u.phone = " + phoneNum);
