@@ -84,6 +84,7 @@ public class DriverRepositoryImpl implements DriverRepository {
             for (Vehicle each : vehciles) {
                 vehiclesData.put("vehicle1", each.toString());
             }
+           
             Driver each = drivers.get(0);
             com.woc.dto.Driver d = new com.woc.dto.Driver();
             d.setEmail(u.getEmail());
@@ -95,6 +96,7 @@ public class DriverRepositoryImpl implements DriverRepository {
             d.setAddress(each.getAddress());
             d.setStatus(each.getStatus());
             d.setDeviceID(each.getDeviceID());
+
             // allRiders.add(r);
             // }
 
@@ -175,7 +177,7 @@ public class DriverRepositoryImpl implements DriverRepository {
             q.setParameter("expiry_date", license.getExpiryDate());
             q.setParameter("license_number", license.getLicenceNumber());
             rowsUpdated = q.executeUpdate();
-            System.out.println("Updated all license info "+rowsUpdated);
+            System.out.println("Updated all license info " + rowsUpdated);
             return rowsUpdated;
         }
 
@@ -187,30 +189,27 @@ public class DriverRepositoryImpl implements DriverRepository {
             // q.setParameter("license_number", license.getLicenceNumber());
             rowsUpdated = q.executeUpdate();
             System.out.println("Updated all expDate info" + rowsUpdated);
-//            return rowsUpdated;
+            // return rowsUpdated;
         }
-       
 
         if ((license.getLicenseDocumentLink() != null && !license.getLicenseDocumentLink().trim().isEmpty())) {
-            Query q = entityManager.createNativeQuery(
-                    "Update Driver d set d.license_doc = :license_doc where d.id = "
-                            + driver_id);
+            Query q = entityManager
+                    .createNativeQuery("Update Driver d set d.license_doc = :license_doc where d.id = " + driver_id);
             q.setParameter("license_doc", license.getLicenseDocumentLink());
-//            q.setParameter("expiry_date", license.getExpiryDate());
+            // q.setParameter("expiry_date", license.getExpiryDate());
             rowsUpdated = q.executeUpdate();
             System.out.println("Updated all docLink info" + rowsUpdated);
-//            return rowsUpdated;
+            // return rowsUpdated;
         }
-        
+
         if ((license.getLicenceNumber() != null && !license.getLicenceNumber().trim().isEmpty())) {
-            Query q = entityManager.createNativeQuery(
-                    "Update Driver d set d.lcense_number = :license_num where d.id = "
-                            + driver_id);
+            Query q = entityManager
+                    .createNativeQuery("Update Driver d set d.lcense_number = :license_num where d.id = " + driver_id);
             q.setParameter("license_num", license.getLicenceNumber());
             System.out.println("Updated all LicNum info" + rowsUpdated);
 
             rowsUpdated = q.executeUpdate();
-//            return rowsUpdated;
+            // return rowsUpdated;
         }
         return rowsUpdated;
     }
@@ -232,7 +231,7 @@ public class DriverRepositoryImpl implements DriverRepository {
         updated = q.executeUpdate();
         return updated;
     }
-    
+
     @Transactional
     @Override
     public long updateDriverLocation(DriverLocationUpdateRequest request) {
@@ -246,14 +245,14 @@ public class DriverRepositoryImpl implements DriverRepository {
 
     @Transactional
     @Override
-	public void updateDriversStatus(String status, List<Long> driverIds) {
-		
-		for (Long driverid : driverIds) {
-			Driver driver = findByID(driverid);
-			driver.setStatus("status");
-			entityManager.merge(driver);
-		}
+    public void updateDriversStatus(String status, List<Long> driverIds) {
 
-	}
-  
+        for (Long driverid : driverIds) {
+            Driver driver = findByID(driverid);
+            driver.setStatus("status");
+            entityManager.merge(driver);
+        }
+
+    }
+
 }

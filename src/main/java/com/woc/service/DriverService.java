@@ -167,16 +167,17 @@ public class DriverService {
         return result;
     }
 
-    public long updateDriver(Driver driver, Vehicle vehcile, DrivingLicense license) {
+    public Driver updateDriver(Driver driver, Vehicle vehcile, DrivingLicense license) {
         long idUpdated = 0l;
 
+        
         // returning -1 for badrequest mandate paramater missing
         if (driver == null ){
-            return -1l;
+            return null;
         }
         if (driver.getDriverID() == 0
                 && (driver.getPhoneNumber().trim().isEmpty() || driver.getPhoneNumber() == null)) {
-            return -1l;
+            return null;
         }
 
         Driver d = new Driver();
@@ -221,10 +222,18 @@ public class DriverService {
 
         // }
         if (idUpdated != 0 || user_update != 0) {
-            return 1;
+            
+            DriverSearchCriteria updatedSearch =  new DriverSearchCriteria();
+            if (driver.getDriverID() != 0) {
+                updatedSearch.setDriverID(driver.getDriverID());
+            } else {
+                updatedSearch.setPhoneNumber(driver.getPhoneNumber());
+            }
+
+            return driverRepository.getDriver(updatedSearch);
         }
 
-        return 0l;
+        return new Driver();
     }
 
     public void notifyNearestDrivers(String riderLocation, String destinationLocation, long rideRequestID)
