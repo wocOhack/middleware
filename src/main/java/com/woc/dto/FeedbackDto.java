@@ -1,13 +1,13 @@
 package com.woc.dto;
 
-public class FeedBack {
+public class FeedbackDto {
 
-	private int tripId;
+	private long tripId;
 	private int rating;
 	private String comments;
 	
 	
-	public int getTripId() { return tripId; }
+	public long getTripId() { return tripId; }
 	public void setTripId(int tripId) { this.tripId = tripId; }
 	public int getRating() {
 		return rating;
@@ -21,6 +21,5 @@ public class FeedBack {
 	public void setComments(String comments) {
 		this.comments = comments;
 	}
-	
-	
+
 }

@@ -21,4 +21,6 @@ public interface TripRepository {
     
     public List<Trip> getTrips(TripSearchCriteria searchCriteria);
 
+    public Long isTripInProgress(Long driverId, Long riderId);
+
 }

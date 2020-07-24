@@ -17,17 +17,24 @@ public class Pricing implements Serializable {
 	@Column(nullable=false, length=20)
 	private String city;
 
-	@Column(name="cost_per_km", nullable=false)
-	private int costPerKm;
+	@Column(name="cost_per_km", nullable = false)
+	private Double costPerKm;
 
-	@Column(name="extra_charges", nullable=false)
-	private int extraCharges;
+	@Column(name="cost_per_min", nullable = false)
+	private Double costPerMin;
+
+	@Column(name="extra_charges", nullable = false)
+	private Double extraCharges;
 
 	public Pricing() {
 	}
 
+	public static long getSerialVersionUID() {
+		return serialVersionUID;
+	}
+
 	public Integer getId() {
-		return this.id;
+		return id;
 	}
 
 	public void setId(Integer id) {
@@ -35,27 +42,34 @@ public class Pricing implements Serializable {
 	}
 
 	public String getCity() {
-		return this.city;
+		return city;
 	}
 
 	public void setCity(String city) {
 		this.city = city;
 	}
 
-	public int getCostPerKm() {
-		return this.costPerKm;
+	public Double getCostPerKm() {
+		return costPerKm;
 	}
 
-	public void setCostPerKm(int costPerKm) {
+	public void setCostPerKm(Double costPerKm) {
 		this.costPerKm = costPerKm;
 	}
 
-	public int getExtraCharges() {
-		return this.extraCharges;
+	public Double getCostPerMin() {
+		return costPerMin;
 	}
 
-	public void setExtraCharges(int extraCharges) {
+	public void setCostPerMin(Double costPerMin) {
+		this.costPerMin = costPerMin;
+	}
+
+	public Double getExtraCharges() {
+		return extraCharges;
+	}
+
+	public void setExtraCharges(Double extraCharges) {
 		this.extraCharges = extraCharges;
 	}
-
 }

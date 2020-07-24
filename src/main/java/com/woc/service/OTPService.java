@@ -1,20 +1,16 @@
 package com.woc.service;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import com.woc.dto.PhoneVerificationCompletionRequest;
 import com.woc.dto.PhoneVerificationInitiationRequest;
 import com.woc.entity.OTP;
 import com.woc.repository.OTPRepository;
-import com.woc.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Date;
@@ -50,7 +46,7 @@ public class OTPService {
 
         String phoneNumber=phoneVerificationCompletionRequest.getPhoneNumber();
         OTP otp=getOTP(phoneNumber);
-        if(verifyOTP(phoneVerificationCompletionRequest,otp)){
+        if(otp!=null && verifyOTP(phoneVerificationCompletionRequest,otp)){
             otpRepository.removeOTP(otp);
             return true;
         }
@@ -73,7 +69,7 @@ public class OTPService {
         otpRepository.addOTP(otp);
     }
 
-    private OTP getOTP(String phoneNumber){
+    public OTP getOTP(String phoneNumber){
         OTP otp=otpRepository.getOTP(phoneNumber);
         return otp;
     }
@@ -109,10 +105,7 @@ public class OTPService {
         }
     }
 
-    public static void main(String args[]) throws IOException {
-        OTPService otpService=new OTPService();
-        otpService.sendOTP("8971728134","1234");
-    }
+    
 
     private String getResposeBody(HttpURLConnection httpURLConnection) throws IOException {
         BufferedReader in = new BufferedReader(new InputStreamReader(

@@ -1,6 +1,8 @@
 package com.woc.controller;
 
+import com.woc.dto.PhoneVerificationInitiationRequest;
 import com.woc.entity.*;
+import com.woc.service.OTPService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,11 +29,19 @@ public class MainController {
 
     @Autowired
     UserService userService;
+    
+    @Autowired
+    OTPService otpService;
 
     @PostMapping("/addUserCredentials")
     @ResponseBody
     public void addUserCredentials(@RequestBody UserCredentials uc) {
         System.out.println("user cred request : " + uc.toString());
         userService.createUserCreds(uc);
+    }
+    
+    @GetMapping("/getOtp")
+    public com.woc.entity.OTP getOTP(@RequestBody PhoneVerificationInitiationRequest phoneVerificationInitiationRequest){
+       return otpService.getOTP(phoneVerificationInitiationRequest.getPhoneNumber()); 
     }
 }

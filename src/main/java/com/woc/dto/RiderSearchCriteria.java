@@ -7,7 +7,7 @@ public class RiderSearchCriteria implements Serializable {
     private static final long serialVersionUID = -6779314507526973982L;
 
     private String phoneNumber;
-    private long riderId;
+    private long riderID;
 
     public String getPhoneNumber() {
         return phoneNumber;
@@ -17,12 +17,12 @@ public class RiderSearchCriteria implements Serializable {
         this.phoneNumber = phoneNumber;
     }
 
-    public long getRiderId() {
-        return riderId;
+    public long getRiderID() {
+        return riderID;
     }
 
-    public void setRiderId(long riderId) {
-        this.riderId = riderId;
+    public void setRiderID(long riderID) {
+        this.riderID = riderID;
     }
 
 }

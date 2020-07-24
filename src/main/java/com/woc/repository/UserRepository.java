@@ -15,4 +15,6 @@ public interface UserRepository {
 	public User findByID(long id);
     
     public long updateUser(String name, String email, String phone, long userID);
+
+    public void updateUserRating(Double rating, long userId);
 }

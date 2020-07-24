@@ -122,4 +122,13 @@ public class UserRepositoryImpl implements UserRepository {
         return null;
 
     }
+
+    @Transactional
+    @Override
+    public void updateUserRating(Double rating, long userId) {
+        Query q = entityManager.createNativeQuery("update User u set u.ratings = :rating where u.id = " + userId);
+        q.setParameter("rating", rating);
+        long rowsUpdated = q.executeUpdate();
+        System.out.println("rowsUpdated : " + rowsUpdated);
+    }
 }

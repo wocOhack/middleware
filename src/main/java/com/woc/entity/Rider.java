@@ -45,7 +45,10 @@ public class Rider {
     private long user_id;
     
     @Column(name = "deviceID", nullable = false, length = 30)
-    private long deviceID;
+    private String deviceID;
+    
+    @Column(name = "location", nullable = false, length = 30)
+    private String location;
 
     public Long getId() {
         return id;
@@ -111,13 +114,22 @@ public class Rider {
         this.user_id = user_id;
     }
 
-	public long getDeviceID() {
+	public String getDeviceID() {
 		return deviceID;
 	}
 
-	public void setDeviceID(long deviceID) {
+	public void setDeviceID(String deviceID) {
 		this.deviceID = deviceID;
 	}
+	
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
     @Override
     public String toString() {
         return "Rider [id=" + id + ", pin=" + pin + ", is_challenged=" + is_challenged + ", is_verified=" + is_verified

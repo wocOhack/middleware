@@ -3,7 +3,7 @@ package com.woc.dto;
 import java.io.Serializable;
 import java.util.Date;
 
-public class Trip implements Serializable{
+public class TripDto implements Serializable{
 	
 	private static final long serialVersionUID = 5525658357068526063L;
 	private Long tripID;
@@ -11,7 +11,7 @@ public class Trip implements Serializable{
 	private Driver driver;
 	private Date startTime;
 	private Date endTime;
-	private int distance;
+	private Double distance;
 	private Double fare;
 	private Long duration;
 	private String startLocation;
@@ -48,10 +48,10 @@ public class Trip implements Serializable{
 	public void setEndTime(Date endTime) {
 		this.endTime = endTime;
 	}
-	public int getDistance() {
+	public Double getDistance() {
 		return distance;
 	}
-	public void setDistance(int distance) {
+	public void setDistance(Double distance) {
 		this.distance = distance;
 	}
 	public Double getFare() {

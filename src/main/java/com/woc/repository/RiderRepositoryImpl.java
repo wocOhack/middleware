@@ -1,9 +1,7 @@
 package com.woc.repository;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -13,11 +11,11 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.woc.dto.PINUpdateRequestObject;
+import com.woc.dto.RiderDocuments;
+import com.woc.dto.RiderLocaionUpdateRequest;
 import com.woc.dto.RiderSearchCriteria;
-import com.woc.entity.Driver;
 import com.woc.entity.Rider;
 import com.woc.entity.User;
-import com.woc.utilities.Utilities;
 
 @Repository
 public class RiderRepositoryImpl implements RiderRepository {
@@ -69,7 +67,7 @@ public class RiderRepositoryImpl implements RiderRepository {
                     .createNativeQuery("select * from Rider r where r.user_id = " + userId, Rider.class)
                     .getResultList();
             // for (Rider each : riders) {
-
+            System.out.println("riders.size() : " + riders.size());
             if (riders.size() == 0) {
                 return null;
             }
@@ -81,16 +79,24 @@ public class RiderRepositoryImpl implements RiderRepository {
             r.setPhoneNumber(u.getPhone());
             r.setRiderID(each.getId());
             r.setUserId(userId);
-            Map<String, String> docs = new HashMap<String, String>();
-            docs.put("document_proof", each.getProof_of_challenge());
+            r.setDisabled(each.isIs_challenged());
+            r.setDeviceID(each.getDeviceID());
+            // Map<String, String> docs = new HashMap<String, String>();
+            // docs.put("document_proof", each.getProof_of_challenge());
+            RiderDocuments docs = new RiderDocuments();
+            docs.setDisabilityProof(each.getProof_of_challenge());
+            r.setPIN(each.getPin());
             // allRiders.add(r);
+            r.setDocuments(docs);
+            r.setLocation(each.getLocation());
+
             // }
 
             // }
             return r;
 
         } else {
-            long riderId = searchRider.getRiderId();
+            long riderId = searchRider.getRiderID();
             List<Rider> riders = entityManager
                     .createNativeQuery("select * from Rider r where r.id = " + riderId, Rider.class).getResultList();
             if (riders.size() == 0) {
@@ -112,9 +118,16 @@ public class RiderRepositoryImpl implements RiderRepository {
             // r.setPIN(u.get);
             r.setPhoneNumber(u.getPhone());
             r.setRiderID(rider.getId());
-            Map<String, String> docs = new HashMap<String, String>();
-            docs.put("document_proof", rider.getProof_of_challenge());
+            r.setDisabled(rider.isIs_challenged());
+            // Map<String, String> docs = new HashMap<String, String>();
+            // docs.put("document_proof", rider.getProof_of_challenge());
+            RiderDocuments doc = new RiderDocuments();
+            doc.setDisabilityProof(rider.getProof_of_challenge());
             r.setUserId(u.getId());
+            r.setDeviceID(rider.getDeviceID());
+            r.setDocuments(doc);
+            r.setPIN(rider.getPin());
+            r.setLocation(rider.getLocation());
             return r;
             // } // return riders;
         }
@@ -122,15 +135,32 @@ public class RiderRepositoryImpl implements RiderRepository {
 
     @Transactional
     @Override
-    public long updateRiderPin(PINUpdateRequestObject updateReq) {
+    public long updateRiderLocation(RiderLocaionUpdateRequest request) {
+        long updated = 0;
+        Query q = entityManager
+                .createNativeQuery("Update Rider r set r.location = :location where r.id = " + request.getRiderId());
+        q.setParameter("location", request.getLocation());
+        updated = q.executeUpdate();
+        return updated;
+    }
+
+    @Transactional
+    @Override
+    public com.woc.dto.Rider updateRiderPin(PINUpdateRequestObject updateReq) {
         // TODO Auto-generated method stub
         long riderId = updateReq.getRiderID();
         String pin = updateReq.getPIN();
+       
         Query q = entityManager.createNativeQuery("update Rider r set r.pin = " + pin + " where r.id =" + riderId,
                 Rider.class);
         long rowsUpdated = q.executeUpdate();
-        System.out.println("updated row : " + rowsUpdated);
-        return rowsUpdated;
+         if (rowsUpdated != 0 ){
+             RiderSearchCriteria search = new RiderSearchCriteria();
+             search.setRiderID(updateReq.getRiderID());
+             System.out.println("updated row : " + rowsUpdated);
+             return getRider(search);
+         }
+        return new com.woc.dto.Rider();
     }
 
     @Transactional
@@ -144,7 +174,7 @@ public class RiderRepositoryImpl implements RiderRepository {
             long userId = 0;
             if (r.getRiderID() != 0) {
                 RiderSearchCriteria search = new RiderSearchCriteria();
-                search.setRiderId(r.getRiderID());
+                search.setRiderID(r.getRiderID());
                 com.woc.dto.Rider fetched_Rider = getRider(search);
 
                 userId = fetched_Rider.getUserId();
@@ -160,11 +190,28 @@ public class RiderRepositoryImpl implements RiderRepository {
                 userId = u.getId();
             }
 
-            if (r.getDocuments() != null) {
+            if (r.getDocuments() != null && (r.getDeviceID() != null && !r.getDeviceID().trim().isEmpty())) {
+                Query q = entityManager.createNativeQuery(
+                        "update Rider r set r.proof_of_challenge = :proof_of_challenge, r.deviceID = :deviceid where r.user_id ="
+                                + userId,
+                        Rider.class);
+                q.setParameter("proof_of_challenge", r.getDocuments().getDisabilityProof());
+                q.setParameter("deviceid", r.getDeviceID());
+                rowsUpdated = q.executeUpdate();
+                System.out.println("updated row : " + rowsUpdated);
+                return rowsUpdated;
+            } else if (r.getDocuments() != null) {
                 Query q = entityManager.createNativeQuery(
                         "update Rider r set r.proof_of_challenge = :proof_of_challenge where r.user_id =" + userId,
                         Rider.class);
-                q.setParameter("proof_of_challenge", Utilities.convertWithStream(r.getDocuments()));
+                q.setParameter("proof_of_challenge", r.getDocuments().getDisabilityProof());
+                rowsUpdated = q.executeUpdate();
+                System.out.println("updated row : " + rowsUpdated);
+                return rowsUpdated;
+            } else if (r.getDeviceID() != null && !r.getDeviceID().trim().isEmpty()) {
+                Query q = entityManager.createNativeQuery(
+                        "update Rider r set r.deviceID = :deviceid where r.user_id =" + userId, Rider.class);
+                q.setParameter("deviceid", r.getDeviceID());
                 rowsUpdated = q.executeUpdate();
                 System.out.println("updated row : " + rowsUpdated);
                 return rowsUpdated;
