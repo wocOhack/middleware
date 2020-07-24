@@ -75,17 +75,22 @@ public class DriverController {
 
     @PutMapping("/updateProfile")
     public ResponseEntity updateDriverProfile(@RequestBody DriverRegistrationRequest request) {
-        long id = driverService.updateDriver(request.getDriver(), request.getVehicle(), request.getInsurance());
+        Driver driver = driverService.updateDriver(request.getDriver(), request.getVehicle(), request.getInsurance());
         WocResponseBody resp = new WocResponseBody();
-        if (id == 0) {
+        if (driver == null) {
+            resp.setDetailedMessage("DriverId or phoneNumber is required to identify driver");
+            resp.setResponseStatus("Bad Request");
+            return new ResponseEntity(resp, HttpStatus.BAD_REQUEST);
+        }
+        if (driver.getDriverID() == 0) {
             resp.setDetailedMessage("Internal Server Error");
             resp.setResponseStatus("Issue updating Driver");
-
             return new ResponseEntity(resp, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+        resp.setResult(driver);
         resp.setDetailedMessage("OK");
         resp.setResponseStatus("Successfully Updated Driver");
-        return new ResponseEntity("Successfully Updated Driver", HttpStatus.OK);
+        return new ResponseEntity(resp, HttpStatus.OK);
     }
 
     @GetMapping("/getProfile")
@@ -153,14 +158,17 @@ public class DriverController {
     }
 
     @PostMapping("/initiatePhoneVerification")
-    public Boolean initiatePhoneVerification(
-            @RequestBody final PhoneVerificationInitiationRequest phoneVerificationInitiationRequest) {
-        return otpService.initiateVerification(phoneVerificationInitiationRequest);
+    public WocResponseBody initiatePhoneVerification(@RequestBody final PhoneVerificationInitiationRequest phoneVerificationInitiationRequest) {
+        Boolean result=otpService.initiateVerification(phoneVerificationInitiationRequest);
+        if(result){
+            return new WocResponseBody(result,"OK","OTP generated and sent");
+        }
+        return new WocResponseBody(result,"OTP_SENDING_ERROR","OTP generated but not sent");
+        
     }
 
     @PutMapping("/completePhoneVerification")
-    public DriverVerificationCompletionReply completePhoneVerification(
-            @RequestBody final PhoneVerificationCompletionRequest phoneVerificationCompletionRequest) {
+    public WocResponseBody completePhoneVerification(@RequestBody final PhoneVerificationCompletionRequest phoneVerificationCompletionRequest) {
         Boolean isExistingUser = false;
         Driver driver = null;
         Boolean isVerified = otpService.completeVerification(phoneVerificationCompletionRequest);
@@ -172,7 +180,16 @@ public class DriverController {
             driver = driverService.getDriver(driverSearchCriteria);
             isExistingUser = (driver != null);
         }
-        return new DriverVerificationCompletionReply(isVerified, isExistingUser, driver);
+        
+        DriverVerificationCompletionReply driverVerificationCompletionReply= new DriverVerificationCompletionReply(isVerified, isExistingUser, driver);
+        
+        if(!driverVerificationCompletionReply.getIsVerified()){
+            return new WocResponseBody(driverVerificationCompletionReply,"OTP_VERIFICATION_FAILURE","OTP did not match or verification is yet to be initiated");
+        }
+        else{
+            return new WocResponseBody(driverVerificationCompletionReply,"OTP_VERIFICATION_SUCCESS","OTP VERIFIED SUCCESSFULLY");
+        }
+        
     }
 
     @PutMapping("/toggleDriverAvailabilityStatus")

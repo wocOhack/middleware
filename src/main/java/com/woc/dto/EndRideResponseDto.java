@@ -5,9 +5,9 @@ public class EndRideResponseDto {
     private String city;
     private String pickup;
     private String destination;
-    private Double distance;
+    private String distance;
     private String duration;
-    private Double fare;
+    private String fare;
 
     public String getCity() {
         return city;
@@ -33,11 +33,11 @@ public class EndRideResponseDto {
         this.destination = destination;
     }
 
-    public Double getDistance() {
+    public String getDistance() {
         return distance;
     }
 
-    public void setDistance(Double distance) {
+    public void setDistance(String distance) {
         this.distance = distance;
     }
 
@@ -49,11 +49,11 @@ public class EndRideResponseDto {
         this.duration = duration;
     }
 
-    public Double getFare() {
+    public String getFare() {
         return fare;
     }
 
-    public void setFare(Double fare) {
+    public void setFare(String fare) {
         this.fare = fare;
     }
 }
