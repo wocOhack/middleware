@@ -195,13 +195,16 @@ public class DriverService {
         long user_update = 0l;
         if ((driver.getEmail() != null && !driver.getEmail().trim().isEmpty())
                 && (driver.getName() != null && !driver.getName().trim().isEmpty())) {
-            System.out.println("Gonna update rider with email and name");
+            System.out.println("Gonna update driver with email and name");
             user_update = userRepository.updateUser(driver.getName(), driver.getEmail(), driver.getPhoneNumber(),
                     d.getUserID());
+            d.setEmail(driver.getEmail());
+            d.setName(driver.getName());
         } else if (driver.getEmail() != null && !driver.getEmail().trim().isEmpty()) {
             System.out.println("Gonna update rider with email alone ");
-
+            
             user_update = userRepository.updateUser("", driver.getEmail(), driver.getPhoneNumber(), d.getUserID());
+            d.setEmail(driver.getEmail());
             // if (user_update != 0) {
             // long updated = riderRepository.updateRiderData(rider);
             // return updated;
@@ -211,26 +214,21 @@ public class DriverService {
             // return user_update;
         } else if (driver.getName() != null && !driver.getName().trim().isEmpty()) {
             user_update = userRepository.updateUser(driver.getName(), "", driver.getPhoneNumber(), d.getUserID());
+            d.setName(driver.getName());
             // return user_update;
         }
 
         // if ((license.getLicenseDocumentLink() != null && !license.getLicenseDocumentLink().trim().isEmpty()) ||
         // driver.get) {
         if (license != null) {
+            
             idUpdated = driverRepository.updateDriverData(driver, license);
         }
 
         // }
         if (idUpdated != 0 || user_update != 0) {
             
-            DriverSearchCriteria updatedSearch =  new DriverSearchCriteria();
-            if (driver.getDriverID() != 0) {
-                updatedSearch.setDriverID(driver.getDriverID());
-            } else {
-                updatedSearch.setPhoneNumber(driver.getPhoneNumber());
-            }
-
-            return driverRepository.getDriver(updatedSearch);
+            return d;
         }
 
         return new Driver();
