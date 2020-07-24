@@ -19,6 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.woc.entity.ServiceableArea;
 import com.woc.service.DriverService;
 import com.woc.service.RiderService;
+import com.woc.dto.PhoneVerificationInitiationRequest;
+import com.woc.dto.RiderVerificationCompletionReply;
+import com.woc.dto.PhoneVerificationCompletionRequest;
 
 @RestController
 @RequestMapping("/woc/rider")
@@ -217,12 +220,17 @@ public class RiderController {
         }
     }
     @PostMapping("/initiatePhoneVerification")
-    public Boolean initiatePhoneVerification(@RequestBody PhoneVerificationInitiationRequest phoneVerificationInitiationRequest) {
-        return otpService.initiateVerification(phoneVerificationInitiationRequest);
+    public WocResponseBody initiatePhoneVerification(@RequestBody final PhoneVerificationInitiationRequest phoneVerificationInitiationRequest) {
+        Boolean result=otpService.initiateVerification(phoneVerificationInitiationRequest);
+        if(result){
+            return new WocResponseBody(result,"OK","OTP generated and sent");
+        }
+        return new WocResponseBody(result,"OTP_SENDING_ERROR","OTP generated but not sent");
+
     }
 
     @PutMapping("/completePhoneVerification")
-    public RiderVerificationCompletionReply completePhoneVerification(@RequestBody PhoneVerificationCompletionRequest phoneVerificationCompletionRequest) {
+    public WocResponseBody completePhoneVerification(@RequestBody PhoneVerificationCompletionRequest phoneVerificationCompletionRequest) {
         Boolean isExistingUser=false;
         Rider rider=null;
         Boolean isVerified=otpService.completeVerification(phoneVerificationCompletionRequest);
@@ -234,7 +242,15 @@ public class RiderController {
             rider=riderService.getRider(riderSearchCriteria);
             isExistingUser=(rider!=null);
         }
-        return new RiderVerificationCompletionReply(isVerified,isExistingUser,rider);
+        RiderVerificationCompletionReply riderVerificationCompletionReply=new RiderVerificationCompletionReply(isVerified,isExistingUser,rider);
+
+
+        if(!riderVerificationCompletionReply.getIsVerified()){
+            return new WocResponseBody(riderVerificationCompletionReply,"OTP_VERIFICATION_FAILURE","OTP did not match or verification is yet to be initiated");
+        }
+        else{
+            return new WocResponseBody(riderVerificationCompletionReply,"OTP_VERIFICATION_SUCCESS","OTP VERIFIED SUCCESSFULLY");
+        }
     }
 
 }
