@@ -96,7 +96,7 @@ public class DriverService {
         if (driver == null || license == null) {
             return -1l;
         }
-        if (driver.getPhoneNumber() == null || !driver.getPhoneNumber().trim().isEmpty()) {
+        if (driver.getPhoneNumber() == null || driver.getPhoneNumber().trim().isEmpty()) {
             return -1l;
         }
         search.setPhoneNumber(driver.getPhoneNumber());
@@ -250,7 +250,8 @@ public class DriverService {
         });
 
         StringBuffer deviceIDs = new StringBuffer("");
-        for (int i = 0; i < 5; i++) {
+        int numOfNearestDrivers = nearestDrivers.size() > 5 ? 5 : nearestDrivers.size();
+        for (int i = 0; i < numOfNearestDrivers; i++) {
             deviceIDs.append(nearestDrivers.get(i).getDeviceID()).append(",");
             notifiedDrivers.add(nearestDrivers.get(i).getDriverID());
 
@@ -262,7 +263,7 @@ public class DriverService {
         notificationPayload.put("rideRequestId", rideRequestID);
 
         List<String> androidIds = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < numOfNearestDrivers; i++) {
             androidIds.add(nearestDrivers.get(i).getDeviceID());
         }
         pushNotificationService.send(PushNotificationIdentifierEnum.RIDE_REQUEST_FOUND, notificationPayload,
@@ -294,6 +295,7 @@ public class DriverService {
 
         Driver driver = new Driver();
         driver.setDriverID(driverEntity.getId());
+        driver.setDeviceID(driverEntity.getDeviceID());
         driver.setDistanceFromRider(
                 locationService.getDistanceBetweenLocations(driverEntity.getLocation(), riderLocation));
         return driver;
@@ -312,8 +314,9 @@ public class DriverService {
         notificationPayload.put("rideRequestId", rideRequest.getId());
         notificationPayload.put("driverName", driverDetails.getName());
         notificationPayload.put("rating", driverDetails.getRating());
-        notificationPayload.put("vehicleNum", vehicleRepository.findVehicleByUserId(driverDetails.getId()));
-        notificationPayload.put("contactNum", driverDetails.getPhone());
+        notificationPayload.put("vehicle", vehicleRepository.findVehicleByUserId(driverDetails.getId()));
+        notificationPayload.put("phone", driverDetails.getPhone());
+        notificationPayload.put("liveLocation", driver.getLocation());
 
         List<String> riderAndroidId = new ArrayList<>();
         riderAndroidId.add(rideRequest.getRiderId().getDeviceID());
@@ -403,6 +406,8 @@ public class DriverService {
 
         pushNotificationService.send(PushNotificationIdentifierEnum.TRIP_START, null, deviceIdListForPushNotif);
 
+        rideRequestRepository.deleteRideRequest(rideRequest);
+
         return persistedTrip.getId();
     }
 
@@ -422,16 +427,13 @@ public class DriverService {
             endRideResponseDto.setPickup(trip.getStartLocation());
             endRideResponseDto.setDestination(trip.getEndLocation());
             endRideResponseDto.setCity(endRideRequestDto.getCity());
-            endRideResponseDto.setDistance(trip.getDistance());
+            endRideResponseDto.setDistance(trip.getDistance() + " km");
             endRideResponseDto.setDuration((trip.getDuration() / 60) + " minutes");
-            endRideResponseDto.setFare(trip.getCost());
+            endRideResponseDto.setFare(trip.getCost().toString());
 
             Map<String, Object> notificationPayload = new HashMap<String, Object>();
-            notificationPayload.put("tripId", trip.getId());
-            notificationPayload.put("source", trip.getStartLocation());
-            notificationPayload.put("destination", trip.getEndLocation());
             notificationPayload.put("duration", (trip.getDuration() / 60) + " minutes");
-            notificationPayload.put("distance", trip.getDistance());
+            notificationPayload.put("distance", trip.getDistance() + "km");
             notificationPayload.put("fare", trip.getCost());
 
             pushNotificationService.send(PushNotificationIdentifierEnum.TRIP_END, notificationPayload, riderAndroidId);
@@ -469,16 +471,13 @@ public class DriverService {
         endRideResponseDto.setCity(endRideRequestDto.getCity());
         endRideResponseDto.setPickup(persistedTrip.getStartLocation());
         endRideResponseDto.setDestination(persistedTrip.getEndLocation());
-        endRideResponseDto.setDistance(persistedTrip.getDistance());
+        endRideResponseDto.setDistance(persistedTrip.getDistance() + " km");
         endRideResponseDto.setDuration((persistedTrip.getDuration() / 60) + " minutes");
-        endRideResponseDto.setFare(persistedTrip.getCost());
+        endRideResponseDto.setFare(persistedTrip.getCost().toString());
 
         Map<String, Object> notificationPayload = new HashMap<String, Object>();
-        notificationPayload.put("tripId", persistedTrip.getId());
-        notificationPayload.put("source", persistedTrip.getStartLocation());
-        notificationPayload.put("destination", persistedTrip.getEndLocation());
         notificationPayload.put("duration", (persistedTrip.getDuration() / 60) + " minutes");
-        notificationPayload.put("distance", persistedTrip.getDistance());
+        notificationPayload.put("distance", persistedTrip.getDistance() + " km");
         notificationPayload.put("fare", persistedTrip.getCost());
 
         pushNotificationService.send(PushNotificationIdentifierEnum.TRIP_END, notificationPayload, riderAndroidId);
