@@ -296,6 +296,7 @@ public class DriverService {
 
         Driver driver = new Driver();
         driver.setDriverID(driverEntity.getId());
+        System.out.println(driverEntity.getLocation());
         driver.setDistanceFromRider(
                 locationService.getDistanceBetweenLocations(driverEntity.getLocation(), riderLocation));
         return driver;
