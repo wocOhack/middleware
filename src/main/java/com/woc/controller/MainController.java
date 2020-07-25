@@ -40,7 +40,7 @@ public class MainController {
         userService.createUserCreds(uc);
     }
     
-    @GetMapping("/getOtp")
+    @PostMapping("/getOtp")
     public com.woc.entity.OTP getOTP(@RequestBody PhoneVerificationInitiationRequest phoneVerificationInitiationRequest){
        return otpService.getOTP(phoneVerificationInitiationRequest.getPhoneNumber()); 
     }
