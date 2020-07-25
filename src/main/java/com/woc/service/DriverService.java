@@ -1,13 +1,7 @@
 package com.woc.service;
 
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -395,8 +389,8 @@ public class DriverService {
         trip.setEndLocation(rideRequest.getEndLocation());
 
         trip.setTripStartTime(new Date());
-        trip.setDistance(locationService.getDistanceBetweenLocations(rideRequest.getStartLocation(),
-                rideRequest.getEndLocation()));
+        trip.setDistance(locationService.getDistanceBetweenLocations(rideRequest.getStartLat() + ":" + rideRequest.getStartLong(),
+                rideRequest.getEndLat() + ":" + rideRequest.getEndLong()));
         trip.setStatus(TripStatusEnum.TRIP_IN_PROGRESS.toString());
         trip.setCreatedTime(trip.getTripStartTime());
         trip.setUpdatedTime(trip.getTripStartTime());
@@ -480,6 +474,10 @@ public class DriverService {
         notificationPayload.put("fare", persistedTrip.getCost());
 
         pushNotificationService.send(PushNotificationIdentifierEnum.TRIP_END, notificationPayload, riderAndroidId);
+
+        List<Long> driverId = new ArrayList<>();
+        driverId.add(persistedTrip.getDriverId());
+        driverRepository.updateDriversStatus("Available", driverId);
 
         return endRideResponseDto;
     }
