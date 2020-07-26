@@ -92,7 +92,7 @@ public class RiderController {
         return new ResponseEntity(resp, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @GetMapping("/getProfile")
+    @PostMapping("/getProfile")
     public ResponseEntity getRiderProfile(@RequestBody RiderSearchCriteria searchCriteria) {
         // Rider rider = new Rider();
         // rider.setName("Harry Potter");
@@ -179,7 +179,7 @@ public class RiderController {
         riderService.cancellRideRequest(request);
     }
 
-    @GetMapping("/getTrips")
+    @PostMapping("/getTrips")
     public ResponseEntity getTrips(@RequestBody TripSearchCriteria criteria) {
         List<TripDto> tripDtos = riderService.getRiderTrips(criteria);
         WocResponseBody resp = new WocResponseBody();
