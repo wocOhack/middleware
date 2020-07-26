@@ -75,25 +75,25 @@ public class DriverController {
 
     @PutMapping("/updateProfile")
     public ResponseEntity updateDriverProfile(@RequestBody DriverRegistrationRequest request) {
-        Driver driver = driverService.updateDriver(request.getDriver(), request.getVehicle(), request.getInsurance());
+        Driver d = driverService.updateDriver(request.getDriver(), request.getVehicle(), request.getInsurance());
         WocResponseBody resp = new WocResponseBody();
-        if (driver == null) {
+        if (d == null) {
             resp.setDetailedMessage("DriverId or phoneNumber is required to identify driver");
             resp.setResponseStatus("Bad Request");
             return new ResponseEntity(resp, HttpStatus.BAD_REQUEST);
         }
-        if (driver.getDriverID() == 0) {
+        if (d.getDriverID() == 0) {
             resp.setDetailedMessage("Internal Server Error");
             resp.setResponseStatus("Issue updating Driver");
             return new ResponseEntity(resp, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        resp.setResult(driver);
+        resp.setResult(d);
         resp.setDetailedMessage("OK");
         resp.setResponseStatus("Successfully Updated Driver");
         return new ResponseEntity(resp, HttpStatus.OK);
     }
 
-    @GetMapping("/getProfile")
+    @PostMapping("/getProfile")
     public ResponseEntity getDriverProfile(@RequestBody DriverSearchCriteria searchCriteria) {
         Driver driver = driverService.getDriver(searchCriteria);
         WocResponseBody resp = new WocResponseBody();
@@ -128,17 +128,33 @@ public class DriverController {
         }
     }
 
-    @PostMapping("/updateRideRequest")
-    public ResponseEntity updateRideRequest(@RequestBody RideRequestUpdateObject rideRequestUpdateObject)
-            throws URISyntaxException {
-
-        RideRequest request = riderService.getRideRequest(rideRequestUpdateObject);
+    @PostMapping("/acceptRideRequest")
+    public ResponseEntity acceptRideRequest(@RequestBody AcceptRideRequestDTO acceptRideRequestDTO) {
+        WocResponseBody wocResponseBody = null;
+        RideRequest request = riderService.getRideRequest(acceptRideRequestDTO.getRideId());
         if (null == request || null != request.getDriverId()) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
-        driverService.acceptRideRequest(rideRequestUpdateObject, request);
-        // if found and no driver alloted, then allot the driver, send push notification to rider
-        return new ResponseEntity(HttpStatus.OK);
+        try {
+			driverService.acceptRideRequest(acceptRideRequestDTO.getDriverId(), request);
+		} catch (Exception e) {
+            wocResponseBody = new WocResponseBody();
+            wocResponseBody.setResponseStatus(INTERNAL_ERROR);
+            wocResponseBody.setDetailedMessage(INTERNAL_ERROR_MESSAGE);
+            return new ResponseEntity(wocResponseBody, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        StringBuffer responseBody = new StringBuffer("");
+        responseBody.append("rideId:").append(acceptRideRequestDTO.getRideId()).append(",");
+        responseBody.append("source:").append(request.getStartLocation()).append(",");
+        responseBody.append("destination:").append(request.getEndLocation()).append("}");
+
+      return new ResponseEntity(wocResponseBody, HttpStatus.OK);
+    }
+    
+    @PostMapping("/rejectRideRequest")
+    public ResponseEntity rejectRideRequest(@RequestBody RejectRideRequestDTO rejectRideRequestDTO) {
+
+    	return new ResponseEntity(" ", HttpStatus.OK);
     }
 
     @PostMapping("/initiatePhoneVerification")

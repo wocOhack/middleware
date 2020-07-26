@@ -4,8 +4,6 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.woc.dto.*;
-import com.woc.service.OTPService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,8 +14,22 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.woc.dto.CancellRideRequestObject;
+import com.woc.dto.FeedbackDto;
+import com.woc.dto.PINUpdateRequestObject;
+import com.woc.dto.PhoneVerificationCompletionRequest;
+import com.woc.dto.PhoneVerificationInitiationRequest;
+import com.woc.dto.RideRequestObject;
+import com.woc.dto.Rider;
+import com.woc.dto.RiderLocaionUpdateRequest;
+import com.woc.dto.RiderSearchCriteria;
+import com.woc.dto.RiderVerificationCompletionReply;
+import com.woc.dto.TripDto;
+import com.woc.dto.TripSearchCriteria;
+import com.woc.dto.WocResponseBody;
 import com.woc.entity.ServiceableArea;
 import com.woc.service.DriverService;
+import com.woc.service.OTPService;
 import com.woc.service.RiderService;
 import com.woc.dto.PhoneVerificationInitiationRequest;
 import com.woc.dto.RiderVerificationCompletionReply;
@@ -80,7 +92,7 @@ public class RiderController {
         return new ResponseEntity(resp, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @GetMapping("/getProfile")
+    @PostMapping("/getProfile")
     public ResponseEntity getRiderProfile(@RequestBody RiderSearchCriteria searchCriteria) {
         // Rider rider = new Rider();
         // rider.setName("Harry Potter");
@@ -144,21 +156,30 @@ public class RiderController {
     }
 
     @PostMapping("/requestRide")
-    public void requestRide(@RequestBody RideRequestObject rideRequest) throws URISyntaxException {
-
+    public ResponseEntity requestRide(@RequestBody RideRequestObject rideRequest) {
+    	
+        WocResponseBody wocResponseBody = null;
         long rideRequestID = riderService.createRideRequest(rideRequest);
-        driverService.notifyNearestDrivers(rideRequest.getSourceLocation(), rideRequest.getDestinationLocation(),
-                rideRequestID);
-        return;
+        String sourceLocation = rideRequest.getSourceLattitude() + ":" + rideRequest.getSourceLongitude();
+        try {
+			driverService.notifyNearestDrivers(sourceLocation, rideRequestID);
+			wocResponseBody = new WocResponseBody();
+		} 
+		catch (Exception e) {
+	            wocResponseBody = new WocResponseBody();
+	            wocResponseBody.setResponseStatus(INTERNAL_ERROR);
+	            wocResponseBody.setDetailedMessage(INTERNAL_ERROR_MESSAGE);
+	            return new ResponseEntity(wocResponseBody, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+        return new ResponseEntity(wocResponseBody, HttpStatus.CREATED);
     }
 
     @PostMapping("/cancelRide")
     public void cancelRide(@RequestBody CancellRideRequestObject request) throws URISyntaxException {
         riderService.cancellRideRequest(request);
-        ;
     }
 
-    @GetMapping("/getTrips")
+    @PostMapping("/getTrips")
     public ResponseEntity getTrips(@RequestBody TripSearchCriteria criteria) {
         List<TripDto> tripDtos = riderService.getRiderTrips(criteria);
         WocResponseBody resp = new WocResponseBody();

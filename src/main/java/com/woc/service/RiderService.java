@@ -14,6 +14,7 @@ import com.woc.dto.PINUpdateRequestObject;
 import com.woc.dto.RideRequestObject;
 import com.woc.dto.RideRequestUpdateObject;
 import com.woc.dto.Rider;
+import com.woc.dto.RiderDocuments;
 import com.woc.dto.RiderLocaionUpdateRequest;
 import com.woc.dto.RiderSearchCriteria;
 import com.woc.dto.TripDto;
@@ -130,6 +131,11 @@ public class RiderService {
         request.setRiderId(riderRepository.findByID(rideRequest.getRiderID()));
         request.setEndLocation(rideRequest.getDestinationLocation());
         request.setStartLocation(rideRequest.getSourceLocation());
+        request.setStartLat(rideRequest.getSourceLattitude());
+        request.setEndLat(rideRequest.getDestinationLattitude());
+        request.setStartLong(rideRequest.getSourceLongitude());
+        request.setEndLong(rideRequest.getDestinationLongitude());
+        request.setStartLocation(rideRequest.getSourceLocation());
         riderRequestsRepository.addRideRequest(request);
         return request.getId();
     }
@@ -150,8 +156,8 @@ public class RiderService {
         return;
     }
 
-    public RideRequest getRideRequest(RideRequestUpdateObject requestObject) {
-        return riderRequestsRepository.findById(requestObject.getRideRequestID());
+    public RideRequest getRideRequest(long rideID) {
+        return riderRequestsRepository.findById(rideID);
     }
 
     public Rider updateRider(Rider rider) {
@@ -179,8 +185,8 @@ public class RiderService {
             System.out.println("Gonna update rider with email and name");
             user_update = userRepository.updateUser(rider.getName(), rider.getEmail(), rider.getPhoneNumber(),
                     r.getUserId());
-            // r.setEmail(rider.getEmail());
-            // r.setName(rider.getName());
+             r.setEmail(rider.getEmail());
+             r.setName(rider.getName());
         } else if (rider.getEmail() != null && !rider.getEmail().trim().isEmpty()) {
             System.out.println("Gonna update rider with email alone ");
 
@@ -197,18 +203,22 @@ public class RiderService {
         } else if (rider.getName() != null && !rider.getName().trim().isEmpty()) {
             user_update = userRepository.updateUser(rider.getName(), "", rider.getPhoneNumber(), r.getUserId());
             // return user_update;
-            // r.setName(rider.getName());
+            r.setName(rider.getName());
         }
 
         if (rider.getDocuments() != null || (rider.getDeviceID() != null && !rider.getDeviceID().trim().isEmpty())) {
             user_update = riderRepository.updateRiderData(rider);
-
+            if (rider.getDeviceID() != null && !rider.getDeviceID().trim().isEmpty()) {
+                r.setDeviceID(rider.getDeviceID());
+            }
+            if (rider.getDocuments() != null && rider.getDocuments().getDisabilityProof() != null && !rider.getDocuments().getDisabilityProof().trim().isEmpty()) {
+                RiderDocuments doc = new RiderDocuments();
+                doc.setDisabilityProof(rider.getDocuments().getDisabilityProof());
+            }
         }
 
-        if (user_update == 0) {
-
-        }
-        return riderRepository.getRider(search);
+        System.out.println("rider Updated :" + r.toString());
+        return r;
     }
 
     public Rider updateRiderPin(PINUpdateRequestObject request) {

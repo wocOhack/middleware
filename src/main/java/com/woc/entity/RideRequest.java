@@ -32,6 +32,18 @@ public class RideRequest implements Serializable {
 	@Column(name = "end_location", length = 100)
 	private String endLocation;
 	
+	@Column(name = "start_lat")
+	private Double startLat;
+	
+	@Column(name = "end_lat")
+	private Double endLat;
+	
+	@Column(name = "start_long")
+	private Double startLong;
+	
+	@Column(name = "end_long")
+	private Double endLong;
+	
 	@Column(name = "notified_drivers", length = 200)
 	private String notifiedDrivers;
 	
@@ -78,6 +90,39 @@ public class RideRequest implements Serializable {
 
 	public void setEndLocation(String endLocation) {
 		this.endLocation = endLocation;
+	}
+	
+
+	public Double getStartLat() {
+		return startLat;
+	}
+
+	public void setStartLat(Double startLat) {
+		this.startLat = startLat;
+	}
+
+	public Double getEndLat() {
+		return endLat;
+	}
+
+	public void setEndLat(Double endLat) {
+		this.endLat = endLat;
+	}
+
+	public Double getStartLong() {
+		return startLong;
+	}
+
+	public void setStartLong(Double startLong) {
+		this.startLong = startLong;
+	}
+
+	public Double getEndLong() {
+		return endLong;
+	}
+
+	public void setEndLong(Double endLong) {
+		this.endLong = endLong;
 	}
 
 	public String getNotifiedDrivers() {
