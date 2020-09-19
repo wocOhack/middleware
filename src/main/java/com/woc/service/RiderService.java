@@ -131,6 +131,11 @@ public class RiderService {
         request.setRiderId(riderRepository.findByID(rideRequest.getRiderID()));
         request.setEndLocation(rideRequest.getDestinationLocation());
         request.setStartLocation(rideRequest.getSourceLocation());
+        request.setStartLat(rideRequest.getSourceLattitude());
+        request.setEndLat(rideRequest.getDestinationLattitude());
+        request.setStartLong(rideRequest.getSourceLongitude());
+        request.setEndLong(rideRequest.getDestinationLongitude());
+        request.setStartLocation(rideRequest.getSourceLocation());
         riderRequestsRepository.addRideRequest(request);
         return request.getId();
     }

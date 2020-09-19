@@ -93,7 +93,7 @@ public class DriverController {
         return new ResponseEntity(resp, HttpStatus.OK);
     }
 
-    @GetMapping("/getProfile")
+    @PostMapping("/getProfile")
     public ResponseEntity getDriverProfile(@RequestBody DriverSearchCriteria searchCriteria) {
         Driver driver = driverService.getDriver(searchCriteria);
         WocResponseBody resp = new WocResponseBody();

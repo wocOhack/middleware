@@ -249,7 +249,7 @@ public class DriverRepositoryImpl implements DriverRepository {
 
         for (Long driverid : driverIds) {
             Driver driver = findByID(driverid);
-            driver.setStatus("status");
+            driver.setStatus(status);
             entityManager.merge(driver);
         }
 

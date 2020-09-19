@@ -8,8 +8,10 @@ public class EndRideRequestDto {
 	private String city;
 	private String pickup;
 	private String destination;
-	private Double distance;
-	private Long duration;
+	private Double distanceInMeters;
+	private String distanceStr;
+	private Long durationInSecs;
+	private String durationStr;
 
 	public Long getTripId() {
 		return tripId;
@@ -43,19 +45,35 @@ public class EndRideRequestDto {
 		this.destination = destination;
 	}
 
-	public Double getDistance() {
-		return distance;
+	public Double getDistanceInMeters() {
+		return distanceInMeters;
 	}
 
-	public void setDistance(Double distance) {
-		this.distance = distance;
+	public void setDistanceInMeters(Double distanceInMeters) {
+		this.distanceInMeters = distanceInMeters;
 	}
 
-	public Long getDuration() {
-		return duration;
+	public String getDistanceStr() {
+		return distanceStr;
 	}
 
-	public void setDuration(Long duration) {
-		this.duration = duration;
+	public void setDistanceStr(String distanceStr) {
+		this.distanceStr = distanceStr;
+	}
+
+	public Long getDurationInSecs() {
+		return durationInSecs;
+	}
+
+	public void setDurationInSecs(Long durationInSecs) {
+		this.durationInSecs = durationInSecs;
+	}
+
+	public String getDurationStr() {
+		return durationStr;
+	}
+
+	public void setDurationStr(String durationStr) {
+		this.durationStr = durationStr;
 	}
 }
