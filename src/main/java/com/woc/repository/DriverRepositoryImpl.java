@@ -58,7 +58,6 @@ public class DriverRepositoryImpl implements DriverRepository {
             String number = search.getPhoneNumber();
             List<User> users = entityManager
                     .createNativeQuery("select * from User u where u.phone = " + number, User.class).getResultList();
-            List<com.woc.dto.Rider> allRiders = new ArrayList();
             // for (User u : users) {
             System.out.println("user length : " + users.size());
 
@@ -84,7 +83,7 @@ public class DriverRepositoryImpl implements DriverRepository {
             for (Vehicle each : vehciles) {
                 vehiclesData.put("vehicle1", each.toString());
             }
-           
+
             Driver each = drivers.get(0);
             com.woc.dto.Driver d = new com.woc.dto.Driver();
             d.setEmail(u.getEmail());
@@ -107,6 +106,9 @@ public class DriverRepositoryImpl implements DriverRepository {
             long driverId = search.getDriverID();
             List<Driver> drivers = entityManager
                     .createNativeQuery("select * from Driver d where d.id = " + driverId, Driver.class).getResultList();
+            if (drivers.size() == 0) {
+                return null;
+            }
             Driver driver = drivers.get(0);
             long userid = driver.getUser_id();
 
