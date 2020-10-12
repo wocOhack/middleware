@@ -153,7 +153,20 @@ public class DriverController {
     
     @PostMapping("/rejectRideRequest")
     public ResponseEntity rejectRideRequest(@RequestBody RejectRideRequestDTO rejectRideRequestDTO) {
-
+    	
+    	 WocResponseBody wocResponseBody = null;
+         RideRequest request = riderService.getRideRequest(rejectRideRequestDTO.getRideId());
+         if (null == request || null != request.getDriverId()) {
+             return new ResponseEntity(HttpStatus.NOT_FOUND);
+         }
+         try {
+ 			driverService.rejectRideRequest(rejectRideRequestDTO.getDriverId(), request);
+ 		} catch (Exception e) {
+             wocResponseBody = new WocResponseBody();
+             wocResponseBody.setResponseStatus(INTERNAL_ERROR);
+             wocResponseBody.setDetailedMessage(INTERNAL_ERROR_MESSAGE);
+             return new ResponseEntity(wocResponseBody, HttpStatus.INTERNAL_SERVER_ERROR);
+         }
     	return new ResponseEntity(" ", HttpStatus.OK);
     }
 

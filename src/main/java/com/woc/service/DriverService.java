@@ -74,6 +74,8 @@ public class DriverService {
 
     @Autowired
     PushNotificationService pushNotificationService;
+    
+    private static String DRIVER_STATUS_AVAILABLE="Available";
 
     public void toggleDriverAvailability(long user_id, String status) {
         driverAvailabilityRepository.toggleDriverAvailability(user_id, status);
@@ -262,7 +264,7 @@ public class DriverService {
         pushNotificationService.send(PushNotificationIdentifierEnum.RIDE_REQUEST_FOUND, notificationPayload,
                 androidIds);
 
-        driverRepository.updateDriversStatus("Blocked", notifiedDrivers);
+        driverRepository.updateDriversStatus("Notified", notifiedDrivers);
         updateRideRequestWithNotifiedDrivers(notifiedDrivers,rideRequestID);
     }
 
@@ -315,8 +317,16 @@ public class DriverService {
 
         pushNotificationService.send(PushNotificationIdentifierEnum.DRIVER_ENROUTE, notificationPayload,
                 riderAndroidId);
+        
+        driverRepository.updateDriversStatus(DRIVER_STATUS_AVAILABLE,getNotifiedDriverIDs(rideRequest.getNotifiedDrivers().split(",")));
     }
 
+    public void rejectRideRequest(long driverID, RideRequest rideRequest){
+        
+    	List<Long> driveridsForUpdate = new ArrayList<Long>();
+    	driveridsForUpdate.add(driverID);		
+        driverRepository.updateDriversStatus(DRIVER_STATUS_AVAILABLE,driveridsForUpdate);
+    }
 
     public long updateDriverLocation(DriverLocationUpdateRequest request) {
         return driverRepository.updateDriverLocation(request);
@@ -480,5 +490,14 @@ public class DriverService {
         driverRepository.updateDriversStatus("Available", driverId);
 
         return endRideResponseDto;
+    }
+    
+    private List<Long> getNotifiedDriverIDs(String[] notifiedDriverIDsString) {
+    	
+    	List<Long> notifiedDriverIDs = new ArrayList<Long>();
+    	for(String id: notifiedDriverIDsString) {
+    		notifiedDriverIDs.add(Long.getLong(id));
+    	}
+    	return notifiedDriverIDs;
     }
 }
