@@ -76,6 +76,8 @@ public class DriverService {
     PushNotificationService pushNotificationService;
     
     private static String DRIVER_STATUS_AVAILABLE="Available";
+    
+    private static String IN_TRIP="InTrip";
 
     public void toggleDriverAvailability(long user_id, String status) {
         driverAvailabilityRepository.toggleDriverAvailability(user_id, status);
@@ -261,8 +263,8 @@ public class DriverService {
 
         Map<String, Object> notificationPayload = new HashMap<>();
         notificationPayload.put("rideRequestId", rideRequestID);
-        pushNotificationService.send(PushNotificationIdentifierEnum.RIDE_REQUEST_FOUND, notificationPayload,
-                androidIds);
+        //pushNotificationService.send(PushNotificationIdentifierEnum.RIDE_REQUEST_FOUND, notificationPayload,
+         //       androidIds);
 
         driverRepository.updateDriversStatus("Notified", notifiedDrivers);
         updateRideRequestWithNotifiedDrivers(notifiedDrivers,rideRequestID);
@@ -290,7 +292,6 @@ public class DriverService {
 
         Driver driver = new Driver();
         driver.setDriverID(driverEntity.getId());
-        System.out.println(driverEntity.getLocation());
         driver.setDistanceFromRider(
                 locationService.getDistanceBetweenLocations(driverEntity.getLocation(), riderLocation));
         return driver;
@@ -317,8 +318,12 @@ public class DriverService {
 
         pushNotificationService.send(PushNotificationIdentifierEnum.DRIVER_ENROUTE, notificationPayload,
                 riderAndroidId);
-        
-        driverRepository.updateDriversStatus(DRIVER_STATUS_AVAILABLE,getNotifiedDriverIDs(rideRequest.getNotifiedDrivers().split(",")));
+        List<Long> driveridsForUpdate = new ArrayList<Long>();
+    	driveridsForUpdate.add(driverID);
+        driverRepository.updateDriversStatus(IN_TRIP,driveridsForUpdate);
+        List<Long> notifiedDrivers = getNotifiedDriverIDs(rideRequest.getNotifiedDrivers().split(","));
+        notifiedDrivers.remove(driverID);
+        driverRepository.updateDriversStatus(DRIVER_STATUS_AVAILABLE,notifiedDrivers);
     }
 
     public void rejectRideRequest(long driverID, RideRequest rideRequest){
@@ -496,7 +501,7 @@ public class DriverService {
     	
     	List<Long> notifiedDriverIDs = new ArrayList<Long>();
     	for(String id: notifiedDriverIDsString) {
-    		notifiedDriverIDs.add(Long.getLong(id));
+    		notifiedDriverIDs.add(Long.parseLong(id));
     	}
     	return notifiedDriverIDs;
     }

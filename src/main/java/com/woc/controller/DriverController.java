@@ -167,7 +167,9 @@ public class DriverController {
              wocResponseBody.setDetailedMessage(INTERNAL_ERROR_MESSAGE);
              return new ResponseEntity(wocResponseBody, HttpStatus.INTERNAL_SERVER_ERROR);
          }
-    	return new ResponseEntity(" ", HttpStatus.OK);
+         wocResponseBody.setDetailedMessage("OK");
+         wocResponseBody.setResponseStatus("Successfully Rejected the request");
+    	return new ResponseEntity(wocResponseBody, HttpStatus.OK);
     }
 
     @PostMapping("/initiatePhoneVerification")
