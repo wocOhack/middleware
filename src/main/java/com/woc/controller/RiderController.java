@@ -164,6 +164,8 @@ public class RiderController {
         try {
 			driverService.notifyNearestDrivers(sourceLocation, rideRequestID);
 			wocResponseBody = new WocResponseBody();
+			wocResponseBody.setResponseStatus("OK");
+			wocResponseBody.setDetailedMessage("rideRequestId:"+rideRequestID);
 		} 
 		catch (Exception e) {
 	            wocResponseBody = new WocResponseBody();
