@@ -98,7 +98,7 @@ public class OTPService {
             String response=getResposeBody(httpURLConnection);
             System.out.println(response);
 
-            if(response.equalsIgnoreCase("sent")) return true;
+            if(response.equalsIgnoreCase("sent.")) return true;
             else return false;
         } else {
             return false;
