@@ -213,7 +213,7 @@ public class RiderController {
 
     }
 
-    @PostMapping("/submitFeedBack")
+    @PostMapping("/submitFeedback")
     public ResponseEntity submitFeedBack(@RequestBody FeedbackDto feedbackDto) {
         WocResponseBody wocResponseBody = null;
         try {
